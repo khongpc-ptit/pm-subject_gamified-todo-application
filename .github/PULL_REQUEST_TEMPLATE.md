@@ -31,3 +31,4 @@ Refs #<user_story_id>
 - [ ] Tất cả tests pass (CI green)
 - [ ] Không có conflict với nhánh đích
 - [ ] Đã cập nhật tài liệu (nếu cần)
+

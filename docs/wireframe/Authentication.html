@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication | Questline</title>
+  <style>
+    :root { --green: #345b46; --ink: #242c2c; --muted: #737d79; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      background: #f6f7f2;
+      color: var(--ink);
+      font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+      background: white;
+      border: 1px solid #dde3dc;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgb(36 44 44 / 4%);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 36px; }
+    .brand-mark {
+      width: 36px; height: 38px; display: grid; place-items: center;
+      background: var(--green); color: white; border-radius: 10px;
+      font-size: 26px; font-weight: 750;
+    }
+    .brand-name { font-size: 23px; font-weight: 750; letter-spacing: -1px; }
+    h1 { margin: 0 0 10px; font-size: 29px; line-height: 1.25; letter-spacing: -1px; }
+    .intro { margin: 0 0 30px; color: var(--muted); }
+    [hidden] { display: none !important; }
+    .auth-switch { display: flex; gap: 24px; margin: 0 0 26px; border-bottom: 1px solid #dde3dc; }
+    .auth-switch button {
+      padding: 10px 0; border: 0; border-bottom: 2px solid transparent;
+      background: transparent; color: var(--muted); font-weight: 600; cursor: pointer;
+    }
+    .auth-switch button[aria-pressed="true"] { border-bottom-color: var(--green); color: var(--green); }
+    .field { margin-bottom: 22px; }
+    label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+    input, button { font: inherit; }
+    input {
+      width: 100%; min-width: 0; padding: 12px 14px;
+      background: white; color: var(--ink);
+      border: 1px solid #cdd6cd; border-radius: 8px;
+    }
+    input:focus-visible, button:focus-visible { outline: 2px solid #6c967b; outline-offset: 3px; }
+    input[aria-invalid="true"] { border-color: #ad4338; }
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 66px; }
+    .password-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      min-height: 36px; padding: 5px 9px; border: 0; border-radius: 5px;
+      background: transparent; color: var(--green); font-size: 12px; cursor: pointer;
+    }
+    .error { margin: 6px 0 0; color: #ad4338; font-size: 12px; }
+    .error:empty, .status:empty { display: none; }
+    .submit {
+      width: 100%; min-height: 48px; padding: 12px 16px;
+      border: 1px solid var(--green); border-radius: 8px;
+      background: var(--green); color: white; font-weight: 650; cursor: pointer;
+    }
+    .submit:hover { background: #294b39; }
+    .status { margin: 18px 0 0; padding: 12px; border-radius: 8px; background: #eaf0e6; color: var(--green); font-size: 13px; }
+    .note { margin: 24px 0 0; padding-top: 18px; border-top: 1px solid #e6ebe2; color: var(--muted); font-size: 12px; }
+    @media (max-width: 480px) {
+      body { padding: 20px 16px; }
+      .login-card { padding: 30px 24px; border-radius: 16px; }
+      h1 { font-size: 27px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card" aria-labelledby="login-title">
+    <div class="brand" aria-label="Questline">
+      <span class="brand-mark" aria-hidden="true">q</span>
+      <span class="brand-name">questline</span>
+    </div>
+    <h1 id="login-title">Chào mừng trở lại.</h1>
+    <p class="intro" id="auth-intro">Tiếp tục những mục tiêu còn dang dở.</p>
+    <div class="auth-switch" role="group" aria-label="Chọn hình thức xác thực">
+      <button id="login-mode" type="button" aria-pressed="true" aria-controls="login-form">Đăng nhập</button>
+      <button id="register-mode" type="button" aria-pressed="false" aria-controls="login-form">Đăng ký</button>
+    </div>
+
+    <form id="login-form" novalidate aria-labelledby="login-title">
+      <div class="field" id="full-name-field" hidden>
+        <label for="fullName">Họ và tên</label>
+        <input id="fullName" name="fullName" type="text" autocomplete="name"
+          placeholder="Nguyễn Minh Anh" disabled aria-describedby="fullName-error">
+        <p id="fullName-error" class="error" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username"
+          placeholder="ban@example.com" required aria-describedby="email-error">
+        <p id="email-error" class="error" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="password">Mật khẩu</label>
+        <div class="password-wrap">
+          <input id="password" name="password" type="password"
+            autocomplete="current-password" placeholder="Nhập mật khẩu"
+            required aria-describedby="password-error">
+          <button id="toggle-password" class="password-toggle" type="button"
+            aria-label="Hiện mật khẩu" aria-pressed="false" aria-controls="password">Hiện</button>
+        </div>
+        <p id="password-error" class="error" aria-live="polite"></p>
+      </div>
+      <button class="submit" id="submit-button" type="submit">Đăng nhập</button>
+      <p id="login-status" class="status" role="status"></p>
+    </form>
+    <p class="note">Bản giao diện mẫu. Thông tin xác thực không được lưu hoặc gửi đi.</p>
+  </main>
+
+  <script>
+    const form = document.querySelector('#login-form');
+    const email = document.querySelector('#email');
+    const password = document.querySelector('#password');
+    const toggle = document.querySelector('#toggle-password');
+    const status = document.querySelector('#login-status');
+    const fullName = document.querySelector('#fullName');
+    const loginMode = document.querySelector('#login-mode');
+    const registerMode = document.querySelector('#register-mode');
+    let mode = 'login';
+
+    function resetPasswordVisibility() {
+      password.type = 'password';
+      toggle.textContent = 'Hiện';
+      toggle.setAttribute('aria-label', 'Hiện mật khẩu');
+      toggle.setAttribute('aria-pressed', 'false');
+    }
+
+    function changeMode(nextMode) {
+      mode = nextMode;
+      const registering = mode === 'register';
+      loginMode.setAttribute('aria-pressed', String(!registering));
+      registerMode.setAttribute('aria-pressed', String(registering));
+      document.querySelector('#full-name-field').hidden = !registering;
+      fullName.disabled = !registering;
+      fullName.required = registering;
+      document.querySelector('#login-title').textContent = registering
+        ? 'Bắt đầu hành trình.' : 'Chào mừng trở lại.';
+      document.querySelector('#auth-intro').textContent = registering
+        ? 'Tạo tài khoản để bắt đầu những mục tiêu mới.'
+        : 'Tiếp tục những mục tiêu còn dang dở.';
+      document.querySelector('#submit-button').textContent = registering ? 'Tạo tài khoản' : 'Đăng nhập';
+      password.autocomplete = registering ? 'new-password' : 'current-password';
+      email.autocomplete = registering ? 'email' : 'username';
+      password.value = '';
+      resetPasswordVisibility();
+      [fullName, email, password].forEach(input => setError(input, ''));
+      status.textContent = '';
+    }
+
+    loginMode.addEventListener('click', () => changeMode('login'));
+    registerMode.addEventListener('click', () => changeMode('register'));
+
+    function setError(input, message) {
+      document.getElementById(input.id + '-error').textContent = message;
+      input.setAttribute('aria-invalid', String(Boolean(message)));
+    }
+
+    toggle.addEventListener('click', () => {
+      const show = password.type === 'password';
+      password.type = show ? 'text' : 'password';
+      toggle.textContent = show ? 'Ẩn' : 'Hiện';
+      toggle.setAttribute('aria-label', show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+      toggle.setAttribute('aria-pressed', String(show));
+    });
+
+    [fullName, email, password].forEach(input => {
+      input.addEventListener('input', () => {
+        setError(input, '');
+        status.textContent = '';
+      });
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      status.textContent = '';
+      const emailError = !email.value.trim()
+        ? 'Vui lòng nhập email.'
+        : !email.validity.valid ? 'Email chưa đúng định dạng.' : '';
+      const passwordError = !password.value.trim() ? 'Vui lòng nhập mật khẩu.' : '';
+      const nameError = mode === 'register' && !fullName.value.trim()
+        ? 'Vui lòng nhập họ và tên.' : '';
+      setError(fullName, nameError);
+      setError(email, emailError);
+      setError(password, passwordError);
+      if (nameError || emailError || passwordError) {
+        (nameError ? fullName : emailError ? email : password).focus();
+        return;
+      }
+      // Khi nối backend:
+      // Đăng nhập: POST /api/v1/auth/login, body { email, password }.
+      // Đăng ký: POST /api/v1/auth/register, body { email, password, fullName }.
+      // Prototype chỉ kiểm tra dữ liệu; chưa tạo tài khoản hoặc phiên đăng nhập.
+      status.textContent = mode === 'register'
+        ? 'Dữ liệu đăng ký hợp lệ. Chưa tạo tài khoản vì chưa kết nối backend.'
+        : 'Dữ liệu đăng nhập hợp lệ. Chưa kết nối hệ thống đăng nhập.';
+      password.value = '';
+      resetPasswordVisibility();
+    });
+  </script>
+</body>
+</html>

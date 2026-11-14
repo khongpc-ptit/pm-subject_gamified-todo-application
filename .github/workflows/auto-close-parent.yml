@@ -84,3 +84,4 @@ jobs:
               const openSubs = subIssues.filter(sub => sub.state !== 'CLOSED');
               console.log(`${openSubs.length} sub-issue(s) still open. Parent #${parent.number} stays open.`);
             }
+

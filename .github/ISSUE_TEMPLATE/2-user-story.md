@@ -24,3 +24,4 @@ assignees: ''
 <!-- Ghi chú bổ sung, edge cases, out-of-scope -->
 
 > 💡 **Nhắc nhở:** Hãy chọn **Milestone** (Sprint) ở cột bên phải trước khi submit.
+
