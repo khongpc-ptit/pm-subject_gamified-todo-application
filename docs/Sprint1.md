@@ -22,38 +22,38 @@
 
 ### PHẦN A: [FEAT-01] Quản lý công việc (Task Management)
 
-| Mã | #ID | Tiêu đề | Phân cấp | Assignee | Milestone | Deadline | Trạng thái | Link |
-|---|---|---|---|---|---|---|---|---|
-| **FEAT-01** | [#16](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/16) | [FEAT-01] Quản lý công việc (Task Management) | Root Feature | *Chưa phân công* | *Không gán* | 13/11/2026 | In Progress | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/16) |
-| **US-S1-01** | [#18](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/18) | [US-S1-01] Tạo công việc cần làm | Sub-issue của #16 | @kiennarutonbmn1 | Sprint 1 | 12/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/18) |
-| **TECH-S1-02** | [#28](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/28) | [TECH-S1-02] Triển khai chức năng tạo công việc (Frontend + Backend) | Sub-issue của #18 | @kiennarutonbmn1 | Sprint 1 | 10/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/28) |
-| **US-S1-02** | [#19](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/19) | [US-S1-02] Xem danh sách công việc | Sub-issue của #16 | @khongpc-ptit | Sprint 1 | 12/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/19) |
-| **TECH-S1-03** | [#29](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/29) | [TECH-S1-03] Triển khai chức năng xem danh sách công việc (Frontend + Backend) | Sub-issue của #19 | @khongpc-ptit | Sprint 1 | 10/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/29) |
-| **US-S1-03** | [#20](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/20) | [US-S1-03] Cập nhật công việc | Sub-issue của #16 | @mhunglee20405 | Sprint 1 | 12/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/20) |
-| **TECH-S1-04** | [#30](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30) | [TECH-S1-04] Triển khai chức năng cập nhật công việc (Frontend + Backend) | Sub-issue của #20 | @mhunglee20405 | Sprint 1 | 10/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30) |
-| **US-S1-04** | [#21](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/21) | [US-S1-04] Đánh dấu công việc đã hoàn thành | Sub-issue của #16 | @kiennarutonbmn1 | Sprint 1 | 12/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/21) |
-| **TECH-S1-05** | [#31](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/31) | [TECH-S1-05] Triển khai chức năng hoàn thành công việc (Frontend + Backend) | Sub-issue của #21 | @kiennarutonbmn1 | Sprint 1 | 09/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/31) |
-| **TECH-S1-01** | [#27](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/27) | [TECH-S1-01] Xác định Task Data Model & API Contract | Sub-issue của #16 (Shared) | @khongpc-ptit | Sprint 1 | 07/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/27) |
-| **TECH-S1-06** | [#32](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/32) | [TECH-S1-06] Kiểm thử tích hợp Task Management | Sub-issue của #16 (Shared) | @mhunglee20405<br>@khongpc-ptit<br>@kiennarutonbmn1 | Sprint 1 | 13/11/2026 | Ready | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/32) |
+| Mã | #ID | Tiêu đề | Phân cấp | Assignee | Milestone | Deadline | Link |
+|---|---|---|---|---|---|---|---|
+| **FEAT-01** | [#16](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/16) | [FEAT-01] Quản lý công việc (Task Management) | Root Feature | *Chưa phân công* | *Không gán* | 13/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/16) |
+| **US-S1-01** | [#18](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/18) | [US-S1-01] Tạo công việc cần làm | Sub-issue của #16 | `@kiennarutonbmn1` | Sprint 1 | 12/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/18) |
+| **TECH-S1-02** | [#28](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/28) | [TECH-S1-02] Triển khai chức năng tạo công việc (Frontend + Backend) | Sub-issue của #18 | `@kiennarutonbmn1` | Sprint 1 | 10/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/28) |
+| **US-S1-02** | [#19](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/19) | [US-S1-02] Xem danh sách công việc | Sub-issue của #16 | `@khongpc-ptit` | Sprint 1 | 12/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/19) |
+| **TECH-S1-03** | [#29](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/29) | [TECH-S1-03] Triển khai chức năng xem danh sách công việc (Frontend + Backend) | Sub-issue của #19 | `@khongpc-ptit` | Sprint 1 | 10/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/29) |
+| **US-S1-03** | [#20](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/20) | [US-S1-03] Cập nhật công việc | Sub-issue của #16 | `@mhunglee20405` | Sprint 1 | 12/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/20) |
+| **TECH-S1-04** | [#30](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30) | [TECH-S1-04] Triển khai chức năng cập nhật công việc (Frontend + Backend) | Sub-issue của #20 | `@mhunglee20405` | Sprint 1 | 10/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30) |
+| **US-S1-04** | [#21](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/21) | [US-S1-04] Đánh dấu công việc đã hoàn thành | Sub-issue của #16 | `@kiennarutonbmn1` | Sprint 1 | 12/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/21) |
+| **TECH-S1-05** | [#31](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/31) | [TECH-S1-05] Triển khai chức năng hoàn thành công việc (Frontend + Backend) | Sub-issue của #21 | `@kiennarutonbmn1` | Sprint 1 | 09/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/31) |
+| **TECH-S1-01** | [#27](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/27) | [TECH-S1-01] Xác định Task Data Model & API Contract | Sub-issue của #16 (Shared) | `@khongpc-ptit` | Sprint 1 | 07/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/27) |
+| **TECH-S1-06** | [#32](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/32) | [TECH-S1-06] Kiểm thử tích hợp Task Management | Sub-issue của #16 (Shared) | `@mhunglee20405`<br>`@khongpc-ptit`<br>`@kiennarutonbmn1` | Sprint 1 | 13/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/32) |
 
 ---
 
 ### PHẦN B: [FEAT-02] Xác thực người dùng & Quản lý tài khoản
 
-| Mã | #ID | Tiêu đề | Phân cấp | Assignee | Milestone | Deadline | Trạng thái | Link |
-|---|---|---|---|---|---|---|---|---|
-| **FEAT-02** | [#17](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/17) | [FEAT-02] Xác thực người dùng & Quản lý tài khoản (User Authentication & Account Management) | Root Feature | *Chưa phân công* | *Không gán* | 14/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/17) |
-| **US-S1-05** | [#22](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/22) | [US-S1-05] Đăng ký tài khoản | Sub-issue của #17 | @khongpc-ptit | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/22) |
-| **TECH-S1-08** | [#34](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34) | [TECH-S1-08] Triển khai chức năng đăng ký tài khoản (Frontend + Backend) | Sub-issue của #22 | @khongpc-ptit | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34) |
-| **US-S1-06** | [#23](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/23) | [US-S1-06] Đăng nhập và đăng xuất | Sub-issue của #17 | @kiennarutonbmn1 | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/23) |
-| **TECH-S1-09** | [#35](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/35) | [TECH-S1-09] Triển khai chức năng đăng nhập, đăng xuất & quản lý phiên (Frontend + Backend) | Sub-issue của #23 | @kiennarutonbmn1 | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/35) |
-| **US-S1-07** | [#24](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/24) | [US-S1-07] Xem hồ sơ người dùng | Sub-issue của #17 | @mhunglee20405 | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/24) |
-| **US-S1-08** | [#25](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/25) | [US-S1-08] Cập nhật hồ sơ người dùng | Sub-issue của #17 | @mhunglee20405 | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/25) |
-| **TECH-S1-10** | [#36](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/36) | [TECH-S1-10] Triển khai chức năng xem & cập nhật hồ sơ người dùng (Frontend + Backend) | Sub-issue của #24 (Refs #25) | @mhunglee20405 | Sprint 1 | *Chưa thiết lập* | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/36) |
-| **US-S1-09** | [#26](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/26) | [US-S1-09] Đặt lại mật khẩu đã quên | Sub-issue của #17 | @kiennarutonbmn1 | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/26) |
-| **TECH-S1-11** | [#37](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/37) | [TECH-S1-11] Triển khai chức năng đặt lại mật khẩu đã quên (Frontend + Backend + Email) | Sub-issue của #26 | @kiennarutonbmn1 | Sprint 1 | 18/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/37) |
-| **TECH-S1-07** | [#33](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/33) | [TECH-S1-07] Xác định User Data Model & Authentication API Contract | Sub-issue của #17 (Shared) | @khongpc-ptit | Sprint 1 | 17/11/2026 | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/33) |
-| **TECH-S1-12** | [#38](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) | [TECH-S1-12] Kiểm thử tích hợp Authentication & Account Management | Sub-issue của #17 (Shared) | @mhunglee20405<br>@khongpc-ptit<br>@kiennarutonbmn1 | Sprint 1 | *Chưa thiết lập* | To Do | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) |
+| Mã | #ID | Tiêu đề | Phân cấp | Assignee | Milestone | Deadline | Link |
+|---|---|---|---|---|---|---|---|
+| **FEAT-02** | [#17](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/17) | [FEAT-02] Xác thực người dùng & Quản lý tài khoản (User Authentication & Account Management) | Root Feature | *Chưa phân công* | *Không gán* | 14/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/17) |
+| **US-S1-05** | [#22](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/22) | [US-S1-05] Đăng ký tài khoản | Sub-issue của #17 | `@khongpc-ptit` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/22) |
+| **TECH-S1-08** | [#34](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34) | [TECH-S1-08] Triển khai chức năng đăng ký tài khoản (Frontend + Backend) | Sub-issue của #22 | `@khongpc-ptit` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34) |
+| **US-S1-06** | [#23](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/23) | [US-S1-06] Đăng nhập và đăng xuất | Sub-issue của #17 | `@kiennarutonbmn1` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/23) |
+| **TECH-S1-09** | [#35](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/35) | [TECH-S1-09] Triển khai chức năng đăng nhập, đăng xuất & quản lý phiên (Frontend + Backend) | Sub-issue của #23 | `@kiennarutonbmn1` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/35) |
+| **US-S1-07** | [#24](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/24) | [US-S1-07] Xem hồ sơ người dùng | Sub-issue của #17 | `@mhunglee20405` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/24) |
+| **US-S1-08** | [#25](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/25) | [US-S1-08] Cập nhật hồ sơ người dùng | Sub-issue của #17 | `@mhunglee20405` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/25) |
+| **TECH-S1-10** | [#36](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/36) | [TECH-S1-10] Triển khai chức năng xem & cập nhật hồ sơ người dùng (Frontend + Backend) | Sub-issue của #24 (Refs #25) | `@mhunglee20405` | Sprint 1 | *Chưa thiết lập* | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/36) |
+| **US-S1-09** | [#26](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/26) | [US-S1-09] Đặt lại mật khẩu đã quên | Sub-issue của #17 | `@kiennarutonbmn1` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/26) |
+| **TECH-S1-11** | [#37](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/37) | [TECH-S1-11] Triển khai chức năng đặt lại mật khẩu đã quên (Frontend + Backend + Email) | Sub-issue của #26 | `@kiennarutonbmn1` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/37) |
+| **TECH-S1-07** | [#33](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/33) | [TECH-S1-07] Xác định User Data Model & Authentication API Contract | Sub-issue của #17 (Shared) | `@khongpc-ptit` | Sprint 1 | 17/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/33) |
+| **TECH-S1-12** | [#38](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) | [TECH-S1-12] Kiểm thử tích hợp Authentication & Account Management | Sub-issue của #17 (Shared) | `@mhunglee20405`<br>`@khongpc-ptit`<br>`@kiennarutonbmn1` | Sprint 1 | *Chưa thiết lập* | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) |
 
 ---
 
@@ -105,7 +105,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-01] Xác định Task Data Model & API Contract
-- [ ] **Trạng thái:** `Ready` (Sẵn sàng triển khai)
+- [ ] **Trạng thái:** Chưa thực hiện
 - **GitHub Issue:** [#27](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/27) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue trực tiếp của [FEAT-01] (#16) | **Refs:** #18, #19, #20, #21
 - **Người phụ trách:** `@khongpc-ptit` | **Hạn chót:** `07/11/2026`
@@ -159,7 +159,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-02] Triển khai chức năng tạo công việc (Frontend + Backend)
-- [ ] **Trạng thái:** `Ready` (Sẵn sàng triển khai)
+- [ ] **Trạng thái:** Chưa thực hiện
 - **GitHub Issue:** [#28](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/28) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-01] (#18) | **Feature cha:** [FEAT-01] (#16)
 - **Người phụ trách:** `@kiennarutonbmn1` | **Hạn chót:** `10/11/2026`
@@ -219,7 +219,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-03] Triển khai chức năng xem danh sách công việc (Frontend + Backend)
-- [ ] **Trạng thái:** `Ready` (Sẵn sàng triển khai)
+- [ ] **Trạng thái:** Chưa thực hiện
 - **GitHub Issue:** [#29](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/29) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-02] (#19) | **Feature cha:** [FEAT-01] (#16)
 - **Người phụ trách:** `@khongpc-ptit` | **Hạn chót:** `10/11/2026`
@@ -278,7 +278,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-04] Triển khai chức năng cập nhật công việc (Frontend + Backend)
-- [ ] **Trạng thái:** `Ready` (Sẵn sàng triển khai)
+- [ ] **Trạng thái:** Chưa thực hiện
 - **GitHub Issue:** [#30](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-03] (#20) | **Feature cha:** [FEAT-01] (#16)
 - **Người phụ trách:** `@mhunglee20405` | **Hạn chót:** `10/11/2026`
@@ -335,7 +335,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-05] Triển khai chức năng hoàn thành công việc (Frontend + Backend)
-- [ ] **Trạng thái:** `Ready` (Sẵn sàng triển khai)
+- [ ] **Trạng thái:** Chưa thực hiện
 - **GitHub Issue:** [#31](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/31) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-04] (#21) | **Feature cha:** [FEAT-01] (#16)
 - **Người phụ trách:** `@kiennarutonbmn1` | **Hạn chót:** `09/11/2026`
@@ -389,7 +389,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-06] Kiểm thử tích hợp Task Management
-- [ ] **Trạng thái:** `Ready` (Sẵn sàng triển khai)
+- [ ] **Trạng thái:** Chưa thực hiện
 - **GitHub Issue:** [#32](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/32) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue trực tiếp của [FEAT-01] (#16) | **Refs:** #18, #19, #20, #21
 - **Người phụ trách:** `@mhunglee20405`, `@khongpc-ptit`, `@kiennarutonbmn1` | **Hạn chót:** `13/11/2026`
