@@ -149,3 +149,4 @@ Nếu trong quá trình làm việc, một tài liệu trong `docs/` được c�
 1. Agent phải so sánh nội dung mới với mã nguồn hiện tại.
 2. Nếu có sự sai khác về API Contract, Schema hoặc Validation Rule, **ưu tiên tuân theo file tài liệu mới nhất trong `docs/`**.
 3. Cập nhật lại ghi chú tương ứng trong `docs/Sprint1.md` để đảm bảo tính đồng bộ giữa tiến độ và thiết kế kỹ thuật.
+
