@@ -1,10 +1,18 @@
-const jwt = require('jsonwebtoken');
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
-const verifyToken = (req, res, next) => {
+interface DecodedToken {
+  id: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+}
+
+export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       error: {
         code: 'UNAUTHORIZED',
@@ -12,20 +20,21 @@ const verifyToken = (req, res, next) => {
       },
       timestamp: new Date().toISOString()
     });
+    return;
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
     const secret = process.env.JWT_SECRET || 'supersecretkey_gamified_todo_sprint1';
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, secret) as DecodedToken;
     req.user = {
       id: decoded.id,
       email: decoded.email
     };
     next();
   } catch (error) {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       error: {
         code: 'UNAUTHORIZED',
@@ -35,5 +44,3 @@ const verifyToken = (req, res, next) => {
     });
   }
 };
-
-module.exports = { verifyToken };

@@ -1,4 +1,11 @@
-const notFoundHandler = (req, res, next) => {
+import { Request, Response, NextFunction } from 'express';
+
+export interface AppError extends Error {
+  statusCode?: number;
+  code?: string;
+}
+
+export const notFoundHandler = (req: Request, res: Response, _next: NextFunction): void => {
   res.status(404).json({
     success: false,
     error: {
@@ -9,7 +16,12 @@ const notFoundHandler = (req, res, next) => {
   });
 };
 
-const errorHandler = (err, req, res, next) => {
+export const errorHandler = (
+  err: AppError,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+): void => {
   if (process.env.NODE_ENV !== 'test') {
     console.error('[Error Middleware]:', err);
   }
@@ -27,5 +39,3 @@ const errorHandler = (err, req, res, next) => {
     timestamp: new Date().toISOString()
   });
 };
-
-module.exports = { notFoundHandler, errorHandler };

@@ -1,21 +1,21 @@
-const request = require('supertest');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const app = require('../src/app');
-const { Task } = require('../src/models/Task');
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import { app } from '../src/app';
+import { Task } from '../src/models/Task';
 
 const JWT_SECRET = 'supersecretkey_gamified_todo_sprint1';
 
 // Helper to generate a valid test JWT
-const generateTestToken = (userId, email = 'testuser@example.com') => {
+const generateTestToken = (userId: string, email: string = 'testuser@example.com'): string => {
   return jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '1h' });
 };
 
 describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
   const userA_Id = new mongoose.Types.ObjectId().toString();
   const userB_Id = new mongoose.Types.ObjectId().toString();
-  let tokenUserA;
-  let tokenUserB;
+  let tokenUserA: string;
+  let tokenUserB: string;
 
   beforeAll(() => {
     process.env.JWT_SECRET = JWT_SECRET;
@@ -52,14 +52,14 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
   describe('Truy xuất danh sách công việc (View Task List)', () => {
     it('3. Trả về danh sách rỗng (Empty State) khi người dùng chưa có nhiệm vụ nào', async () => {
       // Mock Task.find trả về mảng rỗng
-      jest.spyOn(Task, 'find').mockImplementation((filter) => {
+      jest.spyOn(Task, 'find').mockImplementation(((filter: any) => {
         expect(filter.user_id).toBe(userA_Id);
         return {
           sort: jest.fn().mockReturnValue({
             lean: jest.fn().mockResolvedValue([])
           })
-        };
-      });
+        } as any;
+      }) as any);
 
       const res = await request(app)
         .get('/api/v1/tasks')
@@ -101,14 +101,14 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
         }
       ];
 
-      jest.spyOn(Task, 'find').mockImplementation((filter) => {
+      jest.spyOn(Task, 'find').mockImplementation(((filter: any) => {
         expect(filter.user_id).toBe(userA_Id);
         return {
           sort: jest.fn().mockReturnValue({
             lean: jest.fn().mockResolvedValue(mockTasks)
           })
-        };
-      });
+        } as any;
+      }) as any);
 
       const res = await request(app)
         .get('/api/v1/tasks')
@@ -136,21 +136,20 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
         }
       ];
 
-      // Khi User B gọi, filter bắt buộc phải là user_id == userB_Id
-      const findSpy = jest.spyOn(Task, 'find').mockImplementation((filter) => {
+      const findSpy = jest.spyOn(Task, 'find').mockImplementation(((filter: any) => {
         if (filter.user_id === userB_Id) {
           return {
             sort: jest.fn().mockReturnValue({
               lean: jest.fn().mockResolvedValue(mockUserBTasks)
             })
-          };
+          } as any;
         }
         return {
           sort: jest.fn().mockReturnValue({
             lean: jest.fn().mockResolvedValue([])
           })
-        };
-      });
+        } as any;
+      }) as any);
 
       const res = await request(app)
         .get('/api/v1/tasks')
@@ -165,7 +164,7 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
 
   describe('Bộ lọc truy vấn (Query Filtering)', () => {
     it('6. Lọc chính xác theo query param status (?status=TODO)', async () => {
-      const findSpy = jest.spyOn(Task, 'find').mockImplementation((filter) => {
+      const findSpy = jest.spyOn(Task, 'find').mockImplementation(((filter: any) => {
         expect(filter.status).toBe('TODO');
         return {
           sort: jest.fn().mockReturnValue({
@@ -179,8 +178,8 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
               }
             ])
           })
-        };
-      });
+        } as any;
+      }) as any);
 
       const res = await request(app)
         .get('/api/v1/tasks?status=TODO')
@@ -205,7 +204,7 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
     });
 
     it('8. Lọc chính xác theo query param priority (?priority=HIGH)', async () => {
-      const findSpy = jest.spyOn(Task, 'find').mockImplementation((filter) => {
+      const findSpy = jest.spyOn(Task, 'find').mockImplementation(((filter: any) => {
         expect(filter.priority).toBe('HIGH');
         return {
           sort: jest.fn().mockReturnValue({
@@ -219,8 +218,8 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
               }
             ])
           })
-        };
-      });
+        } as any;
+      }) as any);
 
       const res = await request(app)
         .get('/api/v1/tasks?priority=HIGH')
@@ -244,17 +243,17 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
     });
 
     it('10. Sắp xếp mặc định sort({ created_at: -1 }) theo thứ tự mới nhất trước', async () => {
-      let sortArgument = null;
-      jest.spyOn(Task, 'find').mockImplementation(() => {
+      let sortArgument: any = null;
+      jest.spyOn(Task, 'find').mockImplementation((() => {
         return {
-          sort: jest.fn().mockImplementation((arg) => {
+          sort: jest.fn().mockImplementation((arg: any) => {
             sortArgument = arg;
             return {
               lean: jest.fn().mockResolvedValue([])
             };
           })
-        };
-      });
+        } as any;
+      }) as any);
 
       const res = await request(app)
         .get('/api/v1/tasks')

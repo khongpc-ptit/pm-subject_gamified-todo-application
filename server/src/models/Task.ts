@@ -1,15 +1,16 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema, Model } from 'mongoose';
+import { ITask, TaskPriority } from '../types/task.types';
 
-const PRIORITY_XP_MAP = {
+export const PRIORITY_XP_MAP: Record<TaskPriority, number> = {
   LOW: 10,
   MEDIUM: 20,
   HIGH: 30
 };
 
-const taskSchema = new mongoose.Schema(
+const taskSchema = new Schema<ITask>(
   {
     user_id: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
       index: true
@@ -59,12 +60,11 @@ const taskSchema = new mongoose.Schema(
 taskSchema.index({ user_id: 1, status: 1 });
 
 // Automatically compute xp_reward based on priority before saving
-taskSchema.pre('save', function (next) {
+taskSchema.pre('save', function (this: ITask, next) {
   if (this.priority && PRIORITY_XP_MAP[this.priority]) {
     this.xp_reward = PRIORITY_XP_MAP[this.priority];
   }
   next();
 });
 
-const Task = mongoose.model('Task', taskSchema);
-module.exports = { Task, PRIORITY_XP_MAP };
+export const Task: Model<ITask> = mongoose.model<ITask>('Task', taskSchema);

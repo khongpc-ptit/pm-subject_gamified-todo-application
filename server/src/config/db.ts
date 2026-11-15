@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const connectDB = async () => {
+export const connectDB = async (): Promise<typeof mongoose> => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/gamified_todo');
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/gamified_todo';
+    const conn = await mongoose.connect(mongoUri);
     console.log(`[MongoDB] Connected: ${conn.connection.host}`);
     return conn;
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[MongoDB] Connection error: ${error.message}`);
-    // Do not exit in test environment so tests can handle gracefully
     if (process.env.NODE_ENV !== 'test') {
       process.exit(1);
     }
@@ -15,13 +15,11 @@ const connectDB = async () => {
   }
 };
 
-const disconnectDB = async () => {
+export const disconnectDB = async (): Promise<void> => {
   try {
     await mongoose.connection.close();
     console.log('[MongoDB] Connection closed.');
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[MongoDB] Error disconnecting: ${error.message}`);
   }
 };
-
-module.exports = { connectDB, disconnectDB };
