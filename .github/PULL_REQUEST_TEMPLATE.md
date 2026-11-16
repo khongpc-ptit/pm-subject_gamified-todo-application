@@ -1,8 +1,7 @@
 ## 🔗 Liên kết Issues
 
-<!-- BẮT BUỘC: Khai báo đúng Technical Task và User Story liên quan -->
+<!-- BẮT BUỘC: Khai báo đúng Technical Task liên quan -->
 Closes #<tech_task_id>
-Refs #<user_story_id>
 
 ## 📝 Tóm tắt thay đổi
 <!-- Mô tả ngắn gọn những gì đã thay đổi và tại sao -->
