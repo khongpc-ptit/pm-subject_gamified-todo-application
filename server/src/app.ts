@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
 import taskRoutes from './routes/task.routes';
 import { notFoundHandler, errorHandler } from './middlewares/error.middleware';
 
@@ -20,10 +21,37 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
-// Health check endpoint
+// Health check endpoint (gốc)
 app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health check API v1 (chuẩn JSON Envelope Pattern theo DOC-11)
+app.get('/api/v1/health', (_req: Request, res: Response) => {
+  const dbState = mongoose.connection.readyState;
+  const dbStatusMap: Record<number, string> = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
+  const isConnected = dbState === 1;
+
+  res.status(200).json({
+    success: true,
+    data: {
+      status: 'UP',
+      database: dbStatusMap[dbState] || 'unknown',
+      databaseConnected: isConnected,
+      environment: process.env.NODE_ENV || 'development'
+    },
+    message: isConnected
+      ? 'System is healthy and database is connected'
+      : 'System is running but database is disconnected',
     timestamp: new Date().toISOString()
   });
 });

@@ -6,31 +6,30 @@ labels: tech-task
 assignees: ''
 ---
 
-## 🔧 Chi tiết kỹ thuật
-<!-- Mô tả chi tiết công việc kỹ thuật cần thực hiện -->
+## Chi tiết kỹ thuật
+*(Mô tả chi tiết công việc kỹ thuật cần thực hiện)*
 
 
-## ✅ Definition of Done
+## Definition of Done
 - [ ] Code hoàn thành và đáp ứng yêu cầu kỹ thuật
 - [ ] Unit test / Integration test pass
 - [ ] Code review approved
 - [ ] Không còn lỗi blocking
 
-## 🔗 Quan hệ & Phụ thuộc (Dependencies)
-- **User Story / Feature (Trello):** <!-- Mã US/FEAT trên Trello, VD: [US-S1-01] -->
-- **Deadline:** <!-- DD/MM/YYYY -->
-- **Người phụ trách:** <!-- Tên thành viên -->
-- **Blocked by (Chờ task này xong trước):** <!-- VD: #1, #2 hoặc Không có -->
-- **Blocks (Đang chặn các task sau):** <!-- VD: #3, #4 hoặc Không có -->
-- **Tài liệu tham chiếu:** 
+## Quan hệ & Phụ thuộc (Dependencies)
+- **User Story / Feature (Trello):** [US-S1-xx]
+- **Deadline:** DD/MM/YYYY
+- **Người phụ trách:** @username
+- **Blocked by (Chờ task này xong trước):** Không có (hoặc #1, #2)
+- **Blocks (Đang chặn các task sau):** Không có (hoặc #3, #4)
+- **Tài liệu tham chiếu:** DOC-11 System Design, API Contract
 
-## 🌿 Quy chuẩn Branch & PR
-- **Branch:** `feat/tech-s1-xx-ten-mo-ta`
-- **PR Title:** `[TECH-S1-xx] Mô tả ngắn`
-- **PR Body:** Bắt buộc khai báo:
-  Closes #<tech_task_id>
+## Quy chuẩn Branch & PR
+- **Branch:** feat/tech-s1-xx-ten-mo-ta
+- **PR Title:** [TECH-S1-xx] Mô tả ngắn
+- **PR Body:** Bắt buộc khai báo Closes #<tech_task_id>
 
-## 📝 Ghi chú
-<!-- Dependencies, risks, technical notes -->
+## Ghi chú
+*(Ghi chú thêm về rủi ro, phụ thuộc hoặc giải pháp kỹ thuật)*
 
-> 💡 **Nhắc nhở:** Hãy chọn **Milestone** (Sprint) và **Assignee** ở cột bên phải trước khi submit.
+> Nhắc nhở: Hãy chọn Milestone (Sprint) và Assignee ở cột bên phải trước khi submit.

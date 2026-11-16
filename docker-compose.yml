@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # MongoDB Database Service
+  mongodb:
+    image: mongo:7.0
+    container_name: gamified-todo-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: gamified_todo
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - gamified-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Web-based MongoDB Admin GUI (Mongo Express)
+  mongo-express:
+    image: mongo-express:1.0.2-no-distroless
+    container_name: gamified-todo-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - gamified-network
+
+volumes:
+  mongodb_data:
+    driver: local
+    name: gamified-todo-mongodb-data
+
+networks:
+  gamified-network:
+    driver: bridge

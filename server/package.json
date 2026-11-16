@@ -33,13 +33,5 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.23.15",
     "typescript": "~5.7.3"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/tests/**/*.test.ts"
-    ],
-    "verbose": true
   }
 }

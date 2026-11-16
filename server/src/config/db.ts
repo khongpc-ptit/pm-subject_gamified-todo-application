@@ -1,10 +1,20 @@
 import mongoose from 'mongoose';
 
-export const connectDB = async (): Promise<typeof mongoose> => {
+/**
+ * Kết nối tới cơ sở dữ liệu MongoDB (Docker local hoặc MongoDB Atlas Cloud)
+ * Áp dụng Connection Pooling và timeout theo chuẩn DOC-11 (Mục 1.2 & 4.3)
+ */
+export const connectDB = async (customUri?: string): Promise<typeof mongoose> => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/gamified_todo';
-    const conn = await mongoose.connect(mongoUri);
-    console.log(`[MongoDB] Connected: ${conn.connection.host}`);
+    const mongoUri = customUri || process.env.MONGODB_URI || 'mongodb://localhost:27017/gamified_todo';
+    const conn = await mongoose.connect(mongoUri, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4
+    });
+    const host = conn.connection?.host || 'localhost';
+    console.log(`[MongoDB] Connected successfully to: ${host}`);
     return conn;
   } catch (error: any) {
     console.error(`[MongoDB] Connection error: ${error.message}`);
@@ -15,10 +25,13 @@ export const connectDB = async (): Promise<typeof mongoose> => {
   }
 };
 
+/**
+ * Đóng kết nối MongoDB an toàn khi shutdown hoặc sau khi kết thúc test
+ */
 export const disconnectDB = async (): Promise<void> => {
   try {
-    await mongoose.connection.close();
-    console.log('[MongoDB] Connection closed.');
+    await mongoose.disconnect();
+    console.log('[MongoDB] Connection closed successfully.');
   } catch (error: any) {
     console.error(`[MongoDB] Error disconnecting: ${error.message}`);
   }

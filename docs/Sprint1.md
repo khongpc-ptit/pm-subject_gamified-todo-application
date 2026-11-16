@@ -10,7 +10,7 @@
 
 | Milestone | Due Date | Số issues gán | Ghi chú |
 |---|---|---|---|
-| **Sprint 1** | **2026-11-18** | **21 issues** (9 US + 12 TECH) | Bao phủ các task đến 18/11/2026 |
+| **Sprint 1** | **2026-11-18** | **22 issues** (9 US + 13 TECH) | Bao phủ các task đến 18/11/2026 |
 | **Sprint 2** | **2026-12-02** | 0 | |
 | **Sprint 3** | **2026-12-16** | 0 | |
 | **Sprint 4** | **2026-12-30** | 0 | |
@@ -18,7 +18,13 @@
 
 ---
 
-## 2. Bảng Tổng Hợp 23 Issues Mới Trên GitHub
+## 2. Bảng Tổng Hợp 24 Issues Mới Trên GitHub
+
+### PHẦN 0: Hạ tầng nền tảng dùng chung (Shared Infrastructure)
+
+| Mã | #ID | Tiêu đề | Phân cấp | Assignee | Milestone | Deadline | Link |
+|---|---|---|---|---|---|---|---|
+| **TECH-S1-00** | [#41](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/41) | [TECH-S1-00] Setup Project Structure, Database & ORM Connection | Shared Foundation Task | `@khongpc-ptit` (Khổng Phú Cường) | Sprint 1 | 06/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/41) |
 
 ### PHẦN A: [FEAT-01] Quản lý công việc (Task Management)
 
@@ -61,6 +67,9 @@
 
 ```text
 SPRINT 1
+├── SHARED FOUNDATION TASK (Hạ tầng nền tảng)
+│   └── [TECH-S1-00] Setup Project Structure, Database & ORM Connection (#41) [@khongpc-ptit]
+│
 ├── [FEAT-01] Quản lý công việc (Task Management) (#16)
 │   ├── [US-S1-01] Tạo công việc cần làm (#18)
 │   │   └── [TECH-S1-02] Triển khai chức năng tạo công việc (Frontend + Backend) (#28)
@@ -101,6 +110,66 @@ SPRINT 1
 > 3. Triển khai chuẩn xác các quy tắc nghiệp vụ, validation và kiến trúc.
 > 4. Sao chép trực tiếp mẫu Commit Message và mẫu Form Pull Request đã điền sẵn số `#ID`.
 > 5. Đánh dấu `[x]` vào ô tiến độ khi hoàn thành.
+
+---
+
+### [TECH-S1-00] Setup Project Structure, Database & ORM Connection
+- [x] **Trạng thái:** Đã hoàn thành
+- **GitHub Issue:** [#41](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/41) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
+- **Quan hệ:** Shared Infrastructure Task | **Blocks:** #28, #29, #30, #31, #34, #35, #36, #37
+- **Người phụ trách:** `@khongpc-ptit` (Khổng Phú Cường) | **Hạn chót:** `06/11/2026`
+- **Lệnh tạo Branch:**
+  ```bash
+  git checkout develop && git pull origin develop
+  git checkout -b chore/tech-s1-00-setup-project-db
+  ```
+- **Tài liệu tham chiếu bắt buộc trong `docs/`:**
+  - [`docs/[DOC-11] System Design Document.md`](file:///d:/UNIVERSITY_PTIT/YEAR_4/PM/project/docs/[DOC-11]%20System%20Design%20Document.md):
+    - **Mục 1.2:** Các nguyên tắc thiết kế cốt lõi (Decoupled Client-Server Architecture, Clean Layered Architecture, Connection Pooling).
+    - **Mục 3.2, 3.3:** Mongoose Schema & Database Modeling.
+    - **Mục 4.1:** Chuẩn thiết kế RESTful & Response Envelope Pattern (`success`, `data`, `message`, `timestamp`).
+    - **Mục 5.1:** Cấu trúc phân rã thư mục chuẩn (`client/` và `server/`).
+  - [`README.md`](file:///d:/UNIVERSITY_PTIT/YEAR_4/PM/project/README.md): Hướng dẫn cài đặt và khởi chạy nhanh toàn diện.
+- **Commit Message mẫu:**
+  ```text
+  chore: [TECH-S1-00] setup project structure, database & mongoose connection
+
+  - Initialize clean decoupled project structure for client (React+TS) and server (Node+TS)
+  - Configure MongoDB connection with Mongoose ODM in server/src/config/db.ts
+  - Add GET /api/v1/health check endpoint with database connection status
+  - Add environment variable templates (server/.env.example, client/.env.example, root .env.example)
+  - Write comprehensive setup and developer quick-start guide in README.md
+  - Add database connection integration tests in server/tests/db.test.ts
+  - Update docs/Sprint1.md mapping TECH-S1-00 assignee to @khongpc-ptit
+  ```
+- **Form Pull Request mẫu:**
+  ```markdown
+  ## 🔗 Liên kết Issues
+  Closes #41
+  Refs #16, #17
+
+  ## 📝 Tóm tắt thay đổi
+  Thiết lập hoàn chỉnh cấu trúc dự án Frontend (React + TypeScript) và Backend (Node.js + TypeScript), kết nối cơ sở dữ liệu MongoDB Atlas qua Mongoose ODM kết hợp Connection Pooling, xây dựng endpoint kiểm tra sức khỏe hệ thống /api/v1/health chuẩn JSON Envelope, bổ sung các tệp mẫu biến môi trường và tài liệu khởi chạy nhanh trong README.md.
+
+  ## 📂 Phân loại thay đổi
+  - [x] 🔙 Backend (API, Service, Database)
+  - [x] 🖥️ Frontend (UI, Components, Pages)
+  - [x] 🗃️ Database (Schema, Migration)
+  - [x] 📄 Docs (Tài liệu, Comments)
+  - [x] 🧪 Tests (Unit, Integration, E2E)
+  - [x] ⚙️ Config / CI/CD
+
+  ## 🧪 Hướng dẫn Test
+  1. Kiểm tra cấu trúc thư mục client/ và server/.
+  2. Chạy `npm test` tại server/ để xác nhận 14/14 tests pass (bao gồm tests/db.test.ts).
+  3. Chạy `npm test` tại client/ để xác nhận 8/8 tests pass.
+  4. Khởi chạy máy chủ Backend `npm run dev` và gọi `curl http://localhost:5000/api/v1/health`.
+
+  ## ✅ Checklist trước khi Review
+  - [x] Code/Tài liệu tuân thủ coding conventions của dự án
+  - [x] Self-review đã hoàn thành
+  - [x] Đã cập nhật tài liệu liên quan
+  ```
 
 ---
 
