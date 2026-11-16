@@ -13,7 +13,7 @@ assignees: ''
 
 ## 🔄 Tác động tới các thành viên khác trong nhóm
 - **Biến môi trường mới trong `.env.example`:** <!-- Có / Không (ghi rõ tên biến) -->
-- **Lệnh cần chạy lại sau khi pull nhánh mặc định:** <!-- VD: npm install, docker compose up -d, npx prisma generate -->
+- **Lệnh cần chạy lại sau khi pull nhánh mặc định:** <!-- VD: npm install, npm test, npm run dev -->
 - **Blocked by (Chờ task nào):** 
 - **Blocks (Đang chặn các task nào):** 
 

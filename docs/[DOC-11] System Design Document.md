@@ -10,8 +10,8 @@ Tài liệu Thiết kế Hệ thống (DOC-11) là văn bản kỹ thuật chi t
 
 ### **1.2. Các nguyên tắc thiết kế cốt lõi**
 
-* **Kiến trúc tách biệt hoàn toàn (Decoupled Client-Server Architecture):** Tách biệt độc lập giữa tầng giao diện người dùng (Frontend) và tầng xử lý nghiệp vụ (Backend) thông qua giao tiếp RESTful API chuẩn hóa. Thiết kế này cho phép hai thành viên kỹ thuật (Nguyễn Trung Kiên phụ trách Frontend và Khổng Phú Cường phụ trách Backend) phát triển và kiểm thử song song.  
-* **Kiến trúc phân tầng sạch (Clean Layered Architecture):** Mã nguồn Backend được tổ chức nghiêm ngặt theo mô hình Controller – Service – Model (sử dụng thư viện Mongoose ODM) nhằm cô lập logic nghiệp vụ, giảm thiểu sự phụ thuộc và hỗ trợ kiểm thử đơn vị (Unit Test) dễ dàng.  
+* **Kiến trúc tách biệt hoàn toàn (Decoupled Client-Server Architecture):** Tách biệt độc lập giữa tầng giao diện người dùng (Frontend \- React TypeScript) và tầng xử lý nghiệp vụ (Backend \- Node.js TypeScript) thông qua giao tiếp RESTful API chuẩn hóa. Thiết kế này cho phép hai thành viên kỹ thuật (Nguyễn Trung Kiên phụ trách Frontend và Khổng Phú Cường phụ trách Backend) phát triển và kiểm thử song song.  
+* **Kiến trúc phân tầng sạch (Clean Layered Architecture):** Mã nguồn Backend (Node.js \+ TypeScript) được tổ chức nghiêm ngặt theo mô hình Controller – Service – Model (sử dụng thư viện Mongoose ODM kết hợp kiểm tra kiểu tĩnh TypeScript) nhằm cô lập logic nghiệp vụ, giảm thiểu sự phụ thuộc và hỗ trợ kiểm thử đơn vị (Unit Test) dễ dàng.  
 * **Mô hình tài liệu linh hoạt (Document-based Data Modeling):** Sử dụng cơ sở dữ liệu MongoDB Atlas (Free Tier M0) cho phép nhúng (embed) các tài liệu con có tần suất truy vấn đồng thời cao (nhật ký check-in thói quen) và tham chiếu (reference bằng ObjectId) đối với các thực thể độc lập, tối ưu hóa tốc độ đọc/ghi dữ liệu.  
 * **Tối ưu hóa tài nguyên với chi phí 0 USD (Cloud Resource Optimization):** Hệ thống được thiết kế theo hướng phi trạng thái (Stateless), tận dụng cơ chế quản lý kết nối tự động (Connection Pooling) của MongoDB Driver để duy trì hoạt động ổn định trong giới hạn tài nguyên miễn phí (512 MB lưu trữ, tối đa 500 kết nối đồng thời).  
 * **Bảo mật và toàn vẹn dữ liệu (Security & Validation):** Tuyệt đối không lưu trữ khóa bảo mật trong mã nguồn; xác thực bằng mã token JWT có thời hạn; áp dụng mã hóa mật khẩu Bcrypt (Salt rounds \= 10); kiểm soát tính toàn vẹn dữ liệu thông qua Mongoose Schema Validation ở tầng ứng dụng.
@@ -60,7 +60,7 @@ Hệ thống sử dụng cơ sở dữ liệu phi quan hệ (NoSQL) MongoDB. Mô
 * priority (String, Enum: \['LOW', 'MEDIUM', 'HIGH'\], Default 'MEDIUM'): Mức độ ưu tiên.  
 * status (String, Enum: \['TODO', 'IN\_PROGRESS', 'COMPLETED'\], Default 'TODO'): Trạng thái thực thi.  
 * due\_date (Date, Nullable): Hạn chót hoàn thành công việc.  
-* xp\_reward (Number, Default 10): Số điểm kinh nghiệm nhận được khi hoàn thành.  
+* xp\_reward (Number, Default 20): Số điểm kinh nghiệm nhận được khi hoàn thành.  
 * completed\_at (Date, Nullable): Thời điểm người dùng đánh dấu hoàn thành.  
 * created\_at (Date, Default Date.now): Thời điểm tạo công việc.
 
@@ -109,11 +109,24 @@ Hệ thống sử dụng cơ sở dữ liệu phi quan hệ (NoSQL) MongoDB. Mô
 
 ### **3.3. Định nghĩa lược đồ Mongoose** 
 
-\`\`\`Implementation model  
-// models/User.js  
-const mongoose \= require('mongoose');
+\`\`\`typescript  
+// src/models/User.ts  
+import mongoose, { Schema, Document } from 'mongoose';
 
-const userSchema \= new mongoose.Schema({  
+export interface IUser extends Document {  
+  email: string;  
+  password\_hash: string;  
+  full\_name: string;  
+  current\_level: number;  
+  total\_xp: number;  
+  current\_streak: number;  
+  last\_active\_date: string \| null;  
+  streak\_freeze\_count: number;  
+  created\_at: Date;  
+  updated\_at: Date;  
+}
+
+const userSchema \= new Schema\<IUser\>({  
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },  
   password\_hash: { type: String, required: true },  
   full\_name: { type: String, required: true, trim: true },  
@@ -124,30 +137,63 @@ const userSchema \= new mongoose.Schema({
   streak\_freeze\_count: { type: Number, default: 1 },  
 }, { timestamps: { createdAt: 'created\_at', updatedAt: 'updated\_at' } });
 
-// models/Task.js  
-const taskSchema \= new mongoose.Schema({  
-  user\_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },  
+export const UserModel \= mongoose.model\<IUser\>('User', userSchema);
+
+// src/models/Task.ts  
+export interface ITask extends Document {  
+  user\_id: mongoose.Types.ObjectId;  
+  title: string;  
+  description: string;  
+  priority: 'LOW' \| 'MEDIUM' \| 'HIGH';  
+  status: 'TODO' \| 'IN\_PROGRESS' \| 'COMPLETED';  
+  due\_date: Date \| null;  
+  xp\_reward: number;  
+  completed\_at: Date \| null;  
+  created\_at: Date;  
+}
+
+const taskSchema \= new Schema\<ITask\>({  
+  user\_id: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },  
   title: { type: String, required: true, trim: true, maxlength: 200 },  
   description: { type: String, default: '' },  
   priority: { type: String, enum: \['LOW', 'MEDIUM', 'HIGH'\], default: 'MEDIUM' },  
   status: { type: String, enum: \['TODO', 'IN\_PROGRESS', 'COMPLETED'\], default: 'TODO', index: true },  
   due\_date: { type: Date, default: null },  
-  xp\_reward: { type: Number, default: 10 },  
+  xp\_reward: { type: Number, default: 20 },  
   completed\_at: { type: Date, default: null }  
 }, { timestamps: { createdAt: 'created\_at', updatedAt: false } });
 
 // Chỉ mục phức hợp tối ưu truy vấn task theo user và status  
 taskSchema.index({ user\_id: 1, status: 1 });
 
-// models/Habit.js  
-const habitLogSchema \= new mongoose.Schema({  
+export const TaskModel \= mongoose.model\<ITask\>('Task', taskSchema);
+
+// src/models/Habit.ts  
+export interface IHabitLog {  
+  log\_date: string;  
+  is\_completed: boolean;  
+  xp\_earned: number;  
+}
+
+export interface IHabit extends Document {  
+  user\_id: mongoose.Types.ObjectId;  
+  title: string;  
+  frequency: 'DAILY' \| 'WEEKLY';  
+  target\_days: number;  
+  current\_streak: number;  
+  is\_active: boolean;  
+  logs: IHabitLog\[\];  
+  created\_at: Date;  
+}
+
+const habitLogSchema \= new Schema\<IHabitLog\>({  
   log\_date: { type: String, required: true }, // Format: YYYY-MM-DD  
   is\_completed: { type: Boolean, default: true },  
   xp\_earned: { type: Number, default: 15 }  
 }, { \_id: false });
 
-const habitSchema \= new mongoose.Schema({  
-  user\_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },  
+const habitSchema \= new Schema\<IHabit\>({  
+  user\_id: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },  
   title: { type: String, required: true, trim: true, maxlength: 200 },  
   frequency: { type: String, enum: \['DAILY', 'WEEKLY'\], default: 'DAILY' },  
   target\_days: { type: Number, default: 7 },  
@@ -158,8 +204,19 @@ const habitSchema \= new mongoose.Schema({
 
 habitSchema.index({ user\_id: 1, is\_active: 1 });
 
-// models/Badge.js  
-const badgeSchema \= new mongoose.Schema({  
+export const HabitModel \= mongoose.model\<IHabit\>('Habit', habitSchema);
+
+// src/models/Badge.ts  
+export interface IBadge extends Document {  
+  code: string;  
+  title: string;  
+  description: string;  
+  icon\_url: string;  
+  condition\_type: 'TASK\_COUNT' \| 'STREAK\_DAYS' \| 'LEVEL\_REACH';  
+  condition\_value: number;  
+}
+
+const badgeSchema \= new Schema\<IBadge\>({  
   code: { type: String, required: true, unique: true },  
   title: { type: String, required: true },  
   description: { type: String, required: true },  
@@ -168,25 +225,45 @@ const badgeSchema \= new mongoose.Schema({
   condition\_value: { type: Number, required: true }  
 });
 
-// models/UserBadge.js  
-const userBadgeSchema \= new mongoose.Schema({  
-  user\_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  
-  badge\_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Badge', required: true },  
+export const BadgeModel \= mongoose.model\<IBadge\>('Badge', badgeSchema);
+
+// src/models/UserBadge.ts  
+export interface IUserBadge extends Document {  
+  user\_id: mongoose.Types.ObjectId;  
+  badge\_id: mongoose.Types.ObjectId;  
+  unlocked\_at: Date;  
+}
+
+const userBadgeSchema \= new Schema\<IUserBadge\>({  
+  user\_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },  
+  badge\_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true },  
   unlocked\_at: { type: Date, default: Date.now }  
 });  
 userBadgeSchema.index({ user\_id: 1, badge\_id: 1 }, { unique: true });
 
-// models/Notification.js  
-const notificationSchema \= new mongoose.Schema({  
-  user\_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },  
+export const UserBadgeModel \= mongoose.model\<IUserBadge\>('UserBadge', userBadgeSchema);
+
+// src/models/Notification.ts  
+export interface INotification extends Document {  
+  user\_id: mongoose.Types.ObjectId;  
+  title: string;  
+  message: string;  
+  type: 'REMINDER' \| 'ACHIEVEMENT' \| 'SYSTEM';  
+  is\_read: boolean;  
+  created\_at: Date;  
+}
+
+const notificationSchema \= new Schema\<INotification\>({  
+  user\_id: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },  
   title: { type: String, required: true },  
   message: { type: String, required: true },  
   type: { type: String, enum: \['REMINDER', 'ACHIEVEMENT', 'SYSTEM'\], default: 'REMINDER' },  
   is\_read: { type: Boolean, default: false }  
 }, { timestamps: { createdAt: 'created\_at', updatedAt: false } });
 
-notificationSchema.index({ user\_id: 1, is\_read: 1 });  
-\`\`\`
+notificationSchema.index({ user\_id: 1, is\_read: 1 });
+
+export const NotificationModel \= mongoose.model\<INotification\>('Notification', notificationSchema);
 
 ### **3.4. Chiến lược chỉ mục trong MongoDB (Indexing Strategy)**
 
@@ -256,9 +333,9 @@ Nhằm duy trì thời gian phản hồi API trung bình dưới 300 ms, hệ th
   * Hoàn thành Task ưu tiên Cao: \+30 XP.  
   * Check-in thói quen thành công trong ngày: \+15 XP.  
 * **Công thức xác định cấp bậc (Level Formula):**  
-  \$\$\\text{Level} \= \\left\\lfloor \\frac{\\sqrt{\\text{Total\\\_XP}}}{10} \\right\\rfloor \+ 1\$\$  
+  Level \= ⌊√(Total\_XP) / 10⌋ \+ 1  
 * **Cơ chế chống gian lận điểm (Anti-gaming / Daily XP Cap):**  
-  * Thiết lập trần nhận kinh nghiệm tối đa trong ngày: $Daily\_XP\_Cap=200XP$. Mọi thao tác hoàn thành task sau khi chạm trần vẫn cập nhật trạng thái nhưng không cộng dồn XP.  
+  * Thiết lập trần nhận kinh nghiệm tối đa trong ngày: Daily\_XP\_Cap \= 200 XP. Mọi thao tác hoàn thành task sau khi chạm trần vẫn cập nhật trạng thái nhưng không cộng dồn XP.  
   * Khi người dùng chuyển trạng thái Task từ COMPLETED ngược lại TODO, hệ thống tự động trừ đi số điểm XP tương ứng đã cộng trước đó.
 
 #### **Cơ chế xử lý chuỗi ngày liên tục và Sai lệch múi giờ (Timezone Handling)**
@@ -266,9 +343,9 @@ Nhằm duy trì thời gian phản hồi API trung bình dưới 300 ms, hệ th
 * **Lưu trữ chuẩn:** Toàn bộ mốc thời gian giao dịch được lưu dưới định dạng chuẩn ISO 8601 UTC trên máy chủ đám mây, các trường ngày hoạt động lưu dưới chuỗi chuẩn YYYY-MM-DD.  
 * **Quy đổi múi giờ người dùng:** Khi tính toán chuỗi ngày liên tục (Daily Streak), hệ thống tự động quy đổi thời gian hiện tại sang múi giờ địa phương Việt Nam (UTC+7).  
 * **Tác vụ quét định kỳ (Scheduled Cronjob):** Thiết lập Cronjob chạy tự động vào lúc 00:05 UTC+7 hàng ngày trên hệ thống Render để kiểm tra trạng thái hoạt động của ngày hôm trước:  
-  * Nếu người dùng có tối thiểu 01 lần ghi nhận hoàn thành (task hoặc habit log với ngày tương ứng): Duy trì và tăng chuỗi $Streak=Streak+1$.  
-  * Nếu người dùng không có hoạt động nhưng còn lượt $streak\_freeze\_count\geq 1$: Tự động tiêu hao 01 lượt đóng băng, giữ nguyên giá trị chuỗi và gửi thông báo nhắc nhở.  
-  * Nếu người dùng không có hoạt động và hết lượt đóng băng: Reset chuỗi $Streak=0$.
+  * Nếu người dùng có tối thiểu 01 lần ghi nhận hoàn thành (task hoặc habit log với ngày tương ứng): Duy trì và tăng chuỗi Streak \= Streak \+ 1\.  
+  * Nếu người dùng không có hoạt động nhưng còn lượt streak\_freeze\_count ≥ 1: Tự động tiêu hao 01 lượt đóng băng, giữ nguyên giá trị chuỗi và gửi thông báo nhắc nhở.  
+  * Nếu người dùng không có hoạt động và hết lượt đóng băng: Reset chuỗi Streak \= 0\.
 
 ## **5\. KẾ HOẠCH TRIỂN KHAI MÃ NGUỒN VÀ BÀN GIAO KỸ THUẬT**
 
@@ -280,24 +357,27 @@ Mã nguồn dự án được tổ chức theo cấu trúc phân rã độc lậ
 gamified-todo-app/  
 ├── .github/  
 │   └── workflows/  
-│       ├── client-ci.yml        \# CI tự động linter và build cho Frontend  
-│       └── server-ci.yml        \# CI tự động linter, test và build cho Backend  
-├── client/                      \# Ứng dụng Next.js (Frontend)  
+│       ├── client-ci.yml        \# CI tự động linter, type-check và build cho Frontend  
+│       └── server-ci.yml        \# CI tự động linter, type-check, test và build cho Backend  
+├── client/                      \# Ứng dụng React \+ TypeScript (Frontend SPA)  
 │   ├── src/  
 │   │   ├── components/          \# Các thành phần UI dùng chung (Button, Modal, BadgeCard)  
-│   │   ├── hooks/               \# Custom hooks quản lý trạng thái và API calls  
-│   │   ├── pages/ (hoặc app/)   \# Khung điều hướng giao diện (Dashboard, Habits, Profile)  
+│   │   ├── hooks/               \# Custom React hooks quản lý trạng thái và API calls  
+│   │   ├── pages/               \# Các trang giao diện điều hướng qua React Router (Dashboard, Habits, Profile)  
 │   │   ├── services/            \# Axios API Client cấu hình base URL và interceptors  
 │   │   └── types/               \# TypeScript interfaces đồng bộ với models Backend  
+│   ├── tsconfig.json            \# Cấu hình trình biên dịch TypeScript cho Frontend  
 │   └── package.json  
-├── server/                      \# Ứng dụng Node.js REST API (Backend)  
+├── server/                      \# Ứng dụng Node.js \+ TypeScript REST API (Backend)  
 │   ├── src/  
-│   │   ├── config/              \# Cấu hình kết nối CSDL (db.js kết nối MongoDB Atlas)  
-│   │   ├── models/              \# Định nghĩa Mongoose Schemas (User, Task, Habit, Badge...)  
+│   │   ├── config/              \# Cấu hình kết nối CSDL (db.ts kết nối MongoDB Atlas)  
+│   │   ├── models/              \# Định nghĩa Mongoose Schemas & TS Interfaces (User.ts, Task.ts, Habit.ts...)  
 │   │   ├── controllers/         \# Tầng tiếp nhận HTTP Request và trả về Envelope JSON  
 │   │   ├── services/            \# Tầng xử lý logic Gamification, Anti-gaming, Cronjobs  
 │   │   ├── middlewares/         \# JWT Auth, Validation, Error Handling Middlewares  
+│   │   ├── types/               \# Định nghĩa kiểu dữ liệu mở rộng (Express Request, DTOs)  
 │   │   └── utils/               \# Hàm bổ trợ quy đổi thời gian ISO, công thức tính Level  
+│   ├── tsconfig.json            \# Cấu hình trình biên dịch TypeScript cho Backend  
 │   └── package.json  
 └── README.md
 

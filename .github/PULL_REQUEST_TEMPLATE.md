@@ -30,7 +30,7 @@
 
 ### C. Nếu là Config / Chore / Docs:
 - **Cấu hình / Thư viện / Tài liệu đã thêm hoặc sửa:** 
-- **Lệnh cần chạy lại ở local sau khi pull (VD: `npm install`, `npx prisma migrate dev`):** 
+- **Lệnh cần chạy lại ở local sau khi pull (VD: `npm install`, `npm test`):** 
 
 ---
 

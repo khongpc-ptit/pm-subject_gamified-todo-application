@@ -1,0 +1,29 @@
+name: Promote unblocked tasks to Ready
+
+on:
+  issues:
+    types: [opened, closed, reopened, edited, milestoned]
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: gtd-auto-ready
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Promote unblocked issues to Ready or Backlog
+        env:
+          GH_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_ORGANIZATION: ${{ github.repository_owner }}
+          PROJECT_TITLE: 'Gamified todo application - group 5'
+        run: node .github/scripts/promote-ready.cjs
