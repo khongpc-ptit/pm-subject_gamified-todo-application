@@ -1,0 +1,33 @@
+{
+  "name": "pm-subject_gamified-todo-application",
+  "version": "1.0.0",
+  "description": "Gamified To-Do Application - PTIT Project Management",
+  "private": true,
+  "scripts": {
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f mongodb",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build:server": "npm --prefix server run build",
+    "build:client": "npm --prefix client run build",
+    "build": "npm run build:server && npm run build:client",
+    "test:server": "npm --prefix server test",
+    "test:client": "npm --prefix client test",
+    "test": "npm run test:server && npm run test:client"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "nodejs",
+    "express",
+    "mongodb",
+    "mongoose",
+    "gamification"
+  ],
+  "author": "Group 5 - PTIT",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^30.0.0"
+  }
+}
