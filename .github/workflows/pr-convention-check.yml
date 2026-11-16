@@ -1,0 +1,135 @@
+name: "PR Convention Check & Status Update"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  convention-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title, body, and update issue status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const prNumber = pr.number;
+            const prTitle = pr.title || '';
+            const prBody = pr.body || '';
+
+            console.log(`Checking PR #${prNumber}: "${prTitle}"`);
+
+            const errors = [];
+
+            // 1. Validate PR Title
+            const titleRegex = /^\[(TECH-S\d+-\d+|BUG-[A-Z0-9-]+|CONF-[A-Z0-9-]+|DOC-[A-Z0-9-]+)\]\s+.+/i;
+            if (!titleRegex.test(prTitle.trim())) {
+              errors.push('- **Tiêu đề PR không đúng chuẩn:** Tiêu đề phải bắt đầu bằng mã công việc trong ngoặc vuông kèm khoảng trắng và mô tả. Ví dụ: `[TECH-S1-02] Triển khai chức năng tạo công việc` hoặc `[BUG-S1-01] Sửa lỗi validation`.');
+            }
+
+            // 2. Validate PR Body for issue linking
+            const bodyLinkRegex = /(Closes|Fixes|Refs)\s+#\d+/i;
+            if (!bodyLinkRegex.test(prBody)) {
+              errors.push('- **Nội dung PR thiếu liên kết Issue hợp lệ:** Bắt buộc phải có từ khóa đóng/liên kết hợp lệ kèm số hiệu Issue (ví dụ: `Closes #28`, `Fixes #15` hoặc `Refs #30`). Không được để trống `Closes #` mà không có số phía sau.');
+            }
+
+            const commentMarker = '<!-- pr-convention-check -->';
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: prNumber
+            });
+            const existingComment = comments.find(c => c.body && c.body.includes(commentMarker));
+
+            // 3. Handle validation failure
+            if (errors.length > 0) {
+              const warningBody = `${commentMarker}\n### ⚠️ Quy chuẩn Pull Request chưa đạt\n\nVui lòng chỉnh sửa lại PR để tuân thủ quy chuẩn của dự án:\n\n${errors.join('\n\n')}\n\n---\n*Hệ thống kiểm tra tự động sẽ kiểm tra lại ngay khi bạn cập nhật Title hoặc Body của PR.*`;
+
+              if (existingComment) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existingComment.id,
+                  body: warningBody
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  body: warningBody
+                });
+              }
+
+              core.setFailed(`Quy chuẩn PR chưa đạt:\n${errors.join('\n')}`);
+              return;
+            }
+
+            // 4. Handle validation success
+            console.log('PR Title and Body conventions are valid!');
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body: `${commentMarker}\n### ✅ Quy chuẩn Pull Request đã đạt!\n\nTiêu đề và cú pháp liên kết Issue đã hoàn toàn hợp lệ.`
+              });
+            }
+
+            // 5. Extract Issue IDs from Closes #<id> or Fixes #<id>
+            const linkedMatches = [...prBody.matchAll(/(?:Closes|Fixes)\s+#(\d+)/gi)].map(m => parseInt(m[1], 10));
+            const uniqueIssueNumbers = [...new Set(linkedMatches)];
+
+            console.log(`Linked issues to update to 'status: in-review': ${uniqueIssueNumbers.join(', ')}`);
+
+            for (const issueNum of uniqueIssueNumbers) {
+              try {
+                const issueRes = await github.rest.issues.get({
+                  owner,
+                  repo,
+                  issue_number: issueNum
+                });
+
+                if (issueRes.data.state !== 'open') {
+                  console.log(`Issue #${issueNum} is already ${issueRes.data.state}. Skipping.`);
+                  continue;
+                }
+
+                const currentLabels = issueRes.data.labels.map(l => (typeof l === 'string' ? l : l.name));
+
+                // Remove 'status: in-progress' or 'status: ready'
+                for (const oldLabel of ['status: in-progress', 'status: ready', 'status: blocked']) {
+                  if (currentLabels.includes(oldLabel)) {
+                    try {
+                      await github.rest.issues.removeLabel({
+                        owner,
+                        repo,
+                        issue_number: issueNum,
+                        name: oldLabel
+                      });
+                    } catch (e) {
+                      console.log(`Notice removing ${oldLabel} from #${issueNum}: ${e.message}`);
+                    }
+                  }
+                }
+
+                // Add 'status: in-review'
+                if (!currentLabels.includes('status: in-review')) {
+                  await github.rest.issues.addLabels({
+                    owner,
+                    repo,
+                    issue_number: issueNum,
+                    labels: ['status: in-review']
+                  });
+                  console.log(`Attached 'status: in-review' to Issue #${issueNum}`);
+                }
+              } catch (err) {
+                console.warn(`Failed to update status for Issue #${issueNum}: ${err.message}`);
+              }
+            }

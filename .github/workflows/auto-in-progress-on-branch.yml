@@ -1,0 +1,129 @@
+name: "Auto In-Progress on Branch"
+
+on:
+  create:
+  push:
+    branches:
+      - 'feat/**'
+      - 'fix/**'
+      - 'chore/**'
+      - 'docs/**'
+      - 'test/**'
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  mark-in-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Match branch with issue and set in-progress
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            let branchName = '';
+
+            if (context.eventName === 'create') {
+              if (context.payload.ref_type !== 'branch') {
+                console.log('Created ref is not a branch. Skipping.');
+                return;
+              }
+              branchName = context.payload.ref;
+            } else if (context.eventName === 'push') {
+              branchName = context.ref.replace('refs/heads/', '');
+            }
+
+            console.log(`Processing branch: "${branchName}" triggered by event "${context.eventName}"`);
+
+            // 1. Extract task identifier from branch name
+            const taskMatch = branchName.match(/(tech-s\d+-\d+|bug-s\d+-\d+|conf-s\d+-\d+|doc-s\d+-\d+)/i) 
+              || branchName.match(/((?:tech|bug|conf|doc)-[a-z0-9-]+)/i);
+
+            if (!taskMatch) {
+              console.log(`Branch "${branchName}" does not match standard task pattern. Skipping.`);
+              return;
+            }
+
+            const taskCode = taskMatch[1].toUpperCase();
+            console.log(`Identified task code: "${taskCode}"`);
+
+            // 2. Search all open issues in the repository
+            const allIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open'
+            });
+
+            const openIssues = allIssues.filter(item => !item.pull_request);
+            const targetIssue = openIssues.find(issue => 
+              issue.title && issue.title.toUpperCase().includes(`[${taskCode}]`)
+            );
+
+            if (!targetIssue) {
+              console.log(`No open issue found with title containing "[${taskCode}]". Skipping.`);
+              return;
+            }
+
+            console.log(`Found matching Issue #${targetIssue.number}: "${targetIssue.title}"`);
+
+            const currentLabels = targetIssue.labels.map(l => (typeof l === 'string' ? l : l.name));
+
+            // Do not downgrade if already in-review
+            if (currentLabels.includes('status: in-review')) {
+              console.log(`Issue #${targetIssue.number} is already in-review. Skipping.`);
+              return;
+            }
+
+            if (currentLabels.includes('status: in-progress')) {
+              console.log(`Issue #${targetIssue.number} is already in-progress.`);
+            } else {
+              // Remove 'status: ready' or 'status: blocked'
+              for (const oldLabel of ['status: ready', 'status: blocked']) {
+                if (currentLabels.includes(oldLabel)) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner,
+                      repo,
+                      issue_number: targetIssue.number,
+                      name: oldLabel
+                    });
+                  } catch (e) {
+                    console.log(`Notice removing ${oldLabel}: ${e.message}`);
+                  }
+                }
+              }
+
+              // Add 'status: in-progress'
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: targetIssue.number,
+                labels: ['status: in-progress']
+              });
+              console.log(`Added 'status: in-progress' to Issue #${targetIssue.number}`);
+            }
+
+            // 3. Post a comment once for this branch
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: targetIssue.number
+            });
+
+            const commentMarker = `Branch \`${branchName}\` đã được khởi tạo`;
+            const alreadyCommented = comments.some(c => c.body && c.body.includes(commentMarker));
+
+            if (!alreadyCommented) {
+              const commentBody = `🚀 Branch \`${branchName}\` đã được khởi tạo bởi @${context.actor}. Trạng thái công việc được tự động chuyển sang **In Progress**.`;
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: targetIssue.number,
+                body: commentBody
+              });
+              console.log(`Posted comment on Issue #${targetIssue.number}`);
+            } else {
+              console.log(`Notification comment for branch "${branchName}" already exists on Issue #${targetIssue.number}.`);
+            }
