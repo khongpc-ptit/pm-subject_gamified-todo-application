@@ -347,7 +347,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-04] Triển khai chức năng cập nhật công việc (Frontend + Backend)
-- [x] **Trạng thái:** Đã hoàn thành
+- [x] **Trạng thái:** Đã hoàn thành (PR #49)
 - **GitHub Issue:** [#30](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-03] (#20) | **Feature cha:** [FEAT-01] (#16)
 - **Người phụ trách:** `@mhunglee20405` | **Hạn chót:** `10/11/2026`

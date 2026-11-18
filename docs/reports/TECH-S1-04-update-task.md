@@ -3,6 +3,7 @@
 > **Ngày thực hiện:** 18/11/2026  
 > **Người thực hiện:** Mạnh Hùng (`@mhunglee20405`)  
 > **Nhánh phát triển:** `feat/tech-s1-04-update-task`  
+> **Pull Request:** [PR #49](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/pull/49) (Target: `develop`)  
 > **User Story cha:** [US-S1-03] Cập nhật công việc (#20) thuộc [FEAT-01] Quản lý công việc (#16)  
 > **Liên kết Issues:** Closes [#30](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30), Refs [#20](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/20)
 
