@@ -814,3 +814,7 @@ SPRINT 1
   - [x] Code test chạy ổn định, không có flaky test
   - [x] Self-review đã hoàn thành
   ```
+
+### TECH-S1-06 verification status
+- Kiên prepared acceptance scenarios in docs/reports/TECH-S1-06-task-integration-test.md.
+- Full integration remains pending feature merges, especially #30. Issue #32 remains incomplete.
