@@ -59,6 +59,29 @@ export class TaskController {
       next(error);
     }
   }
+
+  /**
+   * [US-S1-03 / TECH-S1-04] Cập nhật thông tin công việc
+   * PUT /api/v1/tasks/:id
+   */
+  async updateTask(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const id = req.params.id as string;
+      const updatedTask = await taskService.updateTask(userId, id, req.body);
+
+      const response: ApiSuccessResponse<ITask> = {
+        success: true,
+        data: updatedTask,
+        message: 'Cập nhật nhiệm vụ thành công',
+        timestamp: new Date().toISOString()
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const taskController = new TaskController();
