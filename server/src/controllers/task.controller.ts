@@ -4,6 +4,13 @@ import { ApiSuccessResponse } from '../types/api.types';
 import { ITask, TaskListResponseData } from '../types/task.types';
 
 export class TaskController {
+  async completeTask(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const task = await taskService.completeTask(req.user!.id, String(req.params.id));
+      res.json({ success: true, data: task, message: 'Nhiệm vụ đã được đánh dấu hoàn thành', timestamp: new Date().toISOString() });
+    } catch (error) { next(error); }
+  }
+
   /**
    * [US-S1-02 / TECH-S1-03] Lấy danh sách nhiệm vụ của người dùng
    * GET /api/v1/tasks

@@ -61,6 +61,11 @@ export const INITIAL_MOCK_TASKS: Task[] = [
 ];
 
 export const taskService = {
+  async completeTask(id: string): Promise<Task> {
+    const response = await apiClient.patch<ApiResponse<Task>>(`/tasks/${id}/complete`);
+    if (!response.data.success || !response.data.data) throw new Error('Không thể hoàn thành công việc');
+    return response.data.data;
+  },
   /**
    * Lấy danh sách nhiệm vụ từ API
    * GET /api/v1/tasks

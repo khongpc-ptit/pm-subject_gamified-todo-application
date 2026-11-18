@@ -12,6 +12,24 @@ import {
 import { AppError } from '../middlewares/error.middleware';
 
 export class TaskService {
+  async completeTask(userId: string, taskId: string): Promise<ITask> {
+    if (!/^[a-f0-9]{24}$/i.test(taskId)) {
+      throw Object.assign(new Error('Định danh nhiệm vụ không hợp lệ'), { statusCode: 400, code: 'INVALID_ID' });
+    }
+    const task = await Task.findOneAndUpdate(
+      { _id: taskId, user_id: userId, status: { $ne: 'COMPLETED' } },
+      { $set: { status: 'COMPLETED', completed_at: new Date() } },
+      { new: true, runValidators: true }
+    );
+    if (task) return task;
+    const existing = await Task.findOne({ _id: taskId, user_id: userId });
+    if (existing) return existing;
+    const exists = await Task.exists({ _id: taskId });
+    throw Object.assign(new Error(exists ? 'Bạn không có quyền thao tác trên nhiệm vụ này' : 'Không tìm thấy nhiệm vụ'), {
+      statusCode: exists ? 403 : 404, code: exists ? 'FORBIDDEN' : 'TASK_NOT_FOUND'
+    });
+  }
+
   /**
    * Truy xuất danh sách công việc của người dùng hiện tại
    * @param userId - ID người dùng sở hữu

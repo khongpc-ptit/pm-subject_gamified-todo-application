@@ -556,7 +556,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-08] Triển khai chức năng đăng ký tài khoản (Frontend + Backend)
-- [ ] **Trạng thái:** Chưa thực hiện
+- [x] **Trạng thái:** Đã hoàn thành (PR #50)
 - **GitHub Issue:** [#34](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-05] (#22) | **Feature cha:** [FEAT-02] (#17)
 - **Người phụ trách:** `@khongpc-ptit` | **Hạn chót:** `18/11/2026`
@@ -814,3 +814,7 @@ SPRINT 1
   - [x] Code test chạy ổn định, không có flaky test
   - [x] Self-review đã hoàn thành
   ```
+
+### Implementation update TECH-S1-05
+- Implemented owned, idempotent completion API and frontend interaction on feat/tech-s1-05-complete-task.
+- Build passed. Server 18 tests and client 8 tests passed. Live MongoDB persistence and Tech Lead review pending.

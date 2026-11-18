@@ -7,7 +7,12 @@ import { EditTaskModal } from '../components/EditTaskModal';
 import { useTasks, type DemoState } from '../hooks/useTasks';
 import type { Task, UpdateTaskRequestDTO } from '../types/task.types';
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+  currentUser?: UserProfile | null;
+  onLogout?: () => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout }) => {
   const quickInputRef = useRef<HTMLInputElement>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -44,8 +49,9 @@ export const Dashboard: React.FC = () => {
       {/* 1. Thanh điều hướng Sidebar cố định bên trái */}
       <Sidebar
         currentScreen="dashboard"
-        userName="Minh Anh"
-        userEmail="minhanh@example.com"
+        onLogout={onLogout}
+        userName={currentUser?.full_name || 'Minh Anh'}
+        userEmail={currentUser?.email || 'minhanh@example.com'}
       />
 
       {/* 2. Khung nội dung chính */}
@@ -91,6 +97,7 @@ export const Dashboard: React.FC = () => {
                   error={error}
                   priorityFilter={priorityFilter}
                   onFilterChange={setPriorityFilter}
+                  onToggleComplete={refetch}
                   onRetry={refetch}
                   onFocusCreate={() => quickInputRef.current?.focus()}
                   onEdit={(task) => setEditingTask(task)}
