@@ -4,7 +4,8 @@ import type {
   ListTasksQueryDTO,
   TaskListResponseData,
   ApiResponse,
-  CreateTaskRequestDTO
+  CreateTaskRequestDTO,
+  UpdateTaskRequestDTO
 } from '../types/task.types';
 
 // Dữ liệu mẫu ban đầu theo đúng wireframe Core MVP Screens.html nếu chạy ở chế độ offline preview
@@ -93,5 +94,17 @@ export const taskService = {
       return response.data.data;
     }
     throw new Error(response.data?.message || 'Tạo công việc thất bại');
+  },
+
+  /**
+   * Cập nhật thông tin nhiệm vụ
+   * PUT /api/v1/tasks/:id
+   */
+  async updateTask(id: string, data: UpdateTaskRequestDTO): Promise<Task> {
+    const response = await apiClient.put<ApiResponse<Task>>(`/tasks/${id}`, data);
+    if (response.data && response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    throw new Error(response.data?.message || 'Cập nhật công việc thất bại');
   }
 };

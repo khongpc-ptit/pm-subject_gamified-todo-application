@@ -1,12 +1,16 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { QuickTaskForm } from '../components/QuickTaskForm';
 import { TaskList } from '../components/TaskList';
+import { EditTaskModal } from '../components/EditTaskModal';
 import { useTasks, type DemoState } from '../hooks/useTasks';
+import type { Task, UpdateTaskRequestDTO } from '../types/task.types';
 
 export const Dashboard: React.FC = () => {
   const quickInputRef = useRef<HTMLInputElement>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const {
     tasks,
@@ -19,8 +23,21 @@ export const Dashboard: React.FC = () => {
     setPriorityFilter,
     demoState,
     setDemoState,
+    updateTask,
     refetch
   } = useTasks();
+
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage((prev) => (prev === msg ? null : prev));
+    }, 3000);
+  }, []);
+
+  const handleSaveTask = async (id: string, data: UpdateTaskRequestDTO) => {
+    await updateTask(id, data);
+    showToast('Đã lưu thay đổi');
+  };
 
   return (
     <div className="shell">
@@ -76,6 +93,7 @@ export const Dashboard: React.FC = () => {
                   onFilterChange={setPriorityFilter}
                   onRetry={refetch}
                   onFocusCreate={() => quickInputRef.current?.focus()}
+                  onEdit={(task) => setEditingTask(task)}
                 />
               </div>
 
@@ -153,6 +171,24 @@ export const Dashboard: React.FC = () => {
           </div>
         </main>
       </div>
+
+      {/* Modal Chỉnh sửa công việc [US-S1-03 / TECH-S1-04] */}
+      {editingTask && (
+        <EditTaskModal
+          key={editingTask._id}
+          task={editingTask}
+          isOpen={!!editingTask}
+          onClose={() => setEditingTask(null)}
+          onSave={handleSaveTask}
+        />
+      )}
+
+      {/* Thông báo Toast phản hồi thao tác */}
+      {toastMessage && (
+        <div className="toast" role="status" aria-live="polite">
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 };
