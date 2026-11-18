@@ -3,6 +3,8 @@ import { IUser } from '../types/user.types';
 
 const userSchema = new Schema<IUser>(
   {
+    reset_password_hash: { type: String, select: false },
+    reset_password_expires: { type: Date, select: false },
     email: {
       type: String,
       required: true,
