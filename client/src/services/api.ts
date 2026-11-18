@@ -13,7 +13,7 @@ export const apiClient = axios.create({
 // Request Interceptor: đính kèm Bearer JWT Token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('questline_jwt_token') || 'demo_token_sprint1';
+    const token = localStorage.getItem('questline_jwt_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,6 +27,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
+      if (!error.config?.url?.endsWith('/login')) {
+        localStorage.removeItem('questline_jwt_token');
+        window.dispatchEvent(new Event('questline-session-expired'));
+      }
       console.warn('[API Client] Phiên đăng nhập hết hạn hoặc chưa xác thực (401).');
     }
     return Promise.reject(error);
