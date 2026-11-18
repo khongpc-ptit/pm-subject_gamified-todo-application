@@ -17,4 +17,6 @@ router.post('/', (req, res, next) => {
   taskController.createTask(req, res, next);
 });
 
+router.patch('/:id/complete', (req, res, next) => { taskController.completeTask(req, res, next); });
+
 export default router;

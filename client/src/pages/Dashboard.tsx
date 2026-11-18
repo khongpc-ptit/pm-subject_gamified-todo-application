@@ -81,6 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout }) =
                   error={error}
                   priorityFilter={priorityFilter}
                   onFilterChange={setPriorityFilter}
+                  onToggleComplete={refetch}
                   onRetry={refetch}
                   onFocusCreate={() => quickInputRef.current?.focus()}
                 />
