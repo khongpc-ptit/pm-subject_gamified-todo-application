@@ -814,3 +814,6 @@ SPRINT 1
   - [x] Code test chạy ổn định, không có flaky test
   - [x] Self-review đã hoàn thành
   ```
+
+### Implementation update TECH-S1-09
+- Login API, current-user endpoint, JWT guard and frontend session/logout implemented. Build passed, automated tests run with mocked persistence. Tech Lead review and live account smoke test pending.

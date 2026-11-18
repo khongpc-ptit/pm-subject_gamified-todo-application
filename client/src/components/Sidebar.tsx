@@ -89,6 +89,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
         <button
+          onClick={() => {
+            localStorage.removeItem('questline_jwt_token');
+            window.history.replaceState({}, '', '/login');
+            window.dispatchEvent(new Event('questline-session-expired'));
+          }}
           id="logout"
           className="small logout-button"
           type="button"
