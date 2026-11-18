@@ -74,6 +74,7 @@ export const Dashboard: React.FC = () => {
                   error={error}
                   priorityFilter={priorityFilter}
                   onFilterChange={setPriorityFilter}
+                  onToggleComplete={refetch}
                   onRetry={refetch}
                   onFocusCreate={() => quickInputRef.current?.focus()}
                 />
