@@ -4,8 +4,14 @@ import { Sidebar } from '../components/Sidebar';
 import { QuickTaskForm } from '../components/QuickTaskForm';
 import { TaskList } from '../components/TaskList';
 import { useTasks, type DemoState } from '../hooks/useTasks';
+import type { UserProfile } from '../types/auth.types';
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+  currentUser?: UserProfile | null;
+  onLogout?: () => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout }) => {
   const quickInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -27,8 +33,9 @@ export const Dashboard: React.FC = () => {
       {/* 1. Thanh điều hướng Sidebar cố định bên trái */}
       <Sidebar
         currentScreen="dashboard"
-        userName="Minh Anh"
-        userEmail="minhanh@example.com"
+        onLogout={onLogout}
+        userName={currentUser?.full_name || 'Minh Anh'}
+        userEmail={currentUser?.email || 'minhanh@example.com'}
       />
 
       {/* 2. Khung nội dung chính */}

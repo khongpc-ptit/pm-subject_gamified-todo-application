@@ -806,3 +806,154 @@ p {
     padding: 13px 12px;
   }
 }
+
+/* Authentication Styles */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  background: #f6f7f2;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 40px;
+  background: white;
+  border: 1px solid #dde3dc;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgb(36 44 44 / 4%);
+}
+
+.login-card .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.login-card .brand-mark {
+  width: 36px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: var(--green);
+  color: white;
+  border-radius: 10px;
+  font-size: 26px;
+  font-weight: 750;
+}
+
+.login-card .brand-name {
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -1px;
+}
+
+.login-card h1 {
+  margin: 0 0 10px;
+  font-size: 29px;
+  line-height: 1.25;
+  letter-spacing: -1px;
+}
+
+.intro {
+  margin: 0 0 30px;
+  color: var(--muted);
+}
+
+.auth-switch {
+  display: flex;
+  gap: 24px;
+  margin: 0 0 26px;
+  border-bottom: 1px solid #dde3dc;
+}
+
+.auth-switch button {
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-switch button[aria-pressed="true"] {
+  border-bottom-color: var(--green);
+  color: var(--green);
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  padding-right: 66px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-height: 36px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--green);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.error-text {
+  margin: 6px 0 0;
+  color: #ad4338;
+  font-size: 12px;
+}
+
+.submit-btn {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #294b39;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-msg {
+  margin: 18px 0 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #eaf0e6;
+  color: var(--green);
+  font-size: 13px;
+}
+
+.status-msg.error-banner {
+  background: #fdf2f1;
+  color: #ad4338;
+}
+
+.auth-note {
+  margin: 24px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid #e6ebe2;
+  color: var(--muted);
+  font-size: 12px;
+}

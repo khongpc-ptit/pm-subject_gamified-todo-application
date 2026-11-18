@@ -556,7 +556,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-08] Triển khai chức năng đăng ký tài khoản (Frontend + Backend)
-- [ ] **Trạng thái:** Chưa thực hiện
+- [x] **Trạng thái:** Đã hoàn thành
 - **GitHub Issue:** [#34](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-05] (#22) | **Feature cha:** [FEAT-02] (#17)
 - **Người phụ trách:** `@khongpc-ptit` | **Hạn chót:** `18/11/2026`
