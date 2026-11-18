@@ -3,6 +3,7 @@
 > **Ngày thực hiện:** 18/11/2026  
 > **Người thực hiện:** Khổng Phú Cường (`@khongpc-ptit`) & AI Assistant  
 > **Nhánh phát triển:** `feat/tech-s1-08-user-registration`  
+> **Pull Request:** [PR #50](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/pull/50) (Target: `develop`)  
 > **User Story cha:** [US-S1-05] Đăng ký tài khoản (#22) thuộc [FEAT-02] Xác thực người dùng & Quản lý tài khoản (#17)  
 > **Liên kết Issues:** Closes [#34](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34), Refs [#22](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/22)
 
