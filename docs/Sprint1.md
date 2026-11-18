@@ -814,3 +814,7 @@ SPRINT 1
   - [x] Code test chạy ổn định, không có flaky test
   - [x] Self-review đã hoàn thành
   ```
+
+### TECH-S1-12 verification status
+- Kien prepared acceptance scenarios in docs/reports/TECH-S1-12-auth-integration-test.md.
+- Full integration awaits registration #34, profile #36, feature merges and SMTP configuration. Issue #38 remains incomplete.
