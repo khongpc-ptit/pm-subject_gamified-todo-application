@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { TaskPriority } from '../types/task.types';
 import { taskService } from '../services/task.service';
 
@@ -11,6 +11,8 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
   onTaskCreated,
   inputRef
 }) => {
+  const submittingRef = useRef(false);
+  const [success, setSuccess] = useState(false);
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('MEDIUM');
   const [dueDate, setDueDate] = useState('');
@@ -19,6 +21,8 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return;
+    setSuccess(false);
     if (!title.trim()) {
       setError('Vui lòng nhập tiêu đề công việc');
       return;
@@ -30,6 +34,7 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
     }
 
     setError(null);
+    submittingRef.current = true;
     setSubmitting(true);
 
     try {
@@ -42,10 +47,12 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
       setTitle('');
       setDueDate('');
       setPriority('MEDIUM');
+      setSuccess(true);
       onTaskCreated?.();
     } catch (err: any) {
       setError(err.response?.data?.error?.message || err.message || 'Không thể tạo công việc');
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -107,6 +114,7 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
           </button>
         </div>
 
+        {success && <p role="status">T?o c?ng vi?c th?nh c?ng</p>}
         {error && (
           <div id="quick-error" className="error" role="alert">
             {error}
