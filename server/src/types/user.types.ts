@@ -1,6 +1,8 @@
 import { Document } from 'mongoose';
 
 export interface IUser extends Document {
+  reset_password_hash?: string;
+  reset_password_expires?: Date;
   email: string;
   password_hash: string;
   full_name: string;
