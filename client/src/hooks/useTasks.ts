@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Task, TaskPriority, ListTasksQueryDTO, UpdateTaskRequestDTO } from '../types/task.types';
-import { taskService, INITIAL_MOCK_TASKS } from '../services/task.service';
+import { taskService } from '../services/task.service';
 
 export type DemoState = 'default' | 'empty' | 'loading' | 'error';
 
@@ -37,9 +37,7 @@ export function useTasks() {
       const data = await taskService.getTasks(filter);
       setTasks(data.tasks);
     } catch (err: any) {
-      // Khi Backend chưa bật, dùng mock data để giữ trải nghiệm kiểm thử wireframe
-      console.warn('[useTasks] Không thể kết nối Backend, đang hiển thị dữ liệu demo');
-      setTasks(INITIAL_MOCK_TASKS);
+      setError(err.response?.data?.error?.message || 'Không thể tải danh sách công việc');
     } finally {
       setLoading(false);
     }

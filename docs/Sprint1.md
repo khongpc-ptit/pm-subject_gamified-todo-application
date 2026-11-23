@@ -825,3 +825,7 @@ SPRINT 1
 ### Implementation update TECH-S1-11
 - Reset request, SMTP delivery adapter, hashed expiring token and atomic single-use password reset implemented on top of TECH-S1-09.
 - Build passed. SMTP delivery and live MongoDB smoke tests need local configuration. Awaiting Tech Lead review.
+
+### Implementation update TECH-S1-02
+- Code and automated validation tests completed on `feat/tech-s1-02-create-task`.
+- Build passed. Server 21 tests and client 8 tests passed. Database persistence still needs a live MongoDB smoke test. Awaiting Tech Lead review.

@@ -98,6 +98,9 @@ export class TaskService {
     }
 
     let trimmedDesc = '';
+    if (description !== undefined && description !== null && typeof description !== 'string') {
+      throw Object.assign(new Error('Mô tả phải là chuỗi'), { statusCode: 400, code: 'VALIDATION_ERROR' });
+    }
     if (description) {
       trimmedDesc = typeof description === 'string' ? description.trim() : '';
       if (trimmedDesc.length > 1000) {
@@ -108,7 +111,7 @@ export class TaskService {
       }
     }
 
-    const taskPriority = (priority || 'MEDIUM') as TaskPriority;
+    const taskPriority = (priority === undefined ? 'MEDIUM' : priority) as TaskPriority;
     if (!['LOW', 'MEDIUM', 'HIGH'].includes(taskPriority)) {
       const error = new Error(
         'Mức độ ưu tiên không hợp lệ. Chỉ chấp nhận: LOW, MEDIUM, HIGH'
@@ -121,7 +124,7 @@ export class TaskService {
     let parsedDueDate: Date | null = null;
     if (due_date) {
       parsedDueDate = new Date(due_date);
-      if (isNaN(parsedDueDate.getTime())) {
+      if (typeof due_date !== 'string' || !/^\d{4}-\d{2}-\d{2}(T.*Z)?$/.test(due_date) || isNaN(parsedDueDate.getTime()) || parsedDueDate.toISOString().slice(0, 10) !== due_date.slice(0, 10)) {
         const error = new Error('Ngày đến hạn không đúng định dạng') as AppError;
         error.statusCode = 400;
         error.code = 'INVALID_DUE_DATE';
