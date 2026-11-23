@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { taskService } from '../services/task.service';
 import type { Task } from '../types/task.types';
 
 interface TaskRowProps {
@@ -18,6 +19,20 @@ export const TaskRow: React.FC<TaskRowProps> = ({
   onToggleComplete,
   onEdit
 }) => {
+  const pendingRef = useRef(false);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState('');
+  const complete = async () => {
+    if (pendingRef.current || task.status === 'COMPLETED') return;
+    pendingRef.current = true;
+    setPending(true);
+    setError('');
+    try {
+      const updated = await taskService.completeTask(task._id);
+      onToggleComplete?.(updated);
+    } catch { setError('Không thể hoàn thành công việc. Vui lòng thử lại.'); }
+    finally { pendingRef.current = false; setPending(false); }
+  };
   const isCompleted = task.status === 'COMPLETED';
 
   // Định dạng ngày hiển thị DD/MM/YYYY
@@ -34,12 +49,15 @@ export const TaskRow: React.FC<TaskRowProps> = ({
       <button
         type="button"
         className={`check ${isCompleted ? 'done' : ''}`}
-        aria-label={`${isCompleted ? 'Chuyển về TODO' : 'Hoàn thành'}: ${task.title}`}
-        onClick={() => onToggleComplete?.(task)}
+        aria-label={`${isCompleted ? 'Đã hoàn thành' : 'Hoàn thành'}: ${task.title}`}
+        disabled={pending || isCompleted}
+        aria-pressed={isCompleted}
+        onClick={complete}
       >
         {isCompleted ? '✓' : ''}
       </button>
 
+      {error && <span role="alert">{error}</span>}
       <div className="task-text">
         <b>{task.title}</b>
         <small>

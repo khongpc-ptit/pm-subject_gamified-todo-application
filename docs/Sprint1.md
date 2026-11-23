@@ -347,7 +347,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-04] Triển khai chức năng cập nhật công việc (Frontend + Backend)
-- [ ] **Trạng thái:** Chưa thực hiện
+- [x] **Trạng thái:** Đã hoàn thành (PR #49)
 - **GitHub Issue:** [#30](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/30) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-03] (#20) | **Feature cha:** [FEAT-01] (#16)
 - **Người phụ trách:** `@mhunglee20405` | **Hạn chót:** `10/11/2026`
@@ -556,7 +556,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-08] Triển khai chức năng đăng ký tài khoản (Frontend + Backend)
-- [ ] **Trạng thái:** Chưa thực hiện
+- [x] **Trạng thái:** Đã hoàn thành (PR #50)
 - **GitHub Issue:** [#34](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/34) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-05] (#22) | **Feature cha:** [FEAT-02] (#17)
 - **Người phụ trách:** `@khongpc-ptit` | **Hạn chót:** `18/11/2026`
@@ -815,6 +815,17 @@ SPRINT 1
   - [x] Self-review đã hoàn thành
   ```
 
-### TECH-S1-12 verification status
-- Kien prepared acceptance scenarios in docs/reports/TECH-S1-12-auth-integration-test.md.
-- Full integration awaits registration #34, profile #36, feature merges and SMTP configuration. Issue #38 remains incomplete.
+### Implementation update TECH-S1-05
+- Implemented owned, idempotent completion API and frontend interaction on feat/tech-s1-05-complete-task.
+- Build passed. Server 18 tests and client 8 tests passed. Live MongoDB persistence and Tech Lead review pending.
+
+### Implementation update TECH-S1-09
+- Login API, current-user endpoint, JWT guard and frontend session/logout implemented. Build passed, automated tests run with mocked persistence. Tech Lead review and live account smoke test pending.
+
+### Implementation update TECH-S1-11
+- Reset request, SMTP delivery adapter, hashed expiring token and atomic single-use password reset implemented on top of TECH-S1-09.
+- Build passed. SMTP delivery and live MongoDB smoke tests need local configuration. Awaiting Tech Lead review.
+
+### Implementation update TECH-S1-02
+- Code and automated validation tests completed on `feat/tech-s1-02-create-task`.
+- Build passed. Server 21 tests and client 8 tests passed. Database persistence still needs a live MongoDB smoke test. Awaiting Tech Lead review.

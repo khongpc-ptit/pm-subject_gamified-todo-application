@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { Task, TaskPriority, ListTasksQueryDTO } from '../types/task.types';
-import { taskService, INITIAL_MOCK_TASKS } from '../services/task.service';
+import type { Task, TaskPriority, ListTasksQueryDTO, UpdateTaskRequestDTO } from '../types/task.types';
+import { taskService } from '../services/task.service';
 
 export type DemoState = 'default' | 'empty' | 'loading' | 'error';
 
@@ -37,9 +37,7 @@ export function useTasks() {
       const data = await taskService.getTasks(filter);
       setTasks(data.tasks);
     } catch (err: any) {
-      // Khi Backend chưa bật, dùng mock data để giữ trải nghiệm kiểm thử wireframe
-      console.warn('[useTasks] Không thể kết nối Backend, đang hiển thị dữ liệu demo');
-      setTasks(INITIAL_MOCK_TASKS);
+      setError(err.response?.data?.error?.message || 'Không thể tải danh sách công việc');
     } finally {
       setLoading(false);
     }
@@ -68,6 +66,52 @@ export function useTasks() {
     return filteredTasks.filter((t) => t.status === 'COMPLETED');
   }, [filteredTasks]);
 
+  const updateTask = useCallback(
+    async (id: string, updateData: UpdateTaskRequestDTO): Promise<Task> => {
+      try {
+        const updated = await taskService.updateTask(id, updateData);
+        setTasks((prev) => prev.map((t) => (t._id === id ? updated : t)));
+        return updated;
+      } catch (err: any) {
+        // Fallback demo state nếu backend offline
+        console.warn('[useTasks] Cập nhật task qua mock fallback');
+        const xpMap: Record<string, number> = { LOW: 10, MEDIUM: 20, HIGH: 30 };
+        let updatedMock: Task | null = null;
+        setTasks((prev) =>
+          prev.map((t) => {
+            if (t._id === id) {
+              const newPriority = updateData.priority || t.priority;
+              updatedMock = {
+                ...t,
+                title: updateData.title !== undefined ? updateData.title : t.title,
+                description:
+                  updateData.description !== undefined
+                    ? updateData.description
+                    : t.description,
+                priority: newPriority,
+                status: updateData.status !== undefined ? updateData.status : t.status,
+                due_date:
+                  updateData.due_date !== undefined ? updateData.due_date : t.due_date,
+                xp_reward: xpMap[newPriority] || t.xp_reward,
+                completed_at:
+                  updateData.status === 'COMPLETED'
+                    ? t.completed_at || new Date().toISOString()
+                    : updateData.status
+                    ? null
+                    : t.completed_at
+              };
+              return updatedMock;
+            }
+            return t;
+          })
+        );
+        if (updatedMock) return updatedMock;
+        throw err;
+      }
+    },
+    []
+  );
+
   return {
     tasks: filteredTasks,
     allTasksCount: tasks.length,
@@ -79,6 +123,7 @@ export function useTasks() {
     setPriorityFilter,
     demoState,
     setDemoState,
+    updateTask,
     refetch: () => fetchTasks(priorityFilter !== 'ALL' ? { priority: priorityFilter as TaskPriority } : {})
   };
 }

@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import authRoutes from './routes/auth.routes';
 import taskRoutes from './routes/task.routes';
 import { notFoundHandler, errorHandler } from './middlewares/error.middleware';
 
@@ -57,6 +58,7 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
 });
 
 // Routes
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 
 // Error Handling
