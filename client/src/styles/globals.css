@@ -1016,3 +1016,63 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+/* Habits Module Styles [TECH-S2-03] */
+.habit-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.habit-row {
+  padding: 22px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.habit-row h3 {
+  margin-bottom: 4px;
+}
+
+.habit-row p {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.habit-foot {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.habit-foot .week {
+  margin: 0;
+  gap: 5px;
+}
+
+.habit-foot .day i {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 700px) {
+  .habit-row {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+  .habit-row > div:last-child {
+    justify-self: start;
+    align-items: flex-start !important;
+  }
+  .habit-foot {
+    flex-wrap: wrap;
+  }
+}
