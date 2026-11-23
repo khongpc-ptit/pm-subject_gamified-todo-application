@@ -264,3 +264,310 @@ describe('GET /api/v1/tasks - [US-S1-02 / TECH-S1-03] View Task List', () => {
     });
   });
 });
+
+describe('PUT /api/v1/tasks/:id - [US-S1-03 / TECH-S1-04] Update Task', () => {
+  const userA_Id = new mongoose.Types.ObjectId().toString();
+  const userB_Id = new mongoose.Types.ObjectId().toString();
+  let tokenUserA: string;
+  let tokenUserB: string;
+
+  beforeAll(() => {
+    process.env.JWT_SECRET = JWT_SECRET;
+    tokenUserA = generateTestToken(userA_Id, 'usera@example.com');
+    tokenUserB = generateTestToken(userB_Id, 'userb@example.com');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe('Xác thực bảo mật (Authentication)', () => {
+    it('1. Trả về 401 UNAUTHORIZED khi không có Header Authorization', async () => {
+      const validId = new mongoose.Types.ObjectId().toString();
+      const res = await request(app)
+        .put(`/api/v1/tasks/${validId}`)
+        .send({ title: 'Task cần cập nhật' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('UNAUTHORIZED');
+    });
+
+    it('2. Trả về 401 UNAUTHORIZED khi token không hợp lệ', async () => {
+      const validId = new mongoose.Types.ObjectId().toString();
+      const res = await request(app)
+        .put(`/api/v1/tasks/${validId}`)
+        .set('Authorization', 'Bearer invalid_token')
+        .send({ title: 'Task cần cập nhật' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('UNAUTHORIZED');
+    });
+  });
+
+  describe('Kiểm tra định dạng ID & Quyền sở hữu (Validation & Authorization)', () => {
+    it('3. Trả về 400 INVALID_ID khi :id không đúng 24 hex ký tự MongoDB ObjectId', async () => {
+      const res = await request(app)
+        .put('/api/v1/tasks/invalid-id-xyz-123')
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ title: 'Tiêu đề mới' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('INVALID_ID');
+      expect(res.body.error.message).toBe('Định danh nhiệm vụ không hợp lệ');
+    });
+
+    it('4. Trả về 404 TASK_NOT_FOUND khi không tìm thấy task với ID đã cung cấp', async () => {
+      const nonExistentId = new mongoose.Types.ObjectId().toString();
+      jest.spyOn(Task, 'findById').mockResolvedValue(null);
+
+      const res = await request(app)
+        .put(`/api/v1/tasks/${nonExistentId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ title: 'Tiêu đề mới' });
+
+      expect(res.status).toBe(404);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('TASK_NOT_FOUND');
+      expect(res.body.error.message).toBe('Không tìm thấy nhiệm vụ');
+    });
+
+    it('5. Trả về 403 FORBIDDEN khi người dùng cập nhật task thuộc sở hữu của người khác', async () => {
+      const taskId = new mongoose.Types.ObjectId().toString();
+      const mockTaskOwnerA: any = {
+        _id: taskId,
+        user_id: new mongoose.Types.ObjectId(userA_Id),
+        title: 'Task của User A'
+      };
+
+      jest.spyOn(Task, 'findById').mockResolvedValue(mockTaskOwnerA);
+
+      // User B cố tình sửa task của User A
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserB}`)
+        .send({ title: 'Cố tình sửa lén' });
+
+      expect(res.status).toBe(403);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('FORBIDDEN');
+      expect(res.body.error.message).toBe('Bạn không có quyền thao tác trên nhiệm vụ này');
+    });
+  });
+
+  describe('Kiểm tra tính hợp lệ dữ liệu đầu vào (Input Validation)', () => {
+    let mockTask: any;
+    let taskId: string;
+
+    beforeEach(() => {
+      taskId = new mongoose.Types.ObjectId().toString();
+      mockTask = {
+        _id: taskId,
+        user_id: new mongoose.Types.ObjectId(userA_Id),
+        title: 'Nhiệm vụ ban đầu',
+        description: 'Mô tả ban đầu',
+        priority: 'LOW',
+        status: 'TODO',
+        due_date: null,
+        xp_reward: 10,
+        completed_at: null,
+        save: jest.fn().mockImplementation(function (this: any) {
+          return Promise.resolve(this);
+        })
+      };
+      jest.spyOn(Task, 'findById').mockResolvedValue(mockTask);
+    });
+
+    it('6. Trả về 400 TITLE_REQUIRED khi title là chuỗi rỗng sau khi trim()', async () => {
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ title: '   ' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('TITLE_REQUIRED');
+    });
+
+    it('7. Trả về 400 TITLE_TOO_LONG khi title vượt quá 200 ký tự', async () => {
+      const longTitle = 'A'.repeat(201);
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ title: longTitle });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('TITLE_TOO_LONG');
+    });
+
+    it('8. Trả về 400 DESCRIPTION_TOO_LONG khi description vượt quá 1000 ký tự', async () => {
+      const longDesc = 'D'.repeat(1001);
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ description: longDesc });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('DESCRIPTION_TOO_LONG');
+    });
+
+    it('9. Trả về 400 INVALID_PRIORITY khi priority không thuộc LOW/MEDIUM/HIGH', async () => {
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ priority: 'CRITICAL' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('INVALID_PRIORITY');
+    });
+
+    it('10. Trả về 400 INVALID_STATUS khi status không thuộc TODO/IN_PROGRESS/COMPLETED', async () => {
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ status: 'ARCHIVED' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('INVALID_STATUS');
+    });
+
+    it('11. Trả về 400 INVALID_DUE_DATE khi due_date không phải định dạng ngày hợp lệ', async () => {
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ due_date: 'invalid-date-format' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('INVALID_DUE_DATE');
+    });
+  });
+
+  describe('Cập nhật thành công (Update Success)', () => {
+    let mockTask: any;
+    let taskId: string;
+
+    beforeEach(() => {
+      taskId = new mongoose.Types.ObjectId().toString();
+      mockTask = {
+        _id: taskId,
+        user_id: new mongoose.Types.ObjectId(userA_Id),
+        title: 'Nộp báo cáo kiến trúc hệ thống',
+        description: 'Kiểm tra lại Swagger trước khi nộp',
+        priority: 'LOW',
+        status: 'TODO',
+        due_date: new Date('2026-11-05T00:00:00.000Z'),
+        xp_reward: 10,
+        completed_at: null,
+        created_at: new Date('2026-11-01T10:00:00.000Z'),
+        save: jest.fn().mockImplementation(function (this: any) {
+          return Promise.resolve(this);
+        })
+      };
+      jest.spyOn(Task, 'findById').mockResolvedValue(mockTask);
+    });
+
+    it('12. Cập nhật thành công tiêu đề và mô tả, trả về Response Envelope 200 OK', async () => {
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({
+          title: 'Nộp báo cáo kiến trúc hệ thống (Đã chỉnh sửa)',
+          description: 'Cập nhật thêm tài liệu API contracts'
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toBe('Cập nhật nhiệm vụ thành công');
+      expect(res.body.data.title).toBe('Nộp báo cáo kiến trúc hệ thống (Đã chỉnh sửa)');
+      expect(res.body.data.description).toBe('Cập nhật thêm tài liệu API contracts');
+      expect(mockTask.save).toHaveBeenCalled();
+    });
+
+    it('13. Tự động tính toán lại xp_reward khi cập nhật độ ưu tiên (LOW -> HIGH => 30 XP)', async () => {
+      expect(mockTask.priority).toBe('LOW');
+      expect(mockTask.xp_reward).toBe(10);
+
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({
+          priority: 'HIGH'
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.priority).toBe('HIGH');
+      expect(res.body.data.xp_reward).toBe(30);
+    });
+
+    it('14. Hỗ trợ cập nhật due_date mới và xóa hạn chót khi truyền null', async () => {
+      // Cập nhật ngày mới
+      const newDateStr = '2026-11-20T17:00:00.000Z';
+      const res1 = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ due_date: newDateStr });
+
+      expect(res1.status).toBe(200);
+      expect(new Date(res1.body.data.due_date).toISOString()).toBe(newDateStr);
+
+      // Xóa ngày bằng cách gửi null
+      const res2 = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ due_date: null });
+
+      expect(res2.status).toBe(200);
+      expect(res2.body.data.due_date).toBeNull();
+    });
+
+    it('15. Tự động gán completed_at khi đổi status sang COMPLETED và reset khi chuyển về TODO', async () => {
+      // Đổi sang COMPLETED
+      const resComplete = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ status: 'COMPLETED' });
+
+      expect(resComplete.status).toBe(200);
+      expect(resComplete.body.data.status).toBe('COMPLETED');
+      expect(resComplete.body.data.completed_at).not.toBeNull();
+
+      // Đổi về TODO
+      const resReopen = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({ status: 'TODO' });
+
+      expect(resReopen.status).toBe(200);
+      expect(resReopen.body.data.status).toBe('TODO');
+      expect(resReopen.body.data.completed_at).toBeNull();
+    });
+
+    it('16. Bảo vệ các trường hệ thống không bị ghi đè (user_id, created_at, _id)', async () => {
+      const maliciousUserId = new mongoose.Types.ObjectId().toString();
+      const maliciousCreatedAt = new Date('2020-01-01').toISOString();
+
+      const res = await request(app)
+        .put(`/api/v1/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${tokenUserA}`)
+        .send({
+          title: 'Tiêu đề cập nhật hợp lệ',
+          user_id: maliciousUserId,
+          created_at: maliciousCreatedAt
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.user_id.toString()).toBe(userA_Id);
+      expect(new Date(res.body.data.created_at).toISOString()).toBe(
+        mockTask.created_at.toISOString()
+      );
+    });
+  });
+});

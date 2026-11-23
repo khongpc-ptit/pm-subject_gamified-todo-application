@@ -10,7 +10,8 @@ const userSchema = new Schema<IUser>(
       required: true,
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Email không đúng định dạng']
     },
     password_hash: {
       type: String,
@@ -19,7 +20,9 @@ const userSchema = new Schema<IUser>(
     full_name: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      minlength: 2,
+      maxlength: 100
     },
     current_level: {
       type: Number,

@@ -22,6 +22,14 @@ export interface CreateTaskDTO {
   due_date?: string | Date | null;
 }
 
+export interface UpdateTaskDTO {
+  title?: string;
+  description?: string;
+  priority?: TaskPriority;
+  due_date?: string | Date | null;
+  status?: TaskStatus;
+}
+
 export interface ListTasksQueryDTO {
   status?: string;
   priority?: string;

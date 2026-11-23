@@ -3,6 +3,9 @@ import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
 import { verifyToken } from '../middlewares/auth.middleware';
 const router = Router();
+router.post('/register', (req, res, next) => {
+  authController.register(req, res, next);
+});
 router.post('/login', (req, res, next) => { void authController.login(req, res, next); });
 router.get('/me', verifyToken, (req, res, next) => { void authController.me(req, res, next); });
 // Stateless JWT logout clears the client's credentials.

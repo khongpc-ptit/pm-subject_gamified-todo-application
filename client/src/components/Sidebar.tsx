@@ -3,6 +3,7 @@ import React from 'react';
 interface SidebarProps {
   currentScreen?: string;
   onNavigate?: (screen: string) => void;
+  onLogout?: () => void;
   userName?: string;
   userEmail?: string;
 }
@@ -10,6 +11,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   currentScreen = 'dashboard',
   onNavigate,
+  onLogout,
   userName = 'Minh Anh',
   userEmail = 'minhanh@example.com'
 }) => {
@@ -89,15 +91,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
         <button
-          onClick={() => {
-            localStorage.removeItem('questline_jwt_token');
-            window.history.replaceState({}, '', '/login');
-            window.dispatchEvent(new Event('questline-session-expired'));
-          }}
           id="logout"
           className="small logout-button"
           type="button"
           title="Đăng xuất"
+          onClick={onLogout}
         >
           Đăng xuất
         </button>

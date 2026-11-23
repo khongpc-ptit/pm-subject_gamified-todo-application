@@ -46,3 +46,12 @@ export interface CreateTaskRequestDTO {
   priority?: TaskPriority;
   due_date?: string | null;
 }
+
+/** Payload gửi lên khi cập nhật nhiệm vụ (US-S1-03: PUT /api/v1/tasks/:id) */
+export interface UpdateTaskRequestDTO {
+  title?: string;
+  description?: string;
+  priority?: TaskPriority;
+  due_date?: string | null;
+  status?: TaskStatus;
+}

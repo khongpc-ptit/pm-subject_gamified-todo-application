@@ -1,6 +1,13 @@
 import { useRef, useState } from 'react';
 import { apiClient } from '../services/api';
-export function Login({ onLogin }: { onLogin: () => void }) {
+import type { AuthResponseData, UserProfile } from '../types/auth.types';
+
+interface LoginProps {
+  onLogin: (user: UserProfile) => void;
+  onSwitchToRegister: () => void;
+}
+
+export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
@@ -14,9 +21,9 @@ export function Login({ onLogin }: { onLogin: () => void }) {
       if (busy.current) return;
       busy.current = true; setPending(true); setError('');
       try {
-        const response = await apiClient.post('/auth/login', { email, password });
+        const response = await apiClient.post<{ data: AuthResponseData }>('/auth/login', { email, password });
         localStorage.setItem('questline_jwt_token', response.data.data.token);
-        onLogin();
+        onLogin(response.data.data.user);
       } catch (error: unknown) {
         const failure = error as { response?: { data?: { error?: { message?: string } } } };
         setError(failure.response?.data?.error?.message || 'Không thể đăng nhập. Vui lòng thử lại.');
@@ -28,6 +35,7 @@ export function Login({ onLogin }: { onLogin: () => void }) {
       {error && <p role="alert">{error}</p>}
       <button type="submit" className="primary" disabled={pending}>{pending ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
     </form>
+    <button type="button" onClick={onSwitchToRegister}>Đăng ký</button>
     <a href="/forgot-password">Quên mật khẩu?</a>
   </section></main>;
 }
