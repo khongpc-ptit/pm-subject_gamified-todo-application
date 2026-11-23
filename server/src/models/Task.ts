@@ -46,6 +46,10 @@ const taskSchema = new Schema<ITask>(
       type: Number,
       default: 20
     },
+    xp_earned: {
+      type: Number,
+      default: 0
+    },
     completed_at: {
       type: Date,
       default: null

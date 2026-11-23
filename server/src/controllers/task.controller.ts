@@ -7,8 +7,23 @@ export class TaskController {
   async completeTask(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const task = await taskService.completeTask(req.user!.id, String(req.params.id));
-      res.json({ success: true, data: task, message: 'Nhiệm vụ đã được đánh dấu hoàn thành', timestamp: new Date().toISOString() });
-    } catch (error) { next(error); }
+      const xpEarned = (task as any).xp_earned ?? 0;
+      let message = 'Nhiệm vụ đã được đánh dấu hoàn thành';
+      if (xpEarned > 0) {
+        message = `Hoàn thành công việc! +${xpEarned} XP`;
+      } else if ((task as any).is_cap_reached) {
+        message = 'Hoàn thành công việc! Đã đạt trần tối đa 200 XP trong ngày hôm nay';
+      }
+
+      res.json({
+        success: true,
+        data: task,
+        message,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
   /**
