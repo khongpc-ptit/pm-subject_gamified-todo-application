@@ -716,7 +716,8 @@ SPRINT 1
 ---
 
 ### [TECH-S1-11] Triển khai chức năng đặt lại mật khẩu đã quên (Frontend + Backend + Email)
-- [ ] **Trạng thái:** Chưa thực hiện
+- [x] **Trạng thái:** Đã triển khai và xác minh với MongoDB và SMTP cục bộ. Đang chờ review.
+- **Báo cáo kiểm thử:** [Kết quả và cách chạy lại](reports/TECH-S1-11-forgot-password.md).
 - **GitHub Issue:** [#37](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/37) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-09] (#26) | **Feature cha:** [FEAT-02] (#17)
 - **Người phụ trách:** `@kiennarutonbmn1` | **Hạn chót:** `18/11/2026`

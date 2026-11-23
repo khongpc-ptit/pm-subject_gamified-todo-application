@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { apiClient } from '../services/api';
+import { authService } from '../services/auth.service';
 export function PasswordReset() {
   const token = new URLSearchParams(window.location.search).get('token');
   const resetting = window.location.pathname === '/reset-password';
@@ -22,7 +23,7 @@ export function PasswordReset() {
         const response = await apiClient.post(resetting ? '/auth/reset-password' : '/auth/forgot-password', resetting ? { token, password } : { email });
         setMessage(response.data.message);
         setPassword(''); setConfirm('');
-        if (resetting) { localStorage.removeItem('questline_jwt_token'); window.history.replaceState({}, '', '/reset-password'); }
+        if (resetting) { authService.logout(); window.history.replaceState({}, '', '/reset-password'); }
       } catch { setError('Không thể xử lý yêu cầu. Kiểm tra liên kết hoặc thử lại sau.'); }
       finally { busy.current = false; setPending(false); }
     }}>
