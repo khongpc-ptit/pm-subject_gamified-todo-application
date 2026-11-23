@@ -1,28 +1,25 @@
-# TECH-S1-06 Task integration verification
+# TECH-S1-06 · Task Management integration
 
-Refs #32, #18, #19, #20, #21.
+Issue #32 covers US-S1-01 through US-S1-04. All four task feature dependencies are in develop.
 
-## Current status
+## Verification on 23 November 2026
 
-Prepared by Kiên. Full acceptance remains pending the merge of #28, #30 and #31 into develop. The current develop tree has no PUT task endpoint or edit modal from #30. Automated creation and completion coverage lives in PR #43 and #44. Existing tests mock persistence and do not establish real database durability.
+| Case | Verification | Result |
+| --- | --- | --- |
+| Create and validate | Submitted title, priority and date in Edge and reloaded. Checked missing, blank and oversized titles, invalid priority and impossible dates against the API. | Pass |
+| Duplicate submission | Submitted the form twice before the first request settled. The Dashboard test observed one create request. | Pass |
+| List and filter | Reloaded with two accounts in Edge. Checked filters, no results, no tasks, loading, a failed list request and retry. Confirmed API status and priority filters against MongoDB. | Pass |
+| Edit | Changed the title, notes, priority and cleared the due date. Reloaded and reopened the form to verify the saved fields. A rejected request left the form open and the row unchanged. | Pass |
+| Complete | Completed and reloaded in Edge. Repeated the completion request against MongoDB and checked that the first timestamp and user XP were unchanged. | Pass |
+| Ownership | Checked account isolation in Edge and verified unauthenticated requests, attempts to edit or complete another account's task, and invalid or missing IDs through the API. | Pass |
 
-## Execution prerequisites
+Two Dashboard defects were found and retested. A failed edit could use the demo fallback and report a local change as saved. An empty priority filter could display the first-task prompt even when other tasks existed. Editing now waits for a successful API response, and filtering uses the complete set of tasks returned for the account.
 
-Merge the task feature PRs after Tech Lead approval. Configure MongoDB, JWT_SECRET and client API URL. Create two accounts A and B. Start the server and client.
+## Reproduce
 
-## Acceptance cases
+1. Run `npm --prefix server ci` and `npm --prefix client ci`.
+2. Set `TEST_MONGODB_URI` to a development MongoDB instance with permission to create and drop a test database, then run `npm run build` and `npm test`. The suite creates and drops its own randomly named database. This run passed 62 server and 30 client tests.
+3. To repeat the browser checks, run the client and API with a disposable MongoDB database, a JWT secret and the matching API/client URLs. Create two test accounts. As account A, create a high-priority task and reload. Filter by low priority, clear the filter, edit the task to low priority and remove the due date, then complete it. Reload after each change. Sign in as account B and verify the task is absent.
+4. Use browser network controls to delay or fail the task request. Check the loading indicator, retry action and that a failed edit leaves the original task visible.
 
-| Case | Steps | Expected result | Result |
-| --- | --- | --- | --- |
-| Create | As A, submit title with description, priority and due date, reload | Stored values survive reload, status TODO, owner A | Pending |
-| Validation | Submit blank title, 201-character title, invalid priority and date directly to API | 400 envelope, no task created | Automated API cases in PR #43, live pending |
-| Duplicate submit | Submit twice while request is pending | One UI request, one task | Pending |
-| List | Fetch as A and B, filter priority/status | Each account sees its own data | Existing mocked API tests pass, live pending |
-| Edit | Edit title, description, priority and clear due date, reload | Values survive reload, XP reward follows priority | Blocked by #30 |
-| Complete | Complete a task, reload, repeat same API request | COMPLETED persists, original completed_at preserved, user XP unchanged | Automated API cases in PR #44, live pending |
-| Ownership | A attempts editing/completing B task | 403, database unchanged | Pending |
-| Missing task | Use a valid nonexistent ID, then malformed ID | 404 and 400 respectively | Pending |
-| Loading/empty/error | Delay API, use empty account, stop API | Loading indicator, empty prompt, recoverable error | Pending |
-| Failure | Fail create/edit/complete API response | Error visible, no false success state | Pending |
-
-Record actual execution date, environment, result and defect links before marking #32 complete. Tech Lead review remains required.
+Tech Lead review is pending.
