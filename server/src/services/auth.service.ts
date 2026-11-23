@@ -1,10 +1,28 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { User } from '../models/User';
 import { RegisterDTO, AuthResponseData, UserProfileResponse } from '../types/user.types';
 import { AppError } from '../middlewares/error.middleware';
 
 export class AuthService {
+  async login(email: unknown, password: unknown) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
+      throw Object.assign(new Error('Vui lòng nhập email và mật khẩu'), { statusCode: 400, code: 'VALIDATION_ERROR' });
+    }
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      throw Object.assign(new Error('Email hoặc mật khẩu không chính xác'), { statusCode: 401, code: 'INVALID_CREDENTIALS' });
+    }
+    const token = this.signToken(user.id, user.email);
+    const { password_hash, reset_password_hash, reset_password_expires, ...profile } = user.toObject();
+    return { token, user: profile };
+  }
+  async me(id: string) {
+    const user = await User.findById(id).select('-password_hash');
+    if (!user) throw Object.assign(new Error('Không tìm thấy người dùng'), { statusCode: 404, code: 'USER_NOT_FOUND' });
+    return user;
+  }
+
   /**
    * [US-S1-05 / TECH-S1-08] Đăng ký tài khoản người dùng mới
    * @param data - Dữ liệu đăng ký { email, password, full_name }
@@ -87,18 +105,8 @@ export class AuthService {
       streak_freeze_count: 1
     });
 
+    const token = this.signToken(user._id.toString(), user.email);
     const savedUser = await user.save();
-
-    // 7. Tạo JWT Access Token
-    const jwtSecret = process.env.JWT_SECRET || 'supersecretkey_gamified_todo_sprint1';
-    const token = jwt.sign(
-      {
-        id: savedUser._id.toString(),
-        email: savedUser.email
-      },
-      jwtSecret,
-      { expiresIn: '7d' }
-    );
 
     // 8. Trả về thông tin hồ sơ người dùng (TUYỆT ĐỐI KHÔNG trả về password_hash)
     const userProfile: UserProfileResponse = {
@@ -117,6 +125,15 @@ export class AuthService {
       token,
       user: userProfile
     };
+  }
+
+  private signToken(id: string, email: string): string {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT_SECRET is required');
+    return jwt.sign({ id, email }, secret, {
+      algorithm: 'HS256',
+      expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn']
+    });
   }
 }
 

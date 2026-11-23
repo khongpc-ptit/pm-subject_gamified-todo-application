@@ -4,14 +4,18 @@ import type { AuthResponseData } from '../types/auth.types';
 
 interface AuthPageProps {
   initialMode?: 'login' | 'register';
+  onSwitchToLogin?: () => void;
   onAuthSuccess?: (data: AuthResponseData) => void;
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({
   initialMode = 'register',
-  onAuthSuccess
+  onAuthSuccess,
+  onSwitchToLogin
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+
+  const switchToLogin = onSwitchToLogin ?? (() => setMode('login'));
 
   return (
     <div className="auth-page">
@@ -38,7 +42,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             id="login-mode"
             type="button"
             aria-pressed={mode === 'login'}
-            onClick={() => setMode('login')}
+            onClick={switchToLogin}
           >
             Đăng nhập
           </button>
@@ -56,7 +60,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         {mode === 'register' ? (
           <RegisterForm
             onSuccess={onAuthSuccess}
-            onSwitchToLogin={() => setMode('login')}
+            onSwitchToLogin={switchToLogin}
           />
         ) : (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>

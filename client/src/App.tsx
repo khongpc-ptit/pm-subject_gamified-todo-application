@@ -1,61 +1,55 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dashboard } from './pages/Dashboard';
+import { PasswordReset } from './pages/PasswordReset';
 import { AuthPage } from './pages/AuthPage';
 import { authService } from './services/auth.service';
 import type { UserProfile } from './types/auth.types';
+import { Login } from './pages/Login';
+import { apiClient } from './services/api';
 import './styles/globals.css';
-
-export const App: React.FC = () => {
-  const [user, setUser] = useState<UserProfile | null>(() => authService.getStoredUser());
-  const [showAuth, setShowAuth] = useState<boolean>(() => !authService.getStoredUser());
-
-  const handleAuthSuccess = (data: { user: UserProfile }) => {
-    setUser(data.user);
-    setShowAuth(false);
+export const App = () => {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [registering, setRegistering] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const checkSession = async () => {
+    setLoading(true); setError('');
+    if (!localStorage.getItem('questline_jwt_token')) { setLoading(false); return; }
+    try {
+      const { data } = await apiClient.get<{ data: UserProfile }>('/auth/me');
+      setUser(data.data);
+    }
+    catch { setError('Không thể xác nhận phiên đăng nhập. Vui lòng thử lại.'); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => {
+    void checkSession();
+    const expire = () => {
+      authService.logout();
+      setUser(null);
+      setError('');
+    };
+    window.addEventListener('questline-session-expired', expire);
+    return () => window.removeEventListener('questline-session-expired', expire);
+  }, []);
+  if (['/forgot-password', '/reset-password'].includes(window.location.pathname)) return <PasswordReset />;
+  if (loading) return <p role="status">Đang kiểm tra phiên đăng nhập…</p>;
+  if (error && localStorage.getItem('questline_jwt_token')) return <div role="alert">{error}<button onClick={checkSession}>Thử lại</button></div>;
+  const startSession = (profile: UserProfile) => {
+    window.history.replaceState({}, '', '/');
+    setRegistering(false);
+    setUser(profile);
   };
 
-  const handleLogout = () => {
-    authService.logout();
-    setUser(null);
-    setShowAuth(true);
-  };
-
-  if (showAuth) {
-    return (
-      <>
-        <AuthPage
-          initialMode="register"
-          onAuthSuccess={handleAuthSuccess}
-        />
-        <div style={{ position: 'fixed', bottom: 12, left: 12, zIndex: 9999 }}>
-          <button
-            type="button"
-            className="small"
-            style={{ opacity: 0.75, background: '#fff', border: '1px solid #ccc' }}
-            onClick={() => setShowAuth(false)}
-          >
-            Chuyển sang Dashboard (Bỏ qua đăng nhập) ↗
-          </button>
-        </div>
-      </>
-    );
+  if (user) {
+    return <Dashboard currentUser={user} onLogout={() => {
+      authService.logout();
+      setUser(null);
+    }} />;
   }
-
-  return (
-    <>
-      <Dashboard currentUser={user} onLogout={handleLogout} />
-      <div style={{ position: 'fixed', bottom: 12, left: 12, zIndex: 9999 }}>
-        <button
-          type="button"
-          className="small"
-          style={{ opacity: 0.75, background: '#fff', border: '1px solid #ccc' }}
-          onClick={() => setShowAuth(true)}
-        >
-          Trang Đăng ký / Xác thực ↗
-        </button>
-      </div>
-    </>
-  );
+  if (registering) {
+    return <AuthPage onAuthSuccess={({ user }) => startSession(user)} onSwitchToLogin={() => setRegistering(false)} />;
+  }
+  return <Login onLogin={startSession} onSwitchToRegister={() => setRegistering(true)} />;
 };
-
 export default App;
