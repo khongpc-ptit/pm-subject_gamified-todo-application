@@ -55,7 +55,7 @@ describe('Dashboard task workflows', () => {
     fireEvent.submit(form);
     expect(await within(form).findByRole('alert')).toHaveTextContent('Create failed');
     expect(within(form).queryByRole('status')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('T?n c?ng vi?c')).toHaveValue(task.title);
+    expect(screen.getByLabelText('Tên công việc')).toHaveValue(task.title);
     fireEvent.submit(form);
     fireEvent.submit(form);
     expect(taskService.createTask).toHaveBeenCalledTimes(2);
