@@ -6,6 +6,7 @@ import { QuickTaskForm } from '../components/QuickTaskForm';
 import { TaskList } from '../components/TaskList';
 import { EditTaskModal } from '../components/EditTaskModal';
 import { ProfilePage } from './ProfilePage';
+import { HabitsPage } from './HabitsPage';
 import { useTasks, type DemoState } from '../hooks/useTasks';
 import type { Task, UpdateTaskRequestDTO } from '../types/task.types';
 
@@ -17,7 +18,7 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onUpdateUser }) => {
   const quickInputRef = useRef<HTMLInputElement>(null);
-  const [currentScreen, setCurrentScreen] = useState<'dashboard' | 'profile'>('dashboard');
+  const [currentScreen, setCurrentScreen] = useState<'dashboard' | 'habits' | 'profile'>('dashboard');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -53,7 +54,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
       {/* 1. Thanh điều hướng Sidebar cố định bên trái */}
       <Sidebar
         currentScreen={currentScreen}
-        onNavigate={(screen) => setCurrentScreen(screen === 'profile' ? 'profile' : 'dashboard')}
+        onNavigate={(screen) => setCurrentScreen(screen as 'dashboard' | 'habits' | 'profile')}
         onLogout={onLogout}
         userName={currentUser?.full_name || 'Minh Anh'}
         userEmail={currentUser?.email || 'minhanh@example.com'}
@@ -92,6 +93,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                   showToast('Cập nhật hồ sơ thành công');
                 }}
                 onNavigateBack={() => setCurrentScreen('dashboard')}
+              />
+            ) : currentScreen === 'habits' ? (
+              <HabitsPage
+                currentUser={currentUser}
+                onNavigate={(screen) => setCurrentScreen(screen)}
+                onToast={showToast}
               />
             ) : (
               <>
