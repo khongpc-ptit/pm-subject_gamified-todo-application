@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
@@ -30,10 +30,13 @@ describeWithMongo('Authentication with MongoDB', () => {
     }
   });
 
-  const register = (email: string) =>
-    api.post(base + '/register').send({ email, password, full_name: 'Test Account' });
+  const register = (email: string, fullName = 'Test Account', pass = password) =>
+    api.post(base + '/register').send({ email, password: pass, full_name: fullName });
   const login = (email: string, value: string) =>
     api.post(base + '/login').send({ email, password: value });
+  const me = (token: string) => api.get(base + '/me').auth(token, { type: 'bearer' });
+  const updateProfile = (token: string, payload: Record<string, unknown>) =>
+    api.put(base + '/profile').auth(token, { type: 'bearer' }).send(payload);
 
   it('registers and normalizes email, then authenticates a public session', async () => {
     const email = 'session@example.test';
@@ -48,7 +51,6 @@ describeWithMongo('Authentication with MongoDB', () => {
     const unknown = await login('unknown@example.test', 'wrong-password').expect(401);
     expect(wrong.body.error).toEqual(unknown.body.error);
     const signedIn = (await login(email, password).expect(200)).body.data;
-    const me = (token: string) => api.get(base + '/me').auth(token, { type: 'bearer' });
     const profile = (await me(signedIn.token).expect(200)).body.data;
     for (const user of [created.user, signedIn.user, profile]) {
       expect(user).toMatchObject({ _id: stored.id, email });
@@ -62,5 +64,124 @@ describeWithMongo('Authentication with MongoDB', () => {
     const claims = { id: stored.id, email };
     await me(jwt.sign(claims, process.env.JWT_SECRET!, { expiresIn: -1 })).expect(401);
     await me(jwt.sign(claims, 'untrusted-fixture-secret')).expect(401);
+  });
+
+  it('verifies profile view, updates with validation, isolates Account A and B, and shields prohibited fields', async () => {
+    const emailA = 'alpha@example.test';
+    const emailB = 'beta@example.test';
+
+    await register(emailA, 'User Alpha').expect(201);
+    await register(emailB, 'User Beta').expect(201);
+
+    const tokenA = (await login(emailA, password).expect(200)).body.data.token;
+    const tokenB = (await login(emailB, password).expect(200)).body.data.token;
+
+    // 1. Profile retrieval shows default gamification stats and no sensitive fields
+    const resA = (await me(tokenA).expect(200)).body.data;
+    expect(resA.email).toBe(emailA);
+    expect(resA.full_name).toBe('User Alpha');
+    expect(resA.current_level).toBe(1);
+    expect(resA.total_xp).toBe(0);
+    expect(resA.current_streak).toBe(0);
+    expect(resA.streak_freeze_count).toBe(2);
+    expect(resA).not.toHaveProperty('password_hash');
+    expect(resA).not.toHaveProperty('reset_password_hash');
+
+    // 2. Account A updates valid name and trims whitespace
+    const updateRes = await updateProfile(tokenA, { full_name: '  User Alpha Updated  ' }).expect(200);
+    expect(updateRes.body.data.full_name).toBe('User Alpha Updated');
+
+    const refreshedA = (await me(tokenA).expect(200)).body.data;
+    expect(refreshedA.full_name).toBe('User Alpha Updated');
+
+    // 3. Account B profile remains unchanged (Cross-user isolation)
+    const resB = (await me(tokenB).expect(200)).body.data;
+    expect(resB.full_name).toBe('User Beta');
+    expect(resB.email).toBe(emailB);
+
+    // 4. Input validation: rejects empty, too short (< 2), and too long (> 100) names
+    await updateProfile(tokenA, { full_name: '   ' }).expect(400);
+    await updateProfile(tokenA, { full_name: 'X' }).expect(400);
+    await updateProfile(tokenA, { full_name: 'X'.repeat(101) }).expect(400);
+
+    // Existing record in DB remains intact after failed validation
+    const unchangedA = (await me(tokenA).expect(200)).body.data;
+    expect(unchangedA.full_name).toBe('User Alpha Updated');
+
+    // 5. Shield prohibited fields: total_xp, current_level, email, password_hash cannot be tampered with
+    const tamperRes = (await updateProfile(tokenA, {
+      full_name: 'Alpha Shielded',
+      total_xp: 99999,
+      current_level: 50,
+      current_streak: 100,
+      streak_freeze_count: 50,
+      email: 'hacker@example.test',
+      password_hash: '$2b$10$malicioushashhere1234567890'
+    }).expect(200)).body.data;
+
+    expect(tamperRes.full_name).toBe('Alpha Shielded');
+    expect(tamperRes.total_xp).toBe(0);
+    expect(tamperRes.current_level).toBe(1);
+    expect(tamperRes.current_streak).toBe(0);
+    expect(tamperRes.streak_freeze_count).toBe(2);
+    expect(tamperRes.email).toBe(emailA);
+
+    // 6. Unauthorized access blocked without Bearer token
+    await api.put(base + '/profile').send({ full_name: 'Anonymous Hacker' }).expect(401);
+  });
+
+  it('completes the full end-to-end auth lifecycle: register -> login -> profile -> forgot -> reset -> re-login -> logout', async () => {
+    const email = 'lifecycle@example.test';
+    const originalPassword = 'Initial-password-123';
+    const newPassword = 'New-secure-password-456';
+
+    // 1. Register
+    const regRes = await register(email, 'Lifecycle User', originalPassword).expect(201);
+    expect(regRes.body.success).toBe(true);
+
+    // 2. Login
+    const loginRes = await login(email, originalPassword).expect(200);
+    const token = loginRes.body.data.token;
+
+    // 3. Profile view & update
+    const profile = (await me(token).expect(200)).body.data;
+    expect(profile.email).toBe(email);
+    await updateProfile(token, { full_name: 'Lifecycle Renamed' }).expect(200);
+
+    // 4. Request forgot password
+    await api.post(base + '/forgot-password').send({ email }).expect(200);
+
+    // Verify reset token in database
+    const userDoc = await User.findOne({ email }).orFail();
+    expect(userDoc.reset_password_hash).toBeDefined();
+    expect(userDoc.reset_password_expires).toBeDefined();
+
+    // Fabricate reset token for test by setting a known token and its hash
+    const rawResetToken = randomUUID();
+    userDoc.reset_password_hash = createHash('sha256').update(rawResetToken).digest('hex');
+    userDoc.reset_password_expires = new Date(Date.now() + 15 * 60 * 1000);
+    await userDoc.save();
+
+    // 5. Reset password with new password
+    await api.post(base + '/reset-password').send({
+      token: rawResetToken,
+      password: newPassword
+    }).expect(200);
+
+    // 6. Token is single-use: replaying returns 400
+    await api.post(base + '/reset-password').send({
+      token: rawResetToken,
+      password: 'Yet-another-password-789'
+    }).expect(400);
+
+    // 7. Old password no longer works
+    await login(email, originalPassword).expect(401);
+
+    // 8. New password works
+    const newSession = (await login(email, newPassword).expect(200)).body.data;
+    expect(newSession.token).toBeDefined();
+
+    // 9. Logout terminates session
+    await api.post(base + '/logout').auth(newSession.token, { type: 'bearer' }).expect(200);
   });
 });

@@ -59,7 +59,7 @@
 | **US-S1-09** | [#26](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/26) | [US-S1-09] Đặt lại mật khẩu đã quên | Sub-issue của #17 | `@kiennarutonbmn1` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/26) |
 | **TECH-S1-11** | [#37](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/37) | [TECH-S1-11] Triển khai chức năng đặt lại mật khẩu đã quên (Frontend + Backend + Email) | Sub-issue của #26 | `@kiennarutonbmn1` | Sprint 1 | 18/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/37) |
 | **TECH-S1-07** | [#33](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/33) | [TECH-S1-07] Xác định User Data Model & Authentication API Contract | Sub-issue của #17 (Shared) | `@khongpc-ptit` | Sprint 1 | 17/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/33) |
-| **TECH-S1-12** | [#38](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) | [TECH-S1-12] Kiểm thử tích hợp Authentication & Account Management | Sub-issue của #17 (Shared) | `@mhunglee20405`<br>`@khongpc-ptit`<br>`@kiennarutonbmn1` | Sprint 1 | *Chưa thiết lập* | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) |
+| **TECH-S1-12** | [#38](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) | [TECH-S1-12] Kiểm thử tích hợp Authentication & Account Management | Sub-issue của #17 (Shared) | `@mhunglee20405`<br>`@khongpc-ptit`<br>`@kiennarutonbmn1` | Sprint 1 | 23/11/2026 | [Xem](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) |
 
 ---
 
@@ -772,14 +772,14 @@ SPRINT 1
 ---
 
 ### [TECH-S1-12] Kiểm thử tích hợp Authentication & Account Management
-- [ ] **Trạng thái:** Đã kiểm thử đăng ký và quản lý phiên. Còn chờ #36 để xác minh hồ sơ.
+- [x] **Trạng thái:** Đã hoàn thành (100% test suites passed)
 - **Báo cáo kiểm thử:** [Kết quả và cách chạy lại](reports/TECH-S1-12-auth-integration-test.md).
 - **GitHub Issue:** [#38](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue trực tiếp của [FEAT-02] (#17) | **Refs:** #22, #23, #24, #25, #26
-- **Người phụ trách:** `@mhunglee20405`, `@khongpc-ptit`, `@kiennarutonbmn1` | **Hạn chót:** `Chưa thiết lập trên Trello`
+- **Người phụ trách:** `@mhunglee20405`, `@khongpc-ptit`, `@kiennarutonbmn1` | **Hạn chót:** `23/11/2026`
 - **Lệnh tạo Branch:**
   ```bash
-  git checkout main && git pull origin main
+  git checkout develop && git pull origin develop
   git checkout -b test/tech-s1-12-auth-integration-test
   ```
 - **Tài liệu tham chiếu bắt buộc trong `docs/`:**
@@ -832,3 +832,10 @@ SPRINT 1
 ### Implementation update TECH-S1-02
 - Code and automated validation tests completed on `feat/tech-s1-02-create-task`.
 - Build passed. Server 21 tests and client 8 tests passed. Database persistence still needs a live MongoDB smoke test. Awaiting Tech Lead review.
+
+### Implementation update TECH-S1-12
+- Completed comprehensive end-to-end and integration test suites for Authentication & Account Management (FEAT-02).
+- Validated complete lifecycle covering US-S1-05 (Registration), US-S1-06 (Login/Logout), US-S1-07 (View Profile), US-S1-08 (Update Profile & Data Isolation), and US-S1-09 (Forgot & Reset Password).
+- Verified multi-user isolation between User A and User B, system field tamper resistance, and single-use password reset token consumption.
+- Client tests: 8 suites, 47 tests passed. Server tests: 9 suites, 74 tests passed. Build passed on both client and server with 0 errors.
+
