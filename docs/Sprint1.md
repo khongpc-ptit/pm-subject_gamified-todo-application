@@ -458,7 +458,8 @@ SPRINT 1
 ---
 
 ### [TECH-S1-06] Kiểm thử tích hợp Task Management
-- [ ] **Trạng thái:** Chưa thực hiện
+- [x] **Trạng thái:** Đã chạy kiểm thử tích hợp với MongoDB và Edge. Đang chờ review.
+- **Báo cáo kiểm thử:** [Kết quả và cách chạy lại](reports/TECH-S1-06-task-integration-test.md).
 - **GitHub Issue:** [#32](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/32) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue trực tiếp của [FEAT-01] (#16) | **Refs:** #18, #19, #20, #21
 - **Người phụ trách:** `@mhunglee20405`, `@khongpc-ptit`, `@kiennarutonbmn1` | **Hạn chót:** `13/11/2026`
