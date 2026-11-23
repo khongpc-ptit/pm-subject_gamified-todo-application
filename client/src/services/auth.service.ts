@@ -1,6 +1,6 @@
 import { apiClient } from './api';
 import type { ApiResponse } from '../types/task.types';
-import type { RegisterRequestDTO, AuthResponseData, UserProfile } from '../types/auth.types';
+import type { RegisterRequestDTO, UpdateProfileRequestDTO, AuthResponseData, UserProfile } from '../types/auth.types';
 
 export const authService = {
   /**
@@ -21,6 +21,52 @@ export const authService = {
     } catch (err: any) {
       if (err.response?.data?.error) {
         const serverError = new Error(err.response.data.error.message || 'Lỗi đăng ký') as any;
+        serverError.code = err.response.data.error.code;
+        serverError.status = err.response.status;
+        throw serverError;
+      }
+      throw err;
+    }
+  },
+
+  /**
+   * [US-S1-07 / TECH-S1-10] Lấy thông tin hồ sơ người dùng hiện tại
+   * GET /api/v1/auth/me
+   */
+  async getProfile(): Promise<UserProfile> {
+    try {
+      const response = await apiClient.get<ApiResponse<UserProfile>>('/auth/me');
+      if (response.data && response.data.success && response.data.data) {
+        localStorage.setItem('questline_user', JSON.stringify(response.data.data));
+        return response.data.data;
+      }
+      throw new Error(response.data?.message || 'Không thể lấy thông tin người dùng.');
+    } catch (err: any) {
+      if (err.response?.data?.error) {
+        const serverError = new Error(err.response.data.error.message || 'Lỗi tải hồ sơ') as any;
+        serverError.code = err.response.data.error.code;
+        serverError.status = err.response.status;
+        throw serverError;
+      }
+      throw err;
+    }
+  },
+
+  /**
+   * [US-S1-08 / TECH-S1-10] Cập nhật thông tin hồ sơ người dùng
+   * PUT /api/v1/auth/profile
+   */
+  async updateProfile(data: UpdateProfileRequestDTO): Promise<UserProfile> {
+    try {
+      const response = await apiClient.put<ApiResponse<UserProfile>>('/auth/profile', data);
+      if (response.data && response.data.success && response.data.data) {
+        localStorage.setItem('questline_user', JSON.stringify(response.data.data));
+        return response.data.data;
+      }
+      throw new Error(response.data?.message || 'Cập nhật hồ sơ thất bại.');
+    } catch (err: any) {
+      if (err.response?.data?.error) {
+        const serverError = new Error(err.response.data.error.message || 'Lỗi cập nhật hồ sơ') as any;
         serverError.code = err.response.data.error.code;
         serverError.status = err.response.status;
         throw serverError;

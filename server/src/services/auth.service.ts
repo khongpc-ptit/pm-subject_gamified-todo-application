@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { User } from '../models/User';
-import { RegisterDTO, AuthResponseData, UserProfileResponse } from '../types/user.types';
+import { RegisterDTO, UpdateProfileDTO, AuthResponseData, UserProfileResponse } from '../types/user.types';
 import { AppError } from '../middlewares/error.middleware';
 
 export class AuthService {
@@ -17,10 +17,86 @@ export class AuthService {
     const { password_hash, reset_password_hash, reset_password_expires, ...profile } = user.toObject();
     return { token, user: profile };
   }
-  async me(id: string) {
-    const user = await User.findById(id).select('-password_hash');
-    if (!user) throw Object.assign(new Error('Không tìm thấy người dùng'), { statusCode: 404, code: 'USER_NOT_FOUND' });
-    return user;
+  async me(id: string): Promise<UserProfileResponse> {
+    return this.getProfile(id);
+  }
+
+  /**
+   * [US-S1-07 / TECH-S1-10] Lấy thông tin hồ sơ người dùng hiện tại
+   * @param userId - ID người dùng từ JWT Token
+   * @returns Hồ sơ người dùng đã chuẩn hóa (loại bỏ hoàn toàn password_hash)
+   */
+  async getProfile(userId: string): Promise<UserProfileResponse> {
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('Không tìm thấy người dùng') as AppError;
+      error.statusCode = 404;
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    return {
+      _id: user._id.toString(),
+      email: user.email,
+      full_name: user.full_name,
+      current_level: user.current_level,
+      total_xp: user.total_xp,
+      current_streak: user.current_streak,
+      last_active_date: user.last_active_date,
+      streak_freeze_count: user.streak_freeze_count,
+      created_at: user.created_at ? user.created_at.toISOString() : new Date().toISOString(),
+      updated_at: user.updated_at ? user.updated_at.toISOString() : undefined
+    };
+  }
+
+  /**
+   * [US-S1-08 / TECH-S1-10] Cập nhật thông tin hồ sơ người dùng
+   * @param userId - ID người dùng từ JWT Token
+   * @param data - Dữ liệu cập nhật { full_name }
+   * @returns Hồ sơ người dùng sau khi cập nhật
+   */
+  async updateProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfileResponse> {
+    const rawFullName = data?.full_name ?? data?.fullName;
+
+    if (!rawFullName || typeof rawFullName !== 'string' || !rawFullName.trim()) {
+      const error = new Error('Vui lòng nhập họ và tên.') as AppError;
+      error.statusCode = 400;
+      error.code = 'VALIDATION_ERROR';
+      throw error;
+    }
+
+    const trimmedFullName = rawFullName.trim();
+    if (trimmedFullName.length < 2 || trimmedFullName.length > 100) {
+      const error = new Error('Họ và tên phải có độ dài từ 2 đến 100 ký tự.') as AppError;
+      error.statusCode = 400;
+      error.code = 'VALIDATION_ERROR';
+      throw error;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('Không tìm thấy người dùng') as AppError;
+      error.statusCode = 404;
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    // Chỉ cập nhật full_name, bỏ qua mọi thay đổi trái phép đối với các trường khác
+    user.full_name = trimmedFullName;
+    const savedUser = await user.save();
+
+    return {
+      _id: savedUser._id.toString(),
+      email: savedUser.email,
+      full_name: savedUser.full_name,
+      current_level: savedUser.current_level,
+      total_xp: savedUser.total_xp,
+      current_streak: savedUser.current_streak,
+      last_active_date: savedUser.last_active_date,
+      streak_freeze_count: savedUser.streak_freeze_count,
+      created_at: savedUser.created_at ? savedUser.created_at.toISOString() : new Date().toISOString(),
+      updated_at: savedUser.updated_at ? savedUser.updated_at.toISOString() : undefined
+    };
   }
 
   /**

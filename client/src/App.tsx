@@ -42,10 +42,16 @@ export const App = () => {
   };
 
   if (user) {
-    return <Dashboard currentUser={user} onLogout={() => {
-      authService.logout();
-      setUser(null);
-    }} />;
+    return (
+      <Dashboard
+        currentUser={user}
+        onUpdateUser={(updated) => setUser(updated)}
+        onLogout={() => {
+          authService.logout();
+          setUser(null);
+        }}
+      />
+    );
   }
   if (registering) {
     return <AuthPage onAuthSuccess={({ user }) => startSession(user)} onSwitchToLogin={() => setRegistering(false)} />;

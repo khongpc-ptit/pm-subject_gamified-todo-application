@@ -17,6 +17,10 @@ export interface RegisterRequestDTO {
   full_name: string;
 }
 
+export interface UpdateProfileRequestDTO {
+  full_name: string;
+}
+
 export interface AuthResponseData {
   token: string;
   user: UserProfile;
