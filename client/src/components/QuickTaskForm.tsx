@@ -114,7 +114,7 @@ export const QuickTaskForm: React.FC<QuickTaskFormProps> = ({
           </button>
         </div>
 
-        {success && <p role="status">T?o c?ng vi?c th?nh c?ng</p>}
+        {success && <p role="status">Tạo công việc thành công</p>}
         {error && (
           <div id="quick-error" className="error" role="alert">
             {error}

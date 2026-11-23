@@ -1,7 +1,9 @@
+import mongoose from 'mongoose';
 import { Task, PRIORITY_XP_MAP } from '../models/Task';
 import {
   ITask,
   CreateTaskDTO,
+  UpdateTaskDTO,
   ListTasksQueryDTO,
   TaskListResponseData,
   TaskPriority,
@@ -10,6 +12,24 @@ import {
 import { AppError } from '../middlewares/error.middleware';
 
 export class TaskService {
+  async completeTask(userId: string, taskId: string): Promise<ITask> {
+    if (!/^[a-f0-9]{24}$/i.test(taskId)) {
+      throw Object.assign(new Error('Định danh nhiệm vụ không hợp lệ'), { statusCode: 400, code: 'INVALID_ID' });
+    }
+    const task = await Task.findOneAndUpdate(
+      { _id: taskId, user_id: userId, status: { $ne: 'COMPLETED' } },
+      { $set: { status: 'COMPLETED', completed_at: new Date() } },
+      { new: true, runValidators: true }
+    );
+    if (task) return task;
+    const existing = await Task.findOne({ _id: taskId, user_id: userId });
+    if (existing) return existing;
+    const exists = await Task.exists({ _id: taskId });
+    throw Object.assign(new Error(exists ? 'Bạn không có quyền thao tác trên nhiệm vụ này' : 'Không tìm thấy nhiệm vụ'), {
+      statusCode: exists ? 403 : 404, code: exists ? 'FORBIDDEN' : 'TASK_NOT_FOUND'
+    });
+  }
+
   /**
    * Truy xuất danh sách công việc của người dùng hiện tại
    * @param userId - ID người dùng sở hữu
@@ -79,7 +99,7 @@ export class TaskService {
 
     let trimmedDesc = '';
     if (description !== undefined && description !== null && typeof description !== 'string') {
-      throw Object.assign(new Error('M? t? ph?i l? chu?i'), { statusCode: 400, code: 'VALIDATION_ERROR' });
+      throw Object.assign(new Error('Mô tả phải là chuỗi'), { statusCode: 400, code: 'VALIDATION_ERROR' });
     }
     if (description) {
       trimmedDesc = typeof description === 'string' ? description.trim() : '';
@@ -125,6 +145,127 @@ export class TaskService {
       completed_at: null
     });
 
+    return await task.save();
+  }
+
+  /**
+   * [US-S1-03 / TECH-S1-04] Cập nhật thông tin công việc
+   * @param userId - ID người dùng hiện tại (xác thực quyền sở hữu)
+   * @param taskId - ID của công việc cần cập nhật (chuỗi 24 hex ký tự MongoDB ObjectId)
+   * @param data - Dữ liệu cần cập nhật { title, description, priority, due_date, status }
+   * @returns Công việc sau khi cập nhật
+   */
+  async updateTask(userId: string, taskId: string, data: UpdateTaskDTO): Promise<ITask> {
+    // 1. Kiểm tra tính hợp lệ của :id (định dạng 24 hex ký tự MongoDB ObjectId)
+    if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
+      const error = new Error('Định danh nhiệm vụ không hợp lệ') as AppError;
+      error.statusCode = 400;
+      error.code = 'INVALID_ID';
+      throw error;
+    }
+
+    // 2. Tìm nhiệm vụ trong cơ sở dữ liệu
+    const task = await Task.findById(taskId);
+    if (!task) {
+      const error = new Error('Không tìm thấy nhiệm vụ') as AppError;
+      error.statusCode = 404;
+      error.code = 'TASK_NOT_FOUND';
+      throw error;
+    }
+
+    // 3. Kiểm tra quyền sở hữu (Chỉ người tạo task mới có quyền chỉnh sửa)
+    if (task.user_id.toString() !== userId) {
+      const error = new Error('Bạn không có quyền thao tác trên nhiệm vụ này') as AppError;
+      error.statusCode = 403;
+      error.code = 'FORBIDDEN';
+      throw error;
+    }
+
+    // 4. Validate và cập nhật từng trường cho phép (Chỉ cho phép: title, description, priority, due_date, status)
+    // - Validate title
+    if (data.title !== undefined) {
+      if (typeof data.title !== 'string' || !data.title.trim()) {
+        const error = new Error('Vui lòng nhập tiêu đề nhiệm vụ') as AppError;
+        error.statusCode = 400;
+        error.code = 'TITLE_REQUIRED';
+        throw error;
+      }
+
+      const trimmedTitle = data.title.trim();
+      if (trimmedTitle.length > 200) {
+        const error = new Error('Tiêu đề công việc không được vượt quá 200 ký tự') as AppError;
+        error.statusCode = 400;
+        error.code = 'TITLE_TOO_LONG';
+        throw error;
+      }
+      task.title = trimmedTitle;
+    }
+
+    // - Validate description
+    if (data.description !== undefined) {
+      const trimmedDesc = typeof data.description === 'string' ? data.description.trim() : '';
+      if (trimmedDesc.length > 1000) {
+        const error = new Error('Mô tả chi tiết tối đa 1000 ký tự') as AppError;
+        error.statusCode = 400;
+        error.code = 'DESCRIPTION_TOO_LONG';
+        throw error;
+      }
+      task.description = trimmedDesc;
+    }
+
+    // - Validate priority & tính toán lại điểm thưởng xp_reward
+    if (data.priority !== undefined) {
+      const validPriorities: TaskPriority[] = ['LOW', 'MEDIUM', 'HIGH'];
+      if (!validPriorities.includes(data.priority)) {
+        const error = new Error(
+          'Mức độ ưu tiên không hợp lệ. Chỉ chấp nhận: LOW, MEDIUM, HIGH'
+        ) as AppError;
+        error.statusCode = 400;
+        error.code = 'INVALID_PRIORITY';
+        throw error;
+      }
+      task.priority = data.priority;
+      task.xp_reward = PRIORITY_XP_MAP[data.priority] || 20;
+    }
+
+    // - Validate due_date
+    if (data.due_date !== undefined) {
+      if (data.due_date === null || data.due_date === '') {
+        task.due_date = null;
+      } else {
+        const parsedDueDate = new Date(data.due_date);
+        if (isNaN(parsedDueDate.getTime())) {
+          const error = new Error('Ngày đến hạn không đúng định dạng') as AppError;
+          error.statusCode = 400;
+          error.code = 'INVALID_DUE_DATE';
+          throw error;
+        }
+        task.due_date = parsedDueDate;
+      }
+    }
+
+    // - Validate status
+    if (data.status !== undefined) {
+      const validStatuses: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'COMPLETED'];
+      if (!validStatuses.includes(data.status)) {
+        const error = new Error(
+          'Trạng thái không hợp lệ. Chỉ chấp nhận: TODO, IN_PROGRESS, COMPLETED'
+        ) as AppError;
+        error.statusCode = 400;
+        error.code = 'INVALID_STATUS';
+        throw error;
+      }
+
+      // Quản lý completed_at tương ứng với status
+      if (data.status === 'COMPLETED' && !task.completed_at) {
+        task.completed_at = new Date();
+      } else if (data.status !== 'COMPLETED') {
+        task.completed_at = null;
+      }
+      task.status = data.status;
+    }
+
+    // 5. Lưu vào MongoDB và trả về dữ liệu mới
     return await task.save();
   }
 }
