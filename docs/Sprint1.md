@@ -770,7 +770,8 @@ SPRINT 1
 ---
 
 ### [TECH-S1-12] Kiểm thử tích hợp Authentication & Account Management
-- [ ] **Trạng thái:** Chưa thực hiện
+- [ ] **Trạng thái:** Đã kiểm thử đăng ký và quản lý phiên. Còn chờ #36 để xác minh hồ sơ.
+- **Báo cáo kiểm thử:** [Kết quả và cách chạy lại](reports/TECH-S1-12-auth-integration-test.md).
 - **GitHub Issue:** [#38](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/38) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue trực tiếp của [FEAT-02] (#17) | **Refs:** #22, #23, #24, #25, #26
 - **Người phụ trách:** `@mhunglee20405`, `@khongpc-ptit`, `@kiennarutonbmn1` | **Hạn chót:** `Chưa thiết lập trên Trello`
