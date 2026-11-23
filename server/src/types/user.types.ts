@@ -23,6 +23,11 @@ export interface RegisterDTO {
   fullName?: string;
 }
 
+export interface UpdateProfileDTO {
+  full_name?: string;
+  fullName?: string;
+}
+
 export interface UserProfileResponse {
   _id: string;
   email: string;

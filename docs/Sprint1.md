@@ -664,7 +664,7 @@ SPRINT 1
 ---
 
 ### [TECH-S1-10] Triển khai chức năng xem & cập nhật hồ sơ người dùng (Frontend + Backend)
-- [ ] **Trạng thái:** Chưa thực hiện
+- [x] **Trạng thái:** Hoàn thành
 - **GitHub Issue:** [#36](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/36) | **Loại:** `tech-task` | **Milestone:** `Sprint 1`
 - **Quan hệ:** Sub-issue của [US-S1-07] (#24) | **Liên kết:** [US-S1-08] (#25) | **Feature cha:** [FEAT-02] (#17)
 - **Người phụ trách:** `@mhunglee20405` | **Hạn chót:** `Chưa thiết lập trên Trello`

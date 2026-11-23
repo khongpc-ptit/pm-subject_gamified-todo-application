@@ -11,10 +11,43 @@ export class AuthController {
     } catch (error) { next(error); }
   }
   async me(req: Request, res: Response, next: NextFunction) {
+    return this.getProfile(req, res, next);
+  }
+
+  /**
+   * [US-S1-07 / TECH-S1-10] Lấy thông tin người dùng hiện tại
+   * GET /api/v1/auth/me
+   */
+  async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const data = await authService.me(req.user!.id);
-      res.json({ success: true, data, message: 'Lấy thông tin người dùng thành công', timestamp: new Date().toISOString() });
-    } catch (error) { next(error); }
+      const data = await authService.getProfile(req.user!.id);
+      res.json({
+        success: true,
+        data,
+        message: 'Lấy thông tin người dùng thành công',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * [US-S1-08 / TECH-S1-10] Cập nhật thông tin hồ sơ người dùng
+   * PUT /api/v1/auth/profile
+   */
+  async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data = await authService.updateProfile(req.user!.id, req.body);
+      res.json({
+        success: true,
+        data,
+        message: 'Cập nhật hồ sơ thành công',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
   /**
