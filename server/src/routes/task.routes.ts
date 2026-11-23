@@ -17,4 +17,13 @@ router.post('/', (req, res, next) => {
   taskController.createTask(req, res, next);
 });
 
+// [US-S1-03] PUT /api/v1/tasks/:id - Cập nhật công việc
+router.put('/:id', (req, res, next) => {
+  taskController.updateTask(req, res, next);
+});
+
+router.patch('/:id/complete', (req, res, next) => {
+  void taskController.completeTask(req, res, next);
+});
+
 export default router;

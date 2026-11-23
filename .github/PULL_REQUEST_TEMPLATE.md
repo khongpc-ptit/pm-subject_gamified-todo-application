@@ -1,16 +1,15 @@
 ## 1. Phân loại Pull Request
 *(Chỉ giữ lại 1 dòng loại PR phù hợp, xóa các dòng còn lại)*
-- Technical Task (Feature / Test): Triển khai công việc kỹ thuật trong Sprint ([TECH-S1-xx])
-- Bugfix / Hotfix: Sửa lỗi phát sinh trong quá trình code hoặc kiểm thử ([BUG-S1-xx])
-- Config / Chore / Docs: Cài đặt hạ tầng, Database, Docker, CI/CD, .env hoặc tài liệu ([CONF-S1-xx] / [DOC-xx])
+- Technical Task (Feature / Test): Triển khai công việc kỹ thuật trong Sprint ([TECH-Sx-yy])
+- Bugfix / Hotfix: Sửa lỗi phát sinh trong quá trình code hoặc kiểm thử ([BUG-Sx-yy])
+- Config / Chore / Docs: Cài đặt hạ tầng, Database, Docker, CI/CD, .env hoặc tài liệu ([CONF-Sx-yy] / [DOC-xx])
 
 ---
 
 ## 2. Liên kết Issue & Trello
-*(Dùng "Closes #<số_issue>" cho Tech Task / Config, hoặc "Fixes #<số_issue_bug>" cho Bugfix)*
-- Đóng Issue trên GitHub (Closes / Fixes): Closes #
-- Liên quan đến Issue khác (nếu có): Refs #
-- Mã thẻ trên Trello (US / TECH): [US-S1-xx] / [TECH-S1-xx]
+*(Dùng "Closes #<số_tech_task>" cho Tech Task / Config / Docs, hoặc "Fixes #<số_bug>" cho Bugfix)*
+- Đóng Tech Task trên GitHub (Closes / Fixes): Closes #
+- Mã thẻ trên Trello (TECH): [TECH-Sx-yy]
 
 ---
 
@@ -50,9 +49,9 @@
 
 ## 6. Checklist trước khi gửi Review
 - [ ] Đặt đúng chuẩn Branch & PR Title:
-  - Tech Task: feat/tech-s1-xx-... | [TECH-S1-xx] Mô tả ngắn
-  - Bugfix: fix/bug-s1-xx-... | [BUG-S1-xx] Fix ...
-  - Config / Docs: chore/... hoặc docs/... | [CONF-S1-xx] / [TECH-S1-xx] Mô tả ngắn
+  - Tech Task: feat/tech-s*-* | [TECH-Sx-yy] Mô tả ngắn
+  - Bugfix: fix/bug-s*-* | [BUG-Sx-yy] Fix ...
+  - Config / Docs: chore/... hoặc docs/... | [CONF-Sx-yy] / [TECH-Sx-yy] Mô tả ngắn
 - [ ] Code đã chạy thử thành công ở local, không lỗi build/lint.
 - [ ] Không commit nhầm file .env hoặc thông tin nhạy cảm.
 - [ ] Đã cập nhật .env.example và README.md (nếu có thêm biến môi trường mới).
