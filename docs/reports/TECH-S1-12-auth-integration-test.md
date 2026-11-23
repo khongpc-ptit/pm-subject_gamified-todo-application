@@ -1,30 +1,27 @@
-# TECH-S1-12 Auth integration verification
+# TECH-S1-12 · Authentication and account management integration
 
-Refs #38, #22, #23, #24, #25, #26.
+Issue #38 covers US-S1-05 through US-S1-09. Profile acceptance still depends on #36.
 
-## Current status
+## Verification on 23 November 2026
 
-Prepared by Kien. Full acceptance awaits registration #34, profile #36 and approval/merge of login PR #45 and reset PR #46. Mocked backend tests cover login, JWT expiry and reset consumption. SMTP delivery and real database persistence remain unverified.
+| Coverage | Result |
+| --- | --- |
+| Registration against MongoDB | Passed. Normalized email, duplicate rejection, bcrypt storage and sanitized responses. |
+| Login and session API | Passed. Same error for wrong password or unknown account, protected current-user and logout endpoints, expired and invalidly signed sessions rejected. |
+| Browser session state | Passed in the React integration suite. Login enables the authenticated view, a fresh mount restores a valid session, and logout or expiration clears local credentials. |
+| Password reset | Covered by the TECH-S1-11 verification for #37, including MongoDB state, SMTP delivery, expiry and concurrent replay. Run both suites together once its follow-up is merged. |
+| Profile view and update | Blocked by #36. The current-user session API is tested. The editable profile view and update endpoint are required for complete acceptance. |
 
-## Execution prerequisites
+## Profile acceptance after #36
 
-Configure MongoDB, JWT_SECRET and CLIENT_URL. Run an SMTP capture service and set SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASSWORD and SMTP_FROM. Start both apps. Use two accounts A and B.
+1. Create accounts A and B. Sign in as A. Verify the profile page shows A's name, email, level and XP as specified in the Sprint 1 wireframe.
+2. Save a valid name using the profile form and reload. Verify the updated name through the UI and `GET /api/v1/auth/me`.
+3. Submit an empty name and an invalid-length name. Verify validation appears, the form keeps the unsaved input and the previously saved record is preserved.
+4. Confirm anonymous requests to `PUT /api/v1/auth/profile` are denied. Verify the authenticated identity determines the record updated and prohibited fields are protected. Check B's unchanged profile and absence of credential fields from the public response.
+5. Record outcomes before marking #38 complete.
 
-## Acceptance cases
+## Reproduce current coverage
 
-| Case | Steps | Expected result | Result |
-| --- | --- | --- | --- |
-| Registration | Register valid account, retry same normalized email | 201 then 409, bcrypt hash only in DB | Blocked by #34 |
-| Login | Wrong password, nonexistent email, then valid credentials | Same 401 error for failures, signed JWT and public user on success | Mocked tests pass, live pending |
-| Session | Reload with valid JWT, then remove JWT, expire JWT, tamper signature | Valid session restored, unauthorized sessions return to login | Pending |
-| Logout | Logout and reload or use browser back | Stored credentials removed, protected UI requires login | Pending |
-| Profile | Read/edit A profile, attempt modifying B or gamification fields | Public fields only, ownership and allowed-field validation | Blocked by #36 |
-| Reset request | Request known and unknown emails | Generic successful response, SMTP message only for existing account | Mocked delivery adapter test passes, actual SMTP pending |
-| Reset storage | Inspect user reset fields | SHA-256 token hash, expiry 15 minutes, no raw token | Pending |
-| Reset consume | Use emailed link, set valid new password, login old/new password | New password works, old password fails, reset fields removed | Pending |
-| Reset replay | Submit same token twice concurrently | Exactly one successful update | Atomic query implemented, real DB pending |
-| Expired reset | Expire token and submit | Rejected, password unchanged | Pending |
-| Email failure | Stop SMTP, request reset, inspect user | Failure response, failed token cleared without removing a newer request | Pending |
-| Leakage | Inspect login/me responses and logs | No password hash or reset token/hash in public response | Pending |
+Run `npm --prefix server ci` and `npm --prefix client ci`. Set `TEST_MONGODB_URI` to development MongoDB, then run `npm run build` and `npm test`. The suite uses and drops its own randomly named database. This run passed 60 server and 28 client tests.
 
-Record execution evidence and defect links before marking #38 complete. Tech Lead approval remains required.
+Full profile acceptance and Tech Lead review are pending.
