@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { TaskPriority } from './task.types';
+export * from './level.types';
 
 export interface DailyXPCapResult {
   currentDayXP: number;

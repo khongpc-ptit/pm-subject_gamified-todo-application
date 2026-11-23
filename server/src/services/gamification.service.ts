@@ -38,27 +38,18 @@ export function getVietnamDayRangeUTC(date: Date = new Date()): { startOfDay: Da
 }
 
 /**
- * Công thức tính cấp bậc dựa trên tổng XP: Level = floor(sqrt(total_xp) / 10) + 1
+ * Re-export các tiện ích tính toán cấp độ từ gamificationUtils [TECH-S2-05]
  */
-export function calculateLevel(totalXP: number): number {
-  if (!totalXP || totalXP <= 0) return 1;
-  return Math.floor(Math.sqrt(totalXP) / 10) + 1;
-}
-
-/**
- * Điểm kinh nghiệm tối thiểu để đạt cấp level: Required_XP(L) = (10 * (L - 1))^2
- */
-export function calculateRequiredXP(level: number): number {
-  if (level <= 1) return 0;
-  return Math.pow(10 * (level - 1), 2);
-}
-
-/**
- * Điểm kinh nghiệm cần thiết để lên cấp tiếp theo: Next_Level_XP(L) = (10 * L)^2
- */
-export function calculateNextLevelXP(level: number): number {
-  return Math.pow(10 * Math.max(1, level), 2);
-}
+export {
+  calculateLevel,
+  calculateRequiredXP,
+  calculateNextLevelXP,
+  calculateProgressPercent,
+  getLevelTitle,
+  checkLevelProgression,
+  LEVEL_TITLES
+} from '../utils/gamificationUtils';
+import { calculateLevel } from '../utils/gamificationUtils';
 
 export class GamificationService {
   /**

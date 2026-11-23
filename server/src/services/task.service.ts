@@ -4,9 +4,12 @@ import { User } from '../models/User';
 import {
   gamificationService,
   calculateLevel,
+  calculateRequiredXP,
   calculateNextLevelXP,
+  calculateProgressPercent,
   getVietnamDateString
 } from './gamification.service';
+import { levelService } from './level.service';
 import {
   ITask,
   CreateTaskDTO,
@@ -45,8 +48,9 @@ export class TaskService {
           const oldLevel = user.current_level || 1;
           user.total_xp = (user.total_xp || 0) + capResult.xp_earned;
           user.last_active_date = getVietnamDateString();
-          user.current_level = calculateLevel(user.total_xp);
-          levelUp = user.current_level > oldLevel;
+          const levelResult = levelService.checkLevelUp(oldLevel, user.total_xp);
+          user.current_level = levelResult.new_level;
+          levelUp = levelResult.level_up;
           if (typeof user.save === 'function') {
             await user.save();
           }
@@ -74,7 +78,9 @@ export class TaskService {
         total_xp: totalXP,
         current_level: currentLevel,
         level_up: levelUp,
+        required_xp: calculateRequiredXP(currentLevel),
         next_level_xp: calculateNextLevelXP(currentLevel),
+        progress_percent: calculateProgressPercent(totalXP, currentLevel),
         is_cap_reached: capResult.is_cap_reached
       };
     }
@@ -359,7 +365,7 @@ export class TaskService {
             if (user) {
               user.total_xp = (user.total_xp || 0) + capResult.xp_earned;
               user.last_active_date = getVietnamDateString();
-              user.current_level = calculateLevel(user.total_xp);
+              user.current_level = levelService.calculateLevel(user.total_xp);
               if (typeof user.save === 'function') {
                 await user.save();
               }
