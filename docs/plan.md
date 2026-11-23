@@ -61,7 +61,7 @@ Mọi API Endpoint trong toàn bộ dự án bắt buộc phải trả về dữ
 | Thành viên | Tài khoản GitHub | Vai trò chính | Trách nhiệm cốt lõi |
 |---|---|---|---|
 | **Khổng Phú Cường** | `@khongpc-ptit` | Project Manager & Tech Lead | Quản lý tiến độ chung, thiết kế kiến trúc hệ thống, cấu hình Docker/CI/CD, Backend API lõi, CSDL MongoDB & Mongoose Schemas, Code Review & Merge PR. |
-| **Nguyễn Trung Kiên** | `@kiennarutonbmn1` | Business Analyst & Frontend Lead | Phân tích quy trình nghiệp vụ (SRS), phát triển toàn bộ UI/UX Components, Custom React Hooks, tích hợp API Client, Quản lý State Frontend. |
+| **Đinh Trung Kiên** | `@kiennarutonbmn1` | Business Analyst & Frontend Lead | Phân tích quy trình nghiệp vụ (SRS), phát triển toàn bộ UI/UX Components, Custom React Hooks, tích hợp API Client, Quản lý State Frontend. |
 | **Lê Mạnh Hùng** | `@mhunglee20405` | Product Owner & QA/Fullstack Lead | Quản lý Acceptance Criteria, thiết kế Test Plan & Test Suites tự động (Unit/Integration/E2E), kiểm thử bảo mật & hiệu năng, điều phối UAT Pilot. |
 
 ---
@@ -181,29 +181,38 @@ gantt
 * **Tài liệu tham chiếu:** [`docs/[DOC-11] System Design Document.md`]([DOC-11]%20System%20Design%20Document.md) (Mục 3.2, 3.3, 4.2, 4.3).
 
 #### 3.2.1. Danh sách User Stories & Tiêu chí Nghiệm thu (05 US)
-1. **`US-S2-01` [Thiết lập thói quen lặp lại]:**
+
+| User Story ID | Tên User Story | Người được giao | Deadline |
+|---|---|---|:---:|
+| **US-S2-01** | Thiết lập thói quen lặp lại | Khổng Phú Cường (`@khongpc-ptit`) | 29/11/2026 |
+| **US-S2-02** | Điểm danh thói quen hàng ngày | Đinh Trung Kiên (`@kiennarutonbmn1`) | 29/11/2026 |
+| **US-S2-03** | Tích lũy điểm kinh nghiệm khi hoàn thành công việc | Đinh Trung Kiên (`@kiennarutonbmn1`) | 29/11/2026 |
+| **US-S2-04** | Cơ chế giới hạn điểm thưởng và hoàn tác (Anti-gaming) | Lê Mạnh Hùng (`@mhunglee20405`) | 29/11/2026 |
+| **US-S2-05** | Thăng cấp độ và theo dõi thanh tiến trình | Lê Mạnh Hùng (`@mhunglee20405`) | 29/11/2026 |
+
+1. **`US-S2-01` [Thiết lập thói quen lặp lại]** *(Phụ trách: `@khongpc-ptit` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn tạo thói quen cần duy trì với chu kỳ lặp lại (Hàng ngày / Hàng tuần) và số ngày mục tiêu để theo đuổi mục tiêu dài hạn.
    - *Acceptance Criteria (AC):*
      - `AC-2.1.1`: Nhập tiêu đề thói quen (1–200 ký tự), chọn chu kỳ (`frequency`: "DAILY" hoặc "WEEKLY"), chọn số ngày mục tiêu (`target_days`, mặc định 7 ngày). Bấm "Tạo thói quen" -> Lưu vào CSDL với `is_active: true`, hiển thị ngay trên bảng Habit Tracker.
      - `AC-2.1.2`: Người dùng có thể xóa/hủy theo dõi thói quen -> Gọi `DELETE /api/v1/habits/:id`, hệ thống chuyển `is_active: false` (soft delete) hoặc xóa bản ghi.
-2. **`US-S2-02` [Điểm danh thói quen hàng ngày]:**
+2. **`US-S2-02` [Điểm danh thói quen hàng ngày]** *(Phụ trách: `@kiennarutonbmn1` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn check-in đánh dấu hoàn thành thói quen trong ngày hôm nay và xem lại lịch sử các ngày đã thực hiện.
    - *Acceptance Criteria (AC):*
      - `AC-2.2.1`: Bấm nút Check-in trên thói quen -> Gọi `POST /api/v1/habits/:id/check-in`. Hệ thống tự động lấy ngày hiện tại định dạng `YYYY-MM-DD` theo múi giờ UTC+7, kiểm tra nếu hôm nay chưa check-in thì thêm vào mảng `logs`, cộng +15 XP cho người dùng.
      - `AC-2.2.2`: Nếu hôm nay đã check-in rồi mà bấm tiếp -> Hệ thống thông báo "Bạn đã điểm danh thói quen này hôm nay rồi" (hoặc chặn nút ở Frontend), không cộng dồn XP lần 2.
-3. **`US-S2-03` [Tích lũy điểm kinh nghiệm khi hoàn thành công việc]:**
+3. **`US-S2-03` [Tích lũy điểm kinh nghiệm khi hoàn thành công việc]** *(Phụ trách: `@kiennarutonbmn1` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn nhận điểm kinh nghiệm tương ứng khi hoàn thành công việc (Thấp: 10 XP, Trung bình: 20 XP, Cao: 30 XP, Check-in thói quen: 15 XP).
    - *Acceptance Criteria (AC):*
      - `AC-2.3.1`: Hoàn thành Task LOW -> Cộng +10 XP vào `user.total_xp`.
      - `AC-2.3.2`: Hoàn thành Task MEDIUM -> Cộng +20 XP vào `user.total_xp`.
      - `AC-2.3.3`: Hoàn thành Task HIGH -> Cộng +30 XP vào `user.total_xp`.
      - `AC-2.3.4`: Check-in Habit thành công -> Cộng +15 XP vào `user.total_xp`. Hiển thị Toast thông báo chúc mừng kèm số XP nhận được trên màn hình.
-4. **`US-S2-04` [Cơ chế giới hạn điểm thưởng và hoàn tác (Anti-gaming)]:**
+4. **`US-S2-04` [Cơ chế giới hạn điểm thưởng và hoàn tác (Anti-gaming)]** *(Phụ trách: `@mhunglee20405` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi hiểu rằng hệ thống giới hạn nhận tối đa 200 XP/ngày (để đảm bảo tính công bằng) và sẽ trừ lại điểm XP nếu tôi hủy đánh dấu hoàn thành một việc cũ.
    - *Acceptance Criteria (AC):*
      - `AC-2.4.1`: Tổng số XP người dùng kiếm được trong ngày từ cả Task và Habit không được vượt quá **200 XP (Daily XP Cap)**. Khi đã đạt 200 XP trong ngày, việc hoàn thành thêm task vẫn đổi trạng thái sang COMPLETED nhưng `xp_earned: 0` và hiển thị thông báo "Bạn đã đạt giới hạn 200 XP tối đa trong ngày hôm nay".
      - `AC-2.4.2`: Khi người dùng chuyển trạng thái Task từ COMPLETED ngược về TODO -> Hệ thống tự động trừ đi đúng số XP đã cộng tương ứng từ `user.total_xp` (không để `total_xp` bị âm).
-5. **`US-S2-05` [Thăng cấp độ và theo dõi thanh tiến trình]:**
+5. **`US-S2-05` [Thăng cấp độ và theo dõi thanh tiến trình]** *(Phụ trách: `@mhunglee20405` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn nhìn thấy cấp độ (Level) của mình tăng lên khi đủ điểm XP và có thanh tiến trình hiển thị rõ còn thiếu bao nhiêu XP để lên cấp tiếp theo.
    - *Acceptance Criteria (AC):*
      - `AC-2.5.1`: Cấp độ được tính tự động theo công thức chuẩn: $\text{Level} = \lfloor \sqrt{\text{Total\_XP}} / 10 \rfloor + 1$.
@@ -212,16 +221,16 @@ gantt
      - `AC-2.5.3`: Thanh XP Bar trên Header hiển thị tỷ lệ % kinh nghiệm hiện tại so với mốc kinh nghiệm cần thiết để đạt cấp kế tiếp.
 
 #### 3.2.2. Danh sách Technical Tasks Chi Tiết (08 TECH Tasks)
-| Mã Task | Phân loại | Người phụ trách | Hạn chót | Mục tiêu, Đặc tả Kỹ thuật & Tiêu chí Hoàn thành | Phụ thuộc |
-|---|---|---|:---:|---|---|
-| **TECH-S2-01** | Docs/Design | `@khongpc-ptit` | 21/11/2026 | **Đặc tả Schema `habits`, Compound Index & API Contract:**<br>• Tạo model `server/src/models/Habit.ts` với Schema: `user_id` (ObjectId, ref: User, required), `title` (String, max 200, required), `frequency` (Enum: ['DAILY', 'WEEKLY'], default 'DAILY'), `target_days` (Number, default 7), `current_streak` (Number, default 0), `is_active` (Boolean, default true), `logs` (Array nhúng: `log_date` YYYY-MM-DD, `is_completed` Boolean, `xp_earned` Number).<br>• Compound Index: `{ user_id: 1, is_active: 1 }`.<br>• Xuất bản tài liệu `docs/[TECH-S2-01] Habit Data Model & Gamification API Contract.md`. | Sprint 1 |
-| **TECH-S2-02** | Backend | `@khongpc-ptit` | 24/11/2026 | **Triển khai Habit Controller, Service & CRUD APIs:**<br>• Tệp: `server/src/controllers/habitController.ts`, `server/src/services/habitService.ts`.<br>• `GET /api/v1/habits`: Trả về danh sách thói quen active của user kèm lịch sử logs 7 ngày gần nhất.<br>• `POST /api/v1/habits`: Tạo thói quen mới, validate `title` 1–200 ký tự.<br>• `DELETE /api/v1/habits/:id`: Xóa thói quen theo `_id` có gắn điều kiện `{ user_id: req.user.id }`. Trả về chuẩn JSON Envelope. | TECH-S2-01 |
-| **TECH-S2-03** | Frontend | `@kiennarutonbmn1` | 25/11/2026 | **Xây dựng Giao diện Quản lý Thói quen (Habit Tracker UI):**<br>• Tệp: `client/src/pages/HabitsPage.tsx`, `client/src/components/habits/HabitCard.tsx`, `HabitCreateModal.tsx`.<br>• Hiển thị danh sách card thói quen, chu kỳ lặp lại, thanh tiến độ số ngày thực hiện trong tuần, nút check-in trạng thái hôm nay. Form tạo thói quen chọn radio Daily/Weekly, input số ngày mục tiêu. | TECH-S2-01 |
-| **TECH-S2-04** | Backend | `@khongpc-ptit` | 26/11/2026 | **Xây dựng Gamification Core Engine & Chống Gian Lận (Anti-gaming):**<br>• Tệp: `server/src/services/gamificationService.ts`.<br>• Hàm `calculateTaskXP(priority)`: LOW: 10, MEDIUM: 20, HIGH: 30.<br>• Hàm `checkDailyXPCap(userId, xpToAdd)`: Tính tổng XP đã nhận trong ngày hôm nay (YYYY-MM-DD UTC+7). Nếu `currentDayXP + xpToAdd > 200`, điều chỉnh số XP thực nhận để tổng không quá 200 (hoặc bằng 0 nếu đã chạm 200).<br>• Hàm `revertTaskXP(userId, xpToDeduct)`: Trừ XP khi revert task về TODO. Tích hợp trực tiếp vào Task Complete API `PATCH /api/v1/tasks/:id/complete`. | TECH-S2-02 |
-| **TECH-S2-05** | Backend | `@mhunglee20405` | 27/11/2026 | **Triển khai Dịch vụ Tính toán Cấp độ (Level Progression Service):**<br>• Tệp: `server/src/services/levelService.ts`, `server/src/utils/gamificationUtils.ts`.<br>• Hàm tính Level: $L = \lfloor \sqrt{\text{Total\_XP}} / 10 \rfloor + 1$.<br>• Hàm tính XP ngưỡng: $\text{Required\_XP}(L) = (10 \times (L - 1))^2$.<br>• Tự động so sánh level cũ và level mới sau mỗi lần cộng XP. Nếu `newLevel > oldLevel`, cập nhật `user.current_level = newLevel` và trả về cờ `level_up: true` trong response. | TECH-S2-04 |
-| **TECH-S2-06** | Fullstack | `@khongpc-ptit`<br>`@kiennarutonbmn1` | 29/11/2026 | **Triển khai API Check-in Thói quen & Tích hợp Gamification:**<br>• `POST /api/v1/habits/:id/check-in`: Kiểm tra log ngày hôm nay (UTC+7). Nếu chưa có -> Push `{ log_date, is_completed: true, xp_earned }` vào `logs`, tăng `habit.current_streak += 1`, cập nhật `user.last_active_date`, gọi `gamificationService` cộng +15 XP (có kiểm tra trần 200 XP). Trả về `{ habit, xp_earned, total_xp, current_level, level_up }`. | TECH-S2-04, TECH-S2-05 |
-| **TECH-S2-07** | Frontend | `@kiennarutonbmn1` | 30/11/2026 | **Tích hợp XP Bar, Level Badge & Modal Level Up trên Frontend:**<br>• Tệp: `client/src/components/gamification/XPProgressBar.tsx`, `LevelBadge.tsx`, `LevelUpModal.tsx`.<br>• Cập nhật Header với thanh tiến trình XP thời gian thực (% tiến trình lên cấp tiếp theo, số XP còn thiếu). Hiệu ứng ăn mừng (Confetti) khi mở modal Level Up. | TECH-S2-03, TECH-S2-06 |
-| **TECH-S2-08** | QA / Test | `@mhunglee20405` | 02/12/2026 | **Kiểm thử Tự động Toàn diện Gamification & Habits:**<br>• Tệp: `server/tests/gamification.test.ts`, `server/tests/habits.test.ts`.<br>• Kịch bản kiểm thử: Check-in thói quen lần 1 (+15 XP), check-in lần 2 trong ngày (bị từ chối); Hoàn thành task High (+30 XP); Cày quá 200 XP/ngày (bị chặn ở đúng 200 XP); Hoàn tác task (bị trừ lại điểm); Tích lũy 100 XP -> Nhảy cấp Level 2 chính xác. 100% tests pass. | TECH-S2-06, TECH-S2-07 |
+| Mã Task | GitHub Issue | User Story cha | Phân loại | Người phụ trách | Hạn chót | Mục tiêu, Đặc tả Kỹ thuật & Tiêu chí Hoàn thành | Phụ thuộc |
+|---|:---:|:---:|---|---|:---:|---|---|
+| **TECH-S2-01** | [#56](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/56) | `US-S2-01`<br>(Shared) | Docs/Design | `@khongpc-ptit` | 29/11/2026 | **Đặc tả Schema `habits`, Compound Index & API Contract:**<br>• Tạo model `server/src/models/Habit.ts` với Schema: `user_id` (ObjectId, ref: User, required), `title` (String, max 200, required), `frequency` (Enum: ['DAILY', 'WEEKLY'], default 'DAILY'), `target_days` (Number, default 7), `current_streak` (Number, default 0), `is_active` (Boolean, default true), `logs` (Array nhúng: `log_date` YYYY-MM-DD, `is_completed` Boolean, `xp_earned` Number).<br>• Compound Index: `{ user_id: 1, is_active: 1 }`.<br>• Xuất bản tài liệu `docs/[TECH-S2-01] Habit Data Model & Gamification API Contract.md` (mục tiêu hợp đồng ban hành ngày 21/11/2026). | Sprint 1 |
+| **TECH-S2-02** | [#57](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/57) | `US-S2-01` | Backend | `@khongpc-ptit` | 29/11/2026 | **Triển khai Habit Controller, Service & CRUD APIs:**<br>• Tệp: `server/src/controllers/habitController.ts`, `server/src/services/habitService.ts`.<br>• `GET /api/v1/habits`: Trả về danh sách thói quen active của user kèm lịch sử logs 7 ngày gần nhất.<br>• `POST /api/v1/habits`: Tạo thói quen mới, validate `title` 1–200 ký tự.<br>• `DELETE /api/v1/habits/:id`: Xóa thói quen theo `_id` có gắn điều kiện `{ user_id: req.user.id }`. Trả về chuẩn JSON Envelope. | TECH-S2-01 |
+| **TECH-S2-03** | [#58](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/58) | `US-S2-01` | Frontend | `@khongpc-ptit` | 29/11/2026 | **Xây dựng Giao diện Quản lý Thói quen (Habit Tracker UI):**<br>• Tệp: `client/src/pages/HabitsPage.tsx`, `client/src/components/habits/HabitCard.tsx`, `HabitCreateModal.tsx`.<br>• Hiển thị danh sách card thói quen, chu kỳ lặp lại, thanh tiến độ số ngày thực hiện trong tuần, nút check-in trạng thái hôm nay. Form tạo thói quen chọn radio Daily/Weekly, input số ngày mục tiêu. | TECH-S2-01 |
+| **TECH-S2-04** | [#59](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/59) | `US-S2-04` | Backend | `@mhunglee20405` | 29/11/2026 | **Xây dựng Gamification Core Engine & Chống Gian Lận (Anti-gaming):**<br>• Tệp: `server/src/services/gamificationService.ts`.<br>• Hàm `calculateTaskXP(priority)`: LOW: 10, MEDIUM: 20, HIGH: 30.<br>• Hàm `checkDailyXPCap(userId, xpToAdd)`: Tính tổng XP đã nhận trong ngày hôm nay (YYYY-MM-DD UTC+7). Nếu `currentDayXP + xpToAdd > 200`, điều chỉnh số XP thực nhận để tổng không quá 200 (hoặc bằng 0 nếu đã chạm 200).<br>• Hàm `revertTaskXP(userId, xpToDeduct)`: Trừ XP khi revert task về TODO. Tích hợp trực tiếp vào Task Complete API `PATCH /api/v1/tasks/:id/complete`. | TECH-S2-02 |
+| **TECH-S2-05** | [#60](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/60) | `US-S2-05` | Backend | `@mhunglee20405` | 29/11/2026 | **Triển khai Dịch vụ Tính toán Cấp độ (Level Progression Service):**<br>• Tệp: `server/src/services/levelService.ts`, `server/src/utils/gamificationUtils.ts`.<br>• Hàm tính Level: $L = \lfloor \sqrt{\text{Total\_XP}} / 10 \rfloor + 1$.<br>• Hàm tính XP ngưỡng: $\text{Required\_XP}(L) = (10 \times (L - 1))^2$.<br>• Tự động so sánh level cũ và level mới sau mỗi lần cộng XP. Nếu `newLevel > oldLevel`, cập nhật `user.current_level = newLevel` và trả về cờ `level_up: true` trong response. | TECH-S2-04 |
+| **TECH-S2-06** | [#61](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/61) | `US-S2-02`<br>`US-S2-03` | Fullstack | `@kiennarutonbmn1` | 29/11/2026 | **Triển khai API Check-in Thói quen & Tích hợp Gamification:**<br>• `POST /api/v1/habits/:id/check-in`: Kiểm tra log ngày hôm nay (UTC+7). Nếu chưa có -> Push `{ log_date, is_completed: true, xp_earned }` vào `logs`, tăng `habit.current_streak += 1`, cập nhật `user.last_active_date`, gọi `gamificationService` cộng +15 XP (có kiểm tra trần 200 XP). Trả về `{ habit, xp_earned, total_xp, current_level, level_up }`. | TECH-S2-04, TECH-S2-05 |
+| **TECH-S2-07** | [#62](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/62) | `US-S2-05`<br>(Refs `US-S2-03`) | Frontend | `@mhunglee20405` | 29/11/2026 | **Tích hợp XP Bar, Level Badge & Modal Level Up trên Frontend:**<br>• Tệp: `client/src/components/gamification/XPProgressBar.tsx`, `LevelBadge.tsx`, `LevelUpModal.tsx`.<br>• Cập nhật Header với thanh tiến trình XP thời gian thực (% tiến trình lên cấp tiếp theo, số XP còn thiếu). Hiệu ứng ăn mừng (Confetti) khi mở modal Level Up. | TECH-S2-03, TECH-S2-06 |
+| **TECH-S2-08** | [#63](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/63) | `US-S2-01` → `05` | QA / Test | `@mhunglee20405`<br>`@khongpc-ptit`<br>`@kiennarutonbmn1` | 02/12/2026 | **Kiểm thử Tự động Toàn diện Gamification & Habits:**<br>• Tệp: `server/tests/gamification.test.ts`, `server/tests/habits.test.ts`.<br>• Kịch bản kiểm thử: Check-in thói quen lần 1 (+15 XP), check-in lần 2 trong ngày (bị từ chối); Hoàn thành task High (+30 XP); Cày quá 200 XP/ngày (bị chặn ở đúng 200 XP); Hoàn tác task (bị trừ lại điểm); Tích lũy 100 XP -> Nhảy cấp Level 2 chính xác. 100% tests pass. | TECH-S2-06, TECH-S2-07 |
 
 ---
 
@@ -412,13 +421,14 @@ gantt
 * **C (Consulted):** Người được tham vấn ý kiến chuyên môn trước khi thực hiện.
 * **I (Informed):** Người được thông báo kết quả sau khi task hoàn thành.
 
-| Phân hệ / Hạng mục công việc kỹ thuật | Khổng Phú Cường (`@khongpc-ptit`) | Nguyễn Trung Kiên (`@kiennarutonbmn1`) | Lê Mạnh Hùng (`@mhunglee20405`) |
+| Phân hệ / Hạng mục công việc kỹ thuật | Khổng Phú Cường (`@khongpc-ptit`) | Đinh Trung Kiên (`@kiennarutonbmn1`) | Lê Mạnh Hùng (`@mhunglee20405`) |
 |---|:---:|:---:|:---:|
 | **Khởi tạo kiến trúc, Docker Compose & CSDL MongoDB (Sprint 1)** | **R / A** | C | I |
 | **Authentication JWT, Bcrypt & Profile User (Sprint 1)** | **R** (Backend) / **A** | **R** (Frontend Pages) | **R** (Integration Tests) |
 | **One-off Task Management CRUD (Sprint 1)** | **R** (Backend API) / **A** | **R** (Task Form & List) | **R** (Modal Edit & Tests) |
-| **Recurring Habits Module (Sprint 2)** | **R** (Backend API & Model) / **A** | **R** (Habit Tracker UI) | C / **R** (Habits Tests) |
-| **Gamification Core: XP, Level & Anti-gaming (Sprint 2)** | **R** (XP Rules & Cap 200) / **A** | **R** (XP Bar & Level UI) | **R** (Level Service & Tests) |
+| **Recurring Habits Module (Sprint 2 - US-S2-01)** | **R** (API, Schema & UI) / **A** | C | C / **R** (Habits Tests) |
+| **Check-in Thói quen & Tích lũy XP (Sprint 2 - US-S2-02, 03)** | C / **A** | **R** (Check-in Flow & XP Awarding) | C / **R** (XP Tests) |
+| **Gamification Core: Anti-gaming & Level (Sprint 2 - US-S2-04, 05)** | C / **A** | C | **R** (Anti-gaming, Level Service & UI) |
 | **Daily Streak Algorithm & Render Cronjob (Sprint 3)** | **R** (Cronjob & UTC+7) / **A** | **R** (Streak Freeze UI) | C / **R** (Timezone Tests) |
 | **Badges & Achievement Trigger Engine (Sprint 3)** | **R** (Trigger Engine) / **A** | **R** (Badge Showcase UI) | C / **R** (Award Tests) |
 | **In-app Notifications System (Sprint 3)** | C / **A** | **R** (Notification Bell UI) | **R** (Backend & Read Status) |
