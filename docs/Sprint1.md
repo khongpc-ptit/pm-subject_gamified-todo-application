@@ -818,3 +818,10 @@ SPRINT 1
 ### Implementation update TECH-S1-05
 - Implemented owned, idempotent completion API and frontend interaction on feat/tech-s1-05-complete-task.
 - Build passed. Server 18 tests and client 8 tests passed. Live MongoDB persistence and Tech Lead review pending.
+
+### Implementation update TECH-S1-09
+- Login API, current-user endpoint, JWT guard and frontend session/logout implemented. Build passed, automated tests run with mocked persistence. Tech Lead review and live account smoke test pending.
+
+### Implementation update TECH-S1-11
+- Reset request, SMTP delivery adapter, hashed expiring token and atomic single-use password reset implemented on top of TECH-S1-09.
+- Build passed. SMTP delivery and live MongoDB smoke tests need local configuration. Awaiting Tech Lead review.

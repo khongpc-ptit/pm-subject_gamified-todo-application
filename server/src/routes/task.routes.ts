@@ -22,4 +22,8 @@ router.put('/:id', (req, res, next) => {
   taskController.updateTask(req, res, next);
 });
 
+router.patch('/:id/complete', (req, res, next) => {
+  void taskController.completeTask(req, res, next);
+});
+
 export default router;

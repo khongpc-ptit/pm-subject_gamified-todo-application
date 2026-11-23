@@ -2,6 +2,8 @@ import { Document, Types } from 'mongoose';
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
+  reset_password_hash?: string;
+  reset_password_expires?: Date;
   email: string;
   password_hash: string;
   full_name: string;

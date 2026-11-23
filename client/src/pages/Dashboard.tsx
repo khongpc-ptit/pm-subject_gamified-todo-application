@@ -1,3 +1,4 @@
+import type { UserProfile } from '../types/auth.types';
 import React, { useRef, useState, useCallback } from 'react';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
