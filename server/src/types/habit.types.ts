@@ -32,6 +32,11 @@ export interface UpdateHabitDTO {
   is_active?: boolean;
 }
 
+export interface HabitListResponseData {
+  habits: IHabit[];
+  total: number;
+}
+
 export interface CheckInHabitResponseData {
   habit: IHabit;
   xp_earned: number;
