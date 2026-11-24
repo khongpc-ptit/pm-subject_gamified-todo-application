@@ -113,9 +113,11 @@ feat: [TECH-S1-02] implement create task form and backend api
 Tạo Pull Request tuân thủ file [`.github/PULL_REQUEST_TEMPLATE.md`](file:///d:/UNIVERSITY_PTIT/YEAR_4/PM/project/.github/PULL_REQUEST_TEMPLATE.md):
 - **BẮT BUỘC điền chính xác:**
   ```markdown
-  ## 2. Liên kết Issue & Trello
+  ## 1. Phân loại Pull Request
+  - Technical Task (Feature / Test): Triển khai công việc kỹ thuật trong Sprint ([TECH-Sx-yy])
+
+  ## 2. Liên kết Issue
   - Đóng Tech Task trên GitHub (Closes / Fixes): Closes #<id_cua_tech_task>
-  - Mã thẻ trên Trello (TECH): [TECH-Sx-yy]
   ```
 - **Tích chọn phân loại thay đổi:** `Backend`, `Frontend`, `Database`, `Docs`, `Tests`...
 - **Ghi rõ Hướng dẫn Test:** Từng bước tái hiện / kiểm tra.

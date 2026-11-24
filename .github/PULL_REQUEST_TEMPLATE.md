@@ -1,15 +1,14 @@
 ## 1. Phân loại Pull Request
-*(Chỉ giữ lại 1 dòng loại PR phù hợp, xóa các dòng còn lại)*
+*(Chỉ giữ lại 1 dòng loại PR phù hợp và điền mã [TECH-Sx-yy], xóa các dòng còn lại)*
 - Technical Task (Feature / Test): Triển khai công việc kỹ thuật trong Sprint ([TECH-Sx-yy])
 - Bugfix / Hotfix: Sửa lỗi phát sinh trong quá trình code hoặc kiểm thử ([BUG-Sx-yy])
 - Config / Chore / Docs: Cài đặt hạ tầng, Database, Docker, CI/CD, .env hoặc tài liệu ([CONF-Sx-yy] / [DOC-xx])
 
 ---
 
-## 2. Liên kết Issue & Trello
+## 2. Liên kết Issue
 *(Dùng "Closes #<số_tech_task>" cho Tech Task / Config / Docs, hoặc "Fixes #<số_bug>" cho Bugfix)*
 - Đóng Tech Task trên GitHub (Closes / Fixes): Closes #
-- Mã thẻ trên Trello (TECH): [TECH-Sx-yy]
 
 ---
 
