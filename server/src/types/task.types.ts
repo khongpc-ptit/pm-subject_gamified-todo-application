@@ -11,6 +11,7 @@ export interface ITask extends Document {
   status: TaskStatus;
   due_date: Date | null;
   xp_reward: number;
+  xp_earned?: number;
   completed_at: Date | null;
   created_at: Date;
 }
