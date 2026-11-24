@@ -14,4 +14,8 @@ GitHub Actions cấp một MongoDB riêng cho job. Mỗi suite tạo một datab
 
 Hai fixture xác thực cũ được sửa để chạy cùng bộ test MongoDB. Tài khoản mới có 1 lượt freeze theo đặc tả. Test vòng đời dùng token thật do API sinh và thu qua adapter email giả lập. Suite Password Reset riêng vẫn kiểm chứng giao tiếp SMTP thật.
 
-Giao diện XP Bar, badge và modal chúc mừng còn phụ thuộc #62. Sau khi #62 vào nhánh đích, kiểm tra việc đồng bộ XP trên Dashboard, Habits và Profile, rồi kiểm tra modal chỉ xuất hiện khi API trả `level_up: true`.
+## Kiểm thử giao diện sau khi merge #62
+
+`client/src/test/Sprint2Gamification.integration.test.tsx` chạy qua App, Dashboard, Habit Tracker và Profile với phản hồi API mẫu. Bộ test kiểm tra tiến độ và XP còn thiếu, modal khi hoàn thành task hoặc điểm danh đạt 100 XP, đóng modal và đồng bộ cấp độ giữa các màn hình. Khi chạm trần 200 XP, task vẫn hoàn thành, hiển thị cảnh báo, XP giữ nguyên và modal thăng cấp không xuất hiện.
+
+Kiểm tra trên Edge với Express và MongoDB thật đã đạt. Hai tài khoản thử nghiệm lần lượt hoàn thành task từ 70 XP và điểm danh từ 85 XP. Cả hai đạt Cấp 2 tại đúng 100 XP. Modal hiển thị khi đạt mốc, Header và Profile đồng bộ, dữ liệu vẫn đúng sau khi tải lại và modal không tự mở lại.

@@ -2,7 +2,7 @@ name: Sprint 2 integration
 
 on:
   pull_request:
-    branches: [develop, feat/tech-s2-06-habit-checkin-gamification]
+    branches: [develop]
 
 permissions:
   contents: read
