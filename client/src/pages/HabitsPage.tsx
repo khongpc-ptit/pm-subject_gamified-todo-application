@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { UserProfile } from '../types/auth.types';
-import type { Habit, CreateHabitRequestDTO } from '../types/habit.types';
+import type { Habit, CreateHabitRequestDTO, CheckInHabitResponseData } from '../types/habit.types';
 import { useHabits } from '../hooks/useHabits';
 import { HabitCard } from '../components/habits/HabitCard';
 import { HabitCreateModal } from '../components/habits/HabitCreateModal';
@@ -8,12 +8,14 @@ import { HabitCreateModal } from '../components/habits/HabitCreateModal';
 interface HabitsPageProps {
   currentUser?: UserProfile | null;
   onNavigate?: (screen: 'dashboard' | 'habits' | 'profile') => void;
+  onCheckInSuccess?: (result: CheckInHabitResponseData) => void;
   onToast?: (message: string) => void;
 }
 
 export const HabitsPage: React.FC<HabitsPageProps> = ({
   currentUser,
-  onToast
+  onToast,
+  onCheckInSuccess
 }) => {
   const {
     habits,
@@ -28,7 +30,8 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deletingHabit, setDeletingHabit] = useState<Habit | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [checkingInId, setCheckingInId] = useState<string | null>(null);
+  const [checkingIn, setCheckingIn] = useState(false);
+  const checkInPending = useRef(false);
 
   const handleCreate = async (dto: CreateHabitRequestDTO) => {
     await createHabit(dto);
@@ -50,10 +53,13 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
   };
 
   const handleCheckIn = async (id: string) => {
-    setCheckingInId(id);
+    if (checkInPending.current) return;
+    checkInPending.current = true;
+    setCheckingIn(true);
     try {
       const res = await checkInHabit(id);
-      const earned = res?.xp_earned ?? 15;
+      onCheckInSuccess?.(res);
+      const earned = res.xp_earned;
       if (earned > 0) {
         onToast?.(`Đã check-in · +${earned} XP`);
       } else {
@@ -66,7 +72,8 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
         'Không thể check-in lúc này';
       onToast?.(msg);
     } finally {
-      setCheckingInId(null);
+      checkInPending.current = false;
+      setCheckingIn(false);
     }
   };
 
@@ -130,7 +137,7 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
                   habit={h}
                   onCheckIn={handleCheckIn}
                   onDelete={(habit) => setDeletingHabit(habit)}
-                  isCheckInLoading={checkingInId === h._id}
+                  isCheckInLoading={checkingIn}
                 />
               ))}
             </div>

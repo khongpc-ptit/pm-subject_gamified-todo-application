@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 import { Habit } from '../models/Habit';
+import { User } from '../models/User';
+import { gamificationService, getVietnamDateString, HABIT_CHECKIN_XP } from './gamification.service';
+import { levelService } from './level.service';
 import {
   IHabit,
+  CheckInHabitResponseData,
   CreateHabitDTO,
   UpdateHabitDTO,
   HabitListResponseData,
@@ -10,6 +14,64 @@ import {
 import { AppError } from '../middlewares/error.middleware';
 
 export class HabitService {
+  async checkInHabit(userId: string, habitId: string): Promise<CheckInHabitResponseData> {
+    if (!mongoose.Types.ObjectId.isValid(habitId)) {
+      throw Object.assign(new Error('??nh danh th?i quen kh?ng h?p l?'), { statusCode: 400, code: 'INVALID_ID' });
+    }
+
+    const now = new Date();
+    const today = getVietnamDateString(now);
+    return gamificationService.withUserXP(userId, async () => {
+      const ownedHabit = { _id: habitId, user_id: userId, is_active: true };
+      const habit = await Habit.findOne(ownedHabit);
+      if (!habit) {
+        throw Object.assign(new Error('Kh?ng t?m th?y th?i quen'), { statusCode: 404, code: 'HABIT_NOT_FOUND' });
+      }
+
+      const completedLog = { log_date: today, is_completed: true };
+      const alreadyCheckedIn = () => Object.assign(new Error('B?n ?? ?i?m danh th?i quen n?y h?m nay r?i'), {
+        statusCode: 400, code: 'HABIT_ALREADY_CHECKED_IN'
+      });
+      if (habit.logs.some(log => log.log_date === today && log.is_completed)) throw alreadyCheckedIn();
+
+      const user = await User.findById(userId);
+      if (!user) {
+        throw Object.assign(new Error('Kh?ng t?m th?y ng??i d?ng'), { statusCode: 404, code: 'USER_NOT_FOUND' });
+      }
+
+      const { xp_earned, is_cap_reached } = await gamificationService.checkDailyXPCap(userId, HABIT_CHECKIN_XP, now, true);
+      const total_xp = user.total_xp + xp_earned;
+      const progress = levelService.checkLevelUp(user.current_level, total_xp);
+      const checkedIn = await Habit.findOneAndUpdate(
+        { ...ownedHabit, logs: { $not: { $elemMatch: completedLog } } },
+        { $push: { logs: { ...completedLog, xp_earned } }, $inc: { current_streak: 1 } },
+        { new: true, runValidators: true }
+      );
+      if (!checkedIn) {
+        if (await Habit.exists(ownedHabit)) throw alreadyCheckedIn();
+        throw Object.assign(new Error('Kh?ng t?m th?y th?i quen'), { statusCode: 404, code: 'HABIT_NOT_FOUND' });
+      }
+
+      try {
+        user.total_xp = total_xp;
+        user.current_level = progress.new_level;
+        user.last_active_date = today;
+        await user.save();
+      } catch (error) {
+        await Habit.updateOne(
+          { _id: habitId, user_id: userId, logs: { $elemMatch: completedLog } },
+          { $pull: { logs: completedLog }, $inc: { current_streak: -1 } }
+        );
+        throw error;
+      }
+
+      return {
+        habit: checkedIn, xp_earned, total_xp, current_level: progress.new_level,
+        level_up: progress.level_up, next_level_xp: progress.next_level_xp, is_cap_reached
+      };
+    });
+  }
+
   /**
    * [US-S2-01 / TECH-S2-02] Lấy danh sách thói quen active của người dùng
    * @param userId - ID người dùng

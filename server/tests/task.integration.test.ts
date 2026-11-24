@@ -88,11 +88,12 @@ describeWithMongo('Task management with MongoDB', () => {
     const previousXP = (await User.findById(owner.user._id).lean())!.total_xp;
     const completed = (await complete(owner.token, id).expect(200)).body.data;
     const repeated = (await complete(owner.token, id).expect(200)).body.data;
-    expect(completed).toMatchObject({ status: 'COMPLETED', completed_at: expect.any(String) });
+    expect(completed).toMatchObject({ status: 'COMPLETED', completed_at: expect.any(String), xp_earned: 10 });
+    expect(repeated.xp_earned).toBe(0);
     expect(repeated.completed_at).toBe(completed.completed_at);
     expect((await list(owner.token).query({ status: 'COMPLETED' }).expect(200)).body.data.tasks)
       .toEqual([expect.objectContaining({ _id: id, completed_at: completed.completed_at })]);
-    expect((await User.findById(owner.user._id).lean())!.total_xp).toBe(previousXP);
+    expect((await User.findById(owner.user._id).lean())!.total_xp).toBe(previousXP + 10);
   });
 
   it('accepts a 200-character title and distinguishes malformed IDs from missing tasks', async () => {

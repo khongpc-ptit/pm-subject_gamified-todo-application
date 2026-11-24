@@ -52,6 +52,20 @@ export {
 import { calculateLevel } from '../utils/gamificationUtils';
 
 export class GamificationService {
+  private readonly pendingXP = new Map<string, Promise<unknown>>();
+
+  async withUserXP<T>(userId: string, operation: () => Promise<T>): Promise<T> {
+    const key = userId.toLowerCase();
+    const previous = this.pendingXP.get(key);
+    const next = (previous ? previous.catch(() => undefined) : Promise.resolve()).then(operation);
+    this.pendingXP.set(key, next);
+    try {
+      return await next;
+    } finally {
+      if (this.pendingXP.get(key) === next) this.pendingXP.delete(key);
+    }
+  }
+
   /**
    * [US-S2-03 / TECH-S2-04] Tính toán XP thưởng theo độ ưu tiên hoặc loại hoạt động
    * - LOW: 10 XP
@@ -72,7 +86,7 @@ export class GamificationService {
    * Tính tổng XP người dùng đã nhận trong ngày hôm nay (00:00 - 23:59 theo múi giờ Asia/Ho_Chi_Minh UTC+7)
    * Bao gồm Task completed hôm nay và Habit logs check-in hôm nay
    */
-  async getCurrentDayXP(userId: string | Types.ObjectId, targetDate: Date = new Date()): Promise<number> {
+  async getCurrentDayXP(userId: string | Types.ObjectId, targetDate: Date = new Date(), strict = false): Promise<number> {
     const todayVN = getVietnamDateString(targetDate);
     const { startOfDay, endOfDay } = getVietnamDayRangeUTC(targetDate);
 
@@ -96,7 +110,8 @@ export class GamificationService {
             return sum + (Number(earned) || 0);
           }, 0);
         }
-      } catch {
+      } catch (error) {
+        if (strict) throw error;
         taskXP = 0;
       }
     }
@@ -122,7 +137,8 @@ export class GamificationService {
             }
           }
         }
-      } catch {
+      } catch (error) {
+        if (strict) throw error;
         habitXP = 0;
       }
     }
@@ -138,9 +154,10 @@ export class GamificationService {
   async checkDailyXPCap(
     userId: string | Types.ObjectId,
     xpToAdd: number,
-    targetDate: Date = new Date()
+    targetDate: Date = new Date(),
+    strict = false
   ): Promise<DailyXPCapResult> {
-    const currentDayXP = await this.getCurrentDayXP(userId, targetDate);
+    const currentDayXP = strict ? await this.getCurrentDayXP(userId, targetDate, true) : await this.getCurrentDayXP(userId, targetDate);
     const validXPToAdd = Math.max(0, xpToAdd);
 
     if (currentDayXP >= DAILY_XP_CAP) {
