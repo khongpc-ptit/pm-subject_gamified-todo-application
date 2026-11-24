@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import authRoutes from './routes/auth.routes';
 import taskRoutes from './routes/task.routes';
 import habitRoutes from './routes/habit.routes';
+import notificationRoutes from './routes/notificationRoutes';
 import { notFoundHandler, errorHandler } from './middlewares/error.middleware';
 
 const app: Application = express();
@@ -62,6 +63,7 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/habits', habitRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // Error Handling
 app.use(notFoundHandler);

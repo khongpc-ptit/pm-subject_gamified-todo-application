@@ -2,12 +2,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import app from './app';
+import { ensureNotificationIndexes } from './services/notificationService';
 import { connectDB } from './config/db';
 
 const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB Atlas / Local then start listening
 connectDB()
+  .then(ensureNotificationIndexes)
   .then(() => {
     app.listen(PORT, () => {
       console.log(`[Server] Gamified To-Do API is running on port ${PORT}`);
