@@ -68,6 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
         <main className="main">
           {/* Header Topbar */}
           <Header
+            notifications={Boolean(currentUser)}
             xp={currentUser?.total_xp ?? totalXP}
             streak={currentUser?.current_streak ?? 6}
             freeze={currentUser?.streak_freeze_count ?? 1}
