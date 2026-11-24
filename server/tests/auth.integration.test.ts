@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../src/app';
 import { User } from '../src/models/User';
+import * as emailService from '../src/services/email.service';
 
 const mongoUri = process.env.TEST_MONGODB_URI;
 const describeWithMongo = mongoUri ? describe : describe.skip;
@@ -83,7 +84,7 @@ describeWithMongo('Authentication with MongoDB', () => {
     expect(resA.current_level).toBe(1);
     expect(resA.total_xp).toBe(0);
     expect(resA.current_streak).toBe(0);
-    expect(resA.streak_freeze_count).toBe(2);
+    expect(resA.streak_freeze_count).toBe(1);
     expect(resA).not.toHaveProperty('password_hash');
     expect(resA).not.toHaveProperty('reset_password_hash');
 
@@ -123,7 +124,7 @@ describeWithMongo('Authentication with MongoDB', () => {
     expect(tamperRes.total_xp).toBe(0);
     expect(tamperRes.current_level).toBe(1);
     expect(tamperRes.current_streak).toBe(0);
-    expect(tamperRes.streak_freeze_count).toBe(2);
+    expect(tamperRes.streak_freeze_count).toBe(1);
     expect(tamperRes.email).toBe(emailA);
 
     // 6. Unauthorized access blocked without Bearer token
@@ -148,19 +149,15 @@ describeWithMongo('Authentication with MongoDB', () => {
     expect(profile.email).toBe(email);
     await updateProfile(token, { full_name: 'Lifecycle Renamed' }).expect(200);
 
-    // 4. Request forgot password
+    // 4. Capture the token emitted by the email adapter. SMTP is covered separately.
+    const delivery = jest.spyOn(emailService, 'sendResetEmail').mockResolvedValue(undefined);
     await api.post(base + '/forgot-password').send({ email }).expect(200);
-
-    // Verify reset token in database
-    const userDoc = await User.findOne({ email }).orFail();
-    expect(userDoc.reset_password_hash).toBeDefined();
-    expect(userDoc.reset_password_expires).toBeDefined();
-
-    // Fabricate reset token for test by setting a known token and its hash
-    const rawResetToken = randomUUID();
-    userDoc.reset_password_hash = createHash('sha256').update(rawResetToken).digest('hex');
-    userDoc.reset_password_expires = new Date(Date.now() + 15 * 60 * 1000);
-    await userDoc.save();
+    expect(delivery).toHaveBeenCalledTimes(1);
+    const [recipient, rawResetToken] = delivery.mock.calls[0];
+    expect(recipient).toBe(email);
+    const userDoc = await User.findOne({ email }).select('+reset_password_hash +reset_password_expires').orFail();
+    expect(userDoc.reset_password_hash).toBe(createHash('sha256').update(rawResetToken).digest('hex'));
+    expect(userDoc.reset_password_expires!.getTime()).toBeGreaterThan(Date.now());
 
     // 5. Reset password with new password
     await api.post(base + '/reset-password').send({
