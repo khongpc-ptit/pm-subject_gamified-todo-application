@@ -74,6 +74,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <small>Hồ sơ &amp; Thành tích</small>
           </span>
         </button>
+        {onNavigate && <button type="button" className={currentScreen === 'badges' ? 'active' : ''}
+          aria-label="Bộ sưu tập huy hiệu" onClick={() => onNavigate('badges')}>
+          <span aria-hidden="true">♔</span><span>Bộ sưu tập huy hiệu</span>
+        </button>}
       </nav>
 
       {/* Thông tin tài khoản phía chân sidebar */}
