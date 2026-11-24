@@ -5,6 +5,8 @@ import { Sidebar } from '../components/Sidebar';
 import { QuickTaskForm } from '../components/QuickTaskForm';
 import { TaskList } from '../components/TaskList';
 import { EditTaskModal } from '../components/EditTaskModal';
+import { LevelUpModal } from '../components/gamification/LevelUpModal';
+import { useGamification } from '../context/GamificationContext';
 import { ProfilePage } from './ProfilePage';
 import { HabitsPage } from './HabitsPage';
 import { useTasks, type DemoState } from '../hooks/useTasks';
@@ -17,6 +19,7 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onUpdateUser }) => {
+  const { totalXP, currentLevel, triggerGamificationUpdate } = useGamification();
   const quickInputRef = useRef<HTMLInputElement>(null);
   const [currentScreen, setCurrentScreen] = useState<'dashboard' | 'habits' | 'profile'>('dashboard');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -65,10 +68,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
         <main className="main">
           {/* Header Topbar */}
           <Header
-            xp={currentUser?.total_xp ?? 380}
+            xp={currentUser?.total_xp ?? totalXP}
             streak={currentUser?.current_streak ?? 6}
             freeze={currentUser?.streak_freeze_count ?? 1}
-            level={currentUser?.current_level ?? 1}
+            level={currentUser?.current_level ?? currentLevel}
           />
 
           {/* Vùng nội dung trung tâm */}
@@ -76,17 +79,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
             {currentScreen === 'profile' ? (
               <ProfilePage
                 currentUser={
-                  currentUser || {
-                    _id: '1',
-                    email: 'minhanh@example.com',
-                    full_name: 'Minh Anh',
-                    current_level: 1,
-                    total_xp: 380,
-                    current_streak: 6,
-                    last_active_date: null,
-                    streak_freeze_count: 1,
-                    created_at: new Date().toISOString()
-                  }
+                  currentUser
+                    ? {
+                        ...currentUser,
+                        total_xp: currentUser.total_xp !== undefined ? currentUser.total_xp : totalXP,
+                        current_level: currentUser.current_level !== undefined ? currentUser.current_level : currentLevel
+                      }
+                    : {
+                        _id: '1',
+                        email: 'minhanh@example.com',
+                        full_name: 'Minh Anh',
+                        current_level: currentLevel,
+                        total_xp: totalXP,
+                        current_streak: 6,
+                        last_active_date: null,
+                        streak_freeze_count: 1,
+                        created_at: new Date().toISOString()
+                      }
                 }
                 onUpdateUser={(updated) => {
                   onUpdateUser?.(updated);
@@ -96,10 +105,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
               />
             ) : currentScreen === 'habits' ? (
               <HabitsPage
-                currentUser={currentUser}
+                currentUser={
+                  currentUser
+                    ? {
+                        ...currentUser,
+                        total_xp: currentUser.total_xp !== undefined ? currentUser.total_xp : totalXP,
+                        current_level: currentUser.current_level !== undefined ? currentUser.current_level : currentLevel
+                      }
+                    : null
+                }
                 onNavigate={(screen) => setCurrentScreen(screen)}
                 onToast={showToast}
                 onCheckInSuccess={(result) => {
+                  triggerGamificationUpdate({
+                    total_xp: result.total_xp,
+                    current_level: result.current_level,
+                    level_up: result.level_up,
+                    xp_earned: result.xp_earned
+                  });
                   if (currentUser) {
                     onUpdateUser?.({
                       ...currentUser,
@@ -142,7 +165,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                       error={error}
                       priorityFilter={priorityFilter}
                       onFilterChange={setPriorityFilter}
-                      onToggleComplete={refetch}
+                      onToggleComplete={(updated) => {
+                        refetch();
+                        if (updated && (updated as any).total_xp !== undefined) {
+                          triggerGamificationUpdate({
+                            total_xp: (updated as any).total_xp,
+                            current_level: (updated as any).current_level,
+                            level_up: (updated as any).level_up,
+                            xp_earned: (updated as any).xp_earned,
+                            is_cap_reached: (updated as any).is_cap_reached
+                          });
+                          if (currentUser) {
+                            onUpdateUser?.({
+                              ...currentUser,
+                              total_xp: (updated as any).total_xp,
+                              current_level: (updated as any).current_level
+                            });
+                          }
+                          const earned = (updated as any).xp_earned ?? 0;
+                          if (earned > 0) {
+                            showToast(`Hoàn thành công việc! +${earned} XP`);
+                          } else if ((updated as any).is_cap_reached) {
+                            showToast('Hoàn thành công việc! Đã đạt trần tối đa 200 XP hôm nay');
+                          }
+                        }
+                      }}
                       onRetry={refetch}
                       onFocusCreate={() => quickInputRef.current?.focus()}
                       onEdit={(task) => setEditingTask(task)}
@@ -240,6 +287,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
           onSave={handleSaveTask}
         />
       )}
+
+      {/* Modal Chúc mừng Thăng cấp độ [TECH-S2-07] */}
+      <LevelUpModal />
 
       {/* Thông báo Toast phản hồi thao tác */}
       {toastMessage && (

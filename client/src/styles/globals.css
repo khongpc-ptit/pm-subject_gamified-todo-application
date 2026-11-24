@@ -1076,3 +1076,224 @@ p {
     flex-wrap: wrap;
   }
 }
+
+/* ==========================================================================
+   Gamification UI Components: XP Bar, Level Badge & Level Up Modal [TECH-S2-07]
+   ========================================================================== */
+
+/* Level Badge */
+.level-badge-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.level-symbol {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.level-badge-sm .level-icon {
+  width: 32px;
+  height: 36px;
+  font-size: 13px;
+}
+
+.level-badge-lg .level-icon {
+  width: 52px;
+  height: 58px;
+  font-size: 18px;
+}
+
+/* XP Progress Bar */
+.xp-progress-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.xp-progress-container .progress {
+  position: relative;
+  background: #e9ede6;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.xp-progress-container .progress .progress-fill {
+  background: linear-gradient(90deg, #5b7c5e, #345b46);
+  border-radius: 5px;
+  box-shadow: 0 0 8px rgba(52, 91, 70, 0.25);
+}
+
+.progress-sm {
+  height: 5px;
+}
+
+.progress-md {
+  height: 7px;
+}
+
+.progress-lg {
+  height: 10px;
+}
+
+/* Level Up Modal & Celebration */
+.level-up-overlay {
+  z-index: 100;
+  background: rgba(20, 28, 24, 0.65);
+  backdrop-filter: blur(6px);
+}
+
+.level-up-modal-content {
+  max-width: 440px;
+  width: 90%;
+  position: relative;
+  padding: 36px 28px 30px;
+  border-radius: 18px;
+  border: 1px solid #d4dfce;
+  box-shadow: 0 20px 40px rgba(28, 48, 36, 0.22);
+  animation: level-modal-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes level-modal-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.celebrate {
+  text-align: center;
+}
+
+.level-up-badge-symbol {
+  width: 84px;
+  height: 90px;
+  margin: 0 auto 16px;
+  background: radial-gradient(circle, #eaf3e5 0%, #d8e8d2 100%);
+  border: 2px solid #b6ccaf;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--green);
+  font-size: 42px;
+  box-shadow: 0 8px 24px rgba(52, 91, 70, 0.18);
+  animation: level-badge-pulse 2s infinite ease-in-out;
+}
+
+@keyframes level-badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(52, 91, 70, 0.18);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 12px 30px rgba(52, 91, 70, 0.3);
+  }
+}
+
+.level-up-eyebrow {
+  color: var(--gold);
+  letter-spacing: 2px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.level-up-heading {
+  font-size: 26px;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.level-up-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.level-up-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 18px 0 22px;
+}
+
+.stat-pill {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.stat-pill small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-pill b {
+  font-size: 15px;
+  color: var(--green);
+}
+
+.level-up-btn {
+  font-size: 14px;
+  padding: 13px 20px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(52, 91, 70, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.level-up-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(52, 91, 70, 0.35);
+}
+
+/* Confetti Falling Animation */
+.confetti-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 101;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -24px;
+  opacity: 0.95;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    top: -20px;
+    opacity: 1;
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(90deg) translateX(15px);
+  }
+  50% {
+    transform: rotate(180deg) translateX(-15px);
+  }
+  75% {
+    transform: rotate(270deg) translateX(15px);
+  }
+  100% {
+    top: 105%;
+    opacity: 0.2;
+    transform: rotate(360deg) translateX(-10px);
+  }
+}
+
