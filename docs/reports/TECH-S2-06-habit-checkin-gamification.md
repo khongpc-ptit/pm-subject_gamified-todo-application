@@ -15,3 +15,5 @@ Issue #61 · US-S2-02 và US-S2-03
 2. Đặt `TEST_MONGODB_URI` tới MongoDB phát triển và chạy `npm run build` rồi `npm test`. Bộ test check-in tạo và dọn database ngẫu nhiên.
 3. Kiểm tra đường biên 00:00 UTC+7, điểm danh trùng đồng thời, quyền sở hữu, rollback khi ghi hồ sơ lỗi, cùng chia trần XP giữa task và habit, và cấp 2 tại 100 XP.
 4. Đăng nhập, mở Thói quen, tạo một thói quen rồi bấm Check-in. Kiểm tra streak, nút đã check-in, toast và XP trên Header. Tải lại để kiểm tra dữ liệu đã lưu.
+
+Đã chạy trên Edge với API Express và MongoDB thật. Tạo thói quen, điểm danh +15 XP, cập nhật Header và kiểm tra lại sau khi tải trang đều đạt.
