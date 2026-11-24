@@ -6,6 +6,7 @@ import { authService } from './services/auth.service';
 import type { UserProfile } from './types/auth.types';
 import { Login } from './pages/Login';
 import { apiClient } from './services/api';
+import { GamificationProvider } from './context/GamificationContext';
 import './styles/globals.css';
 export const App = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -43,14 +44,16 @@ export const App = () => {
 
   if (user) {
     return (
-      <Dashboard
-        currentUser={user}
-        onUpdateUser={(updated) => setUser(updated)}
-        onLogout={() => {
-          authService.logout();
-          setUser(null);
-        }}
-      />
+      <GamificationProvider currentUser={user} onUpdateUser={(updated) => setUser(updated)}>
+        <Dashboard
+          currentUser={user}
+          onUpdateUser={(updated) => setUser(updated)}
+          onLogout={() => {
+            authService.logout();
+            setUser(null);
+          }}
+        />
+      </GamificationProvider>
     );
   }
   if (registering) {

@@ -55,3 +55,16 @@ export interface UpdateTaskRequestDTO {
   due_date?: string | null;
   status?: TaskStatus;
 }
+
+/** Dữ liệu mở rộng trả về khi hoàn thành công việc kèm Gamification (TECH-S2-04, TECH-S2-05, TECH-S2-07) */
+export interface CompleteTaskResponseData extends Task {
+  task?: Task;
+  xp_earned?: number;
+  total_xp?: number;
+  current_level?: number;
+  level_up?: boolean;
+  required_xp?: number;
+  next_level_xp?: number;
+  progress_percent?: number;
+  is_cap_reached?: boolean;
+}

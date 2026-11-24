@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { taskService } from '../services/task.service';
-import type { Task } from '../types/task.types';
+import type { Task, CompleteTaskResponseData } from '../types/task.types';
+import { useGamification } from '../context/GamificationContext';
 
 interface TaskRowProps {
   task: Task;
-  onToggleComplete?: (task: Task) => void;
+  onToggleComplete?: (task: Task | CompleteTaskResponseData) => void;
   onEdit?: (task: Task) => void;
 }
 
@@ -19,6 +20,7 @@ export const TaskRow: React.FC<TaskRowProps> = ({
   onToggleComplete,
   onEdit
 }) => {
+  const { triggerGamificationUpdate } = useGamification();
   const pendingRef = useRef(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +31,15 @@ export const TaskRow: React.FC<TaskRowProps> = ({
     setError('');
     try {
       const updated = await taskService.completeTask(task._id);
+      if (updated && (updated.total_xp !== undefined || updated.level_up !== undefined)) {
+        triggerGamificationUpdate({
+          total_xp: updated.total_xp,
+          current_level: updated.current_level,
+          xp_earned: updated.xp_earned,
+          level_up: updated.level_up,
+          is_cap_reached: updated.is_cap_reached
+        });
+      }
       onToggleComplete?.(updated);
     } catch { setError('Không thể hoàn thành công việc. Vui lòng thử lại.'); }
     finally { pendingRef.current = false; setPending(false); }

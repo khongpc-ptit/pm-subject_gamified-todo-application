@@ -5,7 +5,8 @@ import type {
   TaskListResponseData,
   ApiResponse,
   CreateTaskRequestDTO,
-  UpdateTaskRequestDTO
+  UpdateTaskRequestDTO,
+  CompleteTaskResponseData
 } from '../types/task.types';
 
 // Dữ liệu mẫu ban đầu theo đúng wireframe Core MVP Screens.html nếu chạy ở chế độ offline preview
@@ -61,8 +62,8 @@ export const INITIAL_MOCK_TASKS: Task[] = [
 ];
 
 export const taskService = {
-  async completeTask(id: string): Promise<Task> {
-    const response = await apiClient.patch<ApiResponse<Task>>(`/tasks/${id}/complete`);
+  async completeTask(id: string): Promise<CompleteTaskResponseData> {
+    const response = await apiClient.patch<ApiResponse<CompleteTaskResponseData>>(`/tasks/${id}/complete`);
     if (!response.data.success || !response.data.data) throw new Error('Không thể hoàn thành công việc');
     return response.data.data;
   },
