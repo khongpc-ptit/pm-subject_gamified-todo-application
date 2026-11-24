@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "seed:badges": "tsx src/scripts/seedBadges.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
