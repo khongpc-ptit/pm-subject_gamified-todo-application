@@ -1,4 +1,7 @@
 import React from 'react';
+import { LevelBadge } from './gamification/LevelBadge';
+import { XPProgressBar } from './gamification/XPProgressBar';
+import { useGamification } from '../context/GamificationContext';
 
 interface HeaderProps {
   xp?: number;
@@ -8,46 +11,22 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  xp = 380,
+  xp: propXP,
   streak = 6,
   freeze = 1,
-  level = 1
+  level: propLevel
 }) => {
-  const nextLevelThreshold = 100 * Math.pow(level, 2);
-  const currentLevelThreshold = 100 * Math.pow(level - 1, 2);
-  const progressPercent = Math.min(
-    100,
-    Math.max(0, ((xp - currentLevelThreshold) / (nextLevelThreshold - currentLevelThreshold)) * 100)
-  );
+  const context = useGamification();
+  const xp = propXP !== undefined ? propXP : context.totalXP;
+  const level = propLevel !== undefined ? propLevel : context.currentLevel;
 
   return (
     <header id="header" className="topbar">
-      {/* Khối Cấp độ */}
-      <div className="level">
-        <div className="level-icon">{level}</div>
-        <div>
-          <small>CẤP {level} · CHIẾN BINH</small>
-          <b>Tiến bộ mỗi ngày</b>
-        </div>
-      </div>
+      {/* Khối Cấp độ: LevelBadge [TECH-S2-07] */}
+      <LevelBadge level={level} />
 
-      {/* Khối Tiến trình XP */}
-      <div className="xp">
-        <div className="xp-meta">
-          <span>{xp} / {nextLevelThreshold} XP</span>
-          <span>Cấp {level + 1}</span>
-        </div>
-        <div
-          className="progress"
-          role="progressbar"
-          aria-label="Tiến trình lên cấp"
-          aria-valuemin={currentLevelThreshold}
-          aria-valuemax={nextLevelThreshold}
-          aria-valuenow={xp}
-        >
-          <span style={{ width: `${progressPercent}%` }} />
-        </div>
-      </div>
+      {/* Khối Tiến trình XP: XPProgressBar [TECH-S2-07] */}
+      <XPProgressBar xp={xp} level={level} />
 
       {/* Khối Daily Streak */}
       <div className="streak">
@@ -80,3 +59,5 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+export default Header;
