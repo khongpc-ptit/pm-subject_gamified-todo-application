@@ -10,11 +10,11 @@ it('rejects malformed IDs', async () => {
   const response = await request(app).patch('/api/v1/tasks/invalid/complete').set('Authorization', `Bearer ${token}`);
   expect(response.status).toBe(400);
 });
-it('updates only owned incomplete tasks without awarding XP', async () => {
+it('updates only owned incomplete tasks', async () => {
   const update = jest.spyOn(Task, 'findOneAndUpdate').mockResolvedValue({ _id: id, status: 'COMPLETED' } as any);
   const response = await request(app).patch(`/api/v1/tasks/${id}/complete`).set('Authorization', `Bearer ${token}`);
   expect(response.status).toBe(200);
-  expect(update).toHaveBeenCalledWith({ _id: id, user_id: id, status: { $ne: 'COMPLETED' } }, { $set: { status: 'COMPLETED', completed_at: expect.any(Date) } }, { new: true, runValidators: true });
+  expect(update).toHaveBeenCalledWith({ _id: id, user_id: id, status: { $ne: 'COMPLETED' } }, { $set: { status: 'COMPLETED', completed_at: expect.any(Date), xp_earned: 0 } }, { new: true, runValidators: true });
 });
 it('preserves the first completion timestamp on retries', async () => {
   jest.spyOn(Task, 'findOneAndUpdate').mockResolvedValue(null);

@@ -1,9 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 import { habitService } from '../services/habit.service';
 import { ApiSuccessResponse } from '../types/api.types';
-import { IHabit, HabitListResponseData } from '../types/habit.types';
+import { IHabit, HabitListResponseData, CheckInHabitResponseData } from '../types/habit.types';
 
 export class HabitController {
+  async checkInHabit(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data = await habitService.checkInHabit(req.user!.id, String(req.params.id));
+      const message = data.xp_earned > 0
+        ? '?i?m danh th?i quen th?nh c?ng! B?n nh?n ???c +' + data.xp_earned + ' XP'
+        : '?i?m danh th?i quen th?nh c?ng. B?n ?? ??t tr?n t?i ?a 200 XP trong ng?y h?m nay!';
+      const response: ApiSuccessResponse<CheckInHabitResponseData> = {
+        success: true, data, message, timestamp: new Date().toISOString()
+      };
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   /**
    * [US-S2-01 / TECH-S2-02] Lấy danh sách thói quen của người dùng
    * GET /api/v1/habits

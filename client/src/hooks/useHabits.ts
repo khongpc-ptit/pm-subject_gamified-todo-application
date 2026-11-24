@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Habit, CreateHabitRequestDTO } from '../types/habit.types';
+import type { Habit, CreateHabitRequestDTO, CheckInHabitResponseData } from '../types/habit.types';
 import { habitService, INITIAL_MOCK_HABITS } from '../services/habitService';
 import type { DemoState } from './useTasks';
 
@@ -74,35 +74,10 @@ export const useHabits = () => {
     }
   };
 
-  const checkInHabit = async (id: string): Promise<any> => {
-    try {
-      const result = await habitService.checkInHabit(id);
-      setHabits((prev) =>
-        prev.map((h) => (h._id === id ? { ...h, ...result.habit } : h))
-      );
-      return result;
-    } catch (err: any) {
-      // Fallback local update nếu offline
-      if (err.code === 'ERR_NETWORK' || !err.response) {
-        const todayStr = new Date().toISOString().slice(0, 10);
-        setHabits((prev) =>
-          prev.map((h) => {
-            if (h._id === id) {
-              const already = h.logs.some((l) => l.log_date === todayStr);
-              if (already) return h;
-              return {
-                ...h,
-                current_streak: h.current_streak + 1,
-                logs: [...h.logs, { log_date: todayStr, is_completed: true, xp_earned: 15 }]
-              };
-            }
-            return h;
-          })
-        );
-        return { xp_earned: 15, level_up: false };
-      }
-      throw err;
-    }
+  const checkInHabit = async (id: string): Promise<CheckInHabitResponseData> => {
+    const result = await habitService.checkInHabit(id);
+    setHabits(prev => prev.map(habit => habit._id === id ? result.habit : habit));
+    return result;
   };
 
   // Áp dụng trạng thái review / demo

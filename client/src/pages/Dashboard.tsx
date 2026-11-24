@@ -99,6 +99,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                 currentUser={currentUser}
                 onNavigate={(screen) => setCurrentScreen(screen)}
                 onToast={showToast}
+                onCheckInSuccess={(result) => {
+                  if (currentUser) {
+                    onUpdateUser?.({
+                      ...currentUser,
+                      total_xp: result.total_xp,
+                      current_level: result.current_level,
+                      last_active_date: result.habit.logs.at(-1)?.log_date ?? currentUser.last_active_date
+                    });
+                  }
+                }}
               />
             ) : (
               <>

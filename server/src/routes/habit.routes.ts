@@ -32,4 +32,8 @@ router.delete('/:id', (req, res, next) => {
   habitController.deleteHabit(req, res, next);
 });
 
+router.post('/:id/check-in', (req, res, next) => {
+  void habitController.checkInHabit(req, res, next);
+});
+
 export default router;

@@ -22,18 +22,23 @@ import {
 import { AppError } from '../middlewares/error.middleware';
 
 export class TaskService {
-  async completeTask(userId: string, taskId: string): Promise<any> {
+  completeTask(userId: string, taskId: string): Promise<any> {
+    return gamificationService.withUserXP(userId, () => this.completeTaskForUser(userId, taskId));
+  }
+
+  private async completeTaskForUser(userId: string, taskId: string): Promise<any> {
     if (!/^[a-f0-9]{24}$/i.test(taskId)) {
       throw Object.assign(new Error('Định danh nhiệm vụ không hợp lệ'), { statusCode: 400, code: 'INVALID_ID' });
     }
+    const completedAt = new Date();
     const task = await Task.findOneAndUpdate(
       { _id: taskId, user_id: userId, status: { $ne: 'COMPLETED' } },
-      { $set: { status: 'COMPLETED', completed_at: new Date() } },
+      { $set: { status: 'COMPLETED', completed_at: completedAt, xp_earned: 0 } },
       { new: true, runValidators: true }
     );
     if (task) {
       const xpToAdd = gamificationService.calculateTaskXP(task.priority);
-      const capResult = await gamificationService.checkDailyXPCap(userId, xpToAdd);
+      const capResult = await gamificationService.checkDailyXPCap(userId, xpToAdd, completedAt);
 
       let totalXP = 0;
       let currentLevel = 1;
@@ -47,7 +52,7 @@ export class TaskService {
         if (user) {
           const oldLevel = user.current_level || 1;
           user.total_xp = (user.total_xp || 0) + capResult.xp_earned;
-          user.last_active_date = getVietnamDateString();
+          user.last_active_date = getVietnamDateString(completedAt);
           const levelResult = levelService.checkLevelUp(oldLevel, user.total_xp);
           user.current_level = levelResult.new_level;
           levelUp = levelResult.level_up;
@@ -245,7 +250,11 @@ export class TaskService {
    * @param data - Dữ liệu cần cập nhật { title, description, priority, due_date, status }
    * @returns Công việc sau khi cập nhật
    */
-  async updateTask(userId: string, taskId: string, data: UpdateTaskDTO): Promise<ITask> {
+  updateTask(userId: string, taskId: string, data: UpdateTaskDTO): Promise<ITask> {
+    return gamificationService.withUserXP(userId, () => this.updateTaskForUser(userId, taskId, data));
+  }
+
+  private async updateTaskForUser(userId: string, taskId: string, data: UpdateTaskDTO): Promise<ITask> {
     // 1. Kiểm tra tính hợp lệ của :id (định dạng 24 hex ký tự MongoDB ObjectId)
     if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
       const error = new Error('Định danh nhiệm vụ không hợp lệ') as AppError;
