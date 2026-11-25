@@ -28,7 +28,7 @@ export function BadgesPage({ badges, loading, error, onRetry }: BadgesPageProps)
       {!loading && !error && badges.length === 0 && <p className="card">Chưa có huy hiệu trong bộ sưu tập.</p>}
       {!loading && !error && badges.length > 0 &&
         <div className="badge-showcase-grid">
-          {badges.map(badge => <BadgeCard key={badge._id} badge={badge} />)}
+          {badges.map(badge => <BadgeCard key={badge.id} badge={badge} />)}
         </div>}
     </section>
   );

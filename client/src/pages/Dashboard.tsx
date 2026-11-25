@@ -6,6 +6,7 @@ import { QuickTaskForm } from '../components/QuickTaskForm';
 import { TaskList } from '../components/TaskList';
 import { EditTaskModal } from '../components/EditTaskModal';
 import { LevelUpModal } from '../components/gamification/LevelUpModal';
+import { StreakCard } from '../components/gamification/StreakCard';
 import { useGamification } from '../context/GamificationContext';
 import { BadgesPage } from './BadgesPage';
 import { BadgeUnlockModal } from '../components/badges/BadgeUnlockModal';
@@ -143,6 +144,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                     });
                   }
                 }}
+                onFreezeSuccess={(freezeRes) => {
+                  if (currentUser) {
+                    onUpdateUser?.({
+                      ...currentUser,
+                      streak_freeze_count: freezeRes.streak_freeze_count,
+                      current_streak: freezeRes.current_streak,
+                      streak_frozen_date: freezeRes.frozen_date ?? currentUser.streak_frozen_date
+                    });
+                  }
+                }}
               />
             ) : (
               <>
@@ -210,6 +221,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
 
                   {/* Cột phải: Thống kê Gamification */}
                   <aside>
+                    {/* Khối Chuỗi Ngày Liên Tục & Đóng Băng Khẩn Cấp [TECH-S3-03] */}
+                    <StreakCard
+                      currentStreak={currentUser?.current_streak}
+                      streakFreezeCount={currentUser?.streak_freeze_count}
+                      onToast={showToast}
+                      onFreezeSuccess={(freezeRes) => {
+                        if (currentUser) {
+                          onUpdateUser?.({
+                            ...currentUser,
+                            streak_freeze_count: freezeRes.streak_freeze_count,
+                            current_streak: freezeRes.current_streak,
+                            streak_frozen_date:
+                              freezeRes.frozen_date ?? currentUser.streak_frozen_date
+                          });
+                        }
+                      }}
+                    />
+
                     {/* Khối Nhịp độ tuần này */}
                     <section className="card flat">
                       <div className="eyebrow">NHỊP ĐỘ TUẦN NÀY</div>
@@ -306,7 +335,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
       {/* Modal Chúc mừng Thăng cấp độ [TECH-S2-07] */}
       <LevelUpModal />
       {badgeShowcase.unlocked && !levelUpModal?.isOpen && (
-        <BadgeUnlockModal key={badgeShowcase.unlocked._id} badge={badgeShowcase.unlocked} onClose={badgeShowcase.acknowledge} />
+        <BadgeUnlockModal key={badgeShowcase.unlocked.id} badge={badgeShowcase.unlocked} onClose={badgeShowcase.acknowledge} />
       )}
 
       {/* Thông báo Toast phản hồi thao tác */}

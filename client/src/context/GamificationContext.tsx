@@ -30,6 +30,9 @@ export interface LevelUpModalState {
 export interface GamificationContextType {
   totalXP: number;
   currentLevel: number;
+  currentStreak: number;
+  streakFreezeCount: number;
+  isStreakProtected: boolean;
   requiredXP: number;
   nextLevelXP: number;
   progressPercent: number;
@@ -42,6 +45,12 @@ export interface GamificationContextType {
   showLevelUpModal: (level: number, title?: string, totalXP?: number) => void;
   closeLevelUpModal: () => void;
   updateStats: (totalXP: number, currentLevel?: number) => void;
+  updateStreakFreeze: (
+    streakFreezeCount: number,
+    currentStreak?: number,
+    isProtected?: boolean,
+    frozenDate?: string
+  ) => void;
 }
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
@@ -52,6 +61,15 @@ interface GamificationProviderProps {
   initialLevel?: number;
   currentUser?: UserProfile | null;
   onUpdateUser?: (updated: UserProfile) => void;
+}
+
+function getTodayVietnamDate(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
 }
 
 export const GamificationProvider: React.FC<GamificationProviderProps> = ({
@@ -73,6 +91,20 @@ export const GamificationProvider: React.FC<GamificationProviderProps> = ({
     return calculateLevel(currentUser?.total_xp ?? initialXP ?? 380);
   });
 
+  const [currentStreak, setCurrentStreak] = useState<number>(() => {
+    return currentUser?.current_streak ?? 6;
+  });
+
+  const [streakFreezeCount, setStreakFreezeCount] = useState<number>(() => {
+    return currentUser?.streak_freeze_count ?? 1;
+  });
+
+  const [isStreakProtected, setIsStreakProtected] = useState<boolean>(() => {
+    return Boolean(
+      currentUser?.streak_frozen_date && currentUser.streak_frozen_date === getTodayVietnamDate()
+    );
+  });
+
   const [levelUpModal, setLevelUpModal] = useState<LevelUpModalState | null>(null);
 
   // Đồng bộ khi currentUser thay đổi từ phía ngoài (ví dụ sau khi fetch /auth/me)
@@ -84,8 +116,26 @@ export const GamificationProvider: React.FC<GamificationProviderProps> = ({
       if (currentUser.current_level !== undefined && currentUser.current_level !== currentLevel) {
         setCurrentLevel(currentUser.current_level);
       }
+      if (currentUser.current_streak !== undefined && currentUser.current_streak !== currentStreak) {
+        setCurrentStreak(currentUser.current_streak);
+      }
+      if (
+        currentUser.streak_freeze_count !== undefined &&
+        currentUser.streak_freeze_count !== streakFreezeCount
+      ) {
+        setStreakFreezeCount(currentUser.streak_freeze_count);
+      }
+      if (currentUser.streak_frozen_date !== undefined) {
+        setIsStreakProtected(currentUser.streak_frozen_date === getTodayVietnamDate());
+      }
     }
-  }, [currentUser?.total_xp, currentUser?.current_level]);
+  }, [
+    currentUser?.total_xp,
+    currentUser?.current_level,
+    currentUser?.current_streak,
+    currentUser?.streak_freeze_count,
+    currentUser?.streak_frozen_date
+  ]);
 
   // Các giá trị tính toán dẫn xuất
   const requiredXP = useMemo(() => calculateRequiredXP(currentLevel), [currentLevel]);
@@ -181,10 +231,39 @@ export const GamificationProvider: React.FC<GamificationProviderProps> = ({
     [currentLevel, totalXP, currentUser, onUpdateUser]
   );
 
+  const updateStreakFreeze = useCallback(
+    (
+      newFreezeCount: number,
+      newStreak?: number,
+      protectedToday = true,
+      frozenDate?: string
+    ) => {
+      setStreakFreezeCount(newFreezeCount);
+      if (newStreak !== undefined) {
+        setCurrentStreak(newStreak);
+      }
+      setIsStreakProtected(protectedToday);
+
+      if (currentUser && onUpdateUser) {
+        onUpdateUser({
+          ...currentUser,
+          streak_freeze_count: newFreezeCount,
+          current_streak: newStreak !== undefined ? newStreak : currentUser.current_streak,
+          streak_frozen_date:
+            frozenDate ?? (protectedToday ? getTodayVietnamDate() : currentUser.streak_frozen_date)
+        });
+      }
+    },
+    [currentUser, onUpdateUser]
+  );
+
   const value = useMemo(
     () => ({
       totalXP,
       currentLevel,
+      currentStreak,
+      streakFreezeCount,
+      isStreakProtected,
       requiredXP,
       nextLevelXP,
       progressPercent,
@@ -196,11 +275,15 @@ export const GamificationProvider: React.FC<GamificationProviderProps> = ({
       triggerGamificationUpdate,
       showLevelUpModal,
       closeLevelUpModal,
-      updateStats
+      updateStats,
+      updateStreakFreeze
     }),
     [
       totalXP,
       currentLevel,
+      currentStreak,
+      streakFreezeCount,
+      isStreakProtected,
       requiredXP,
       nextLevelXP,
       progressPercent,
@@ -212,7 +295,8 @@ export const GamificationProvider: React.FC<GamificationProviderProps> = ({
       triggerGamificationUpdate,
       showLevelUpModal,
       closeLevelUpModal,
-      updateStats
+      updateStats,
+      updateStreakFreeze
     ]
   );
 
@@ -235,6 +319,9 @@ export const useGamification = (): GamificationContextType => {
     return {
       totalXP: fallbackXP,
       currentLevel: fallbackLevel,
+      currentStreak: 0,
+      streakFreezeCount: 1,
+      isStreakProtected: false,
       requiredXP: reqXP,
       nextLevelXP: nextXP,
       progressPercent: percent,
@@ -246,7 +333,8 @@ export const useGamification = (): GamificationContextType => {
       triggerGamificationUpdate: () => {},
       showLevelUpModal: () => {},
       closeLevelUpModal: () => {},
-      updateStats: () => {}
+      updateStats: () => {},
+      updateStreakFreeze: () => {}
     };
   }
   return context;

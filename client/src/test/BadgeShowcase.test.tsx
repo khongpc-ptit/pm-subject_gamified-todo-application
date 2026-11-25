@@ -5,9 +5,9 @@ import { useBadges } from '../hooks/useBadges';
 import { badgeService, type Badge } from '../services/badgeService';
 
 const locked: Badge = {
-  _id: 'badge-1', code: 'FIRST_TASK', title: 'Khởi đầu nan', description: 'Hoàn thành công việc',
+  id: 'badge-1', code: 'FIRST_TASK', title: 'Khởi đầu nan', description: 'Hoàn thành công việc',
   icon_url: '/badge.webp', condition_type: 'TASK_COUNT', condition_value: 1,
-  current_progress: 0, is_unlocked: false, unlocked_at: null
+  current_progress: 0, target: 1, progress_percent: 0, is_unlocked: false, unlocked_at: null
 };
 const earned: Badge = { ...locked, current_progress: 1, is_unlocked: true, unlocked_at: '2026-11-24T10:00:00Z' };
 
@@ -15,7 +15,7 @@ afterEach(() => vi.restoreAllMocks());
 
 it('renders progress and earned dates, plus retry on failed load', () => {
   const retry = vi.fn();
-  const { rerender } = render(<BadgesPage badges={[locked, { ...earned, _id: 'badge-2', title: 'Đã đạt' }]}
+  const { rerender } = render(<BadgesPage badges={[locked, { ...earned, id: 'badge-2', title: 'Đã đạt' }]}
     loading={false} error={false} onRetry={retry} />);
   expect(screen.getByText(/1\/2 huy hiệu/)).toBeInTheDocument();
   expect(screen.getByRole('progressbar', { name: 'Tiến độ Khởi đầu nan' })).toHaveAttribute('value', '0');
@@ -26,7 +26,7 @@ it('renders progress and earned dates, plus retry on failed load', () => {
 });
 
 it('celebrates new unlocks after baseline and does not repeat acknowledged badges', async () => {
-  const previous = { ...earned, _id: 'older', title: 'Older badge' };
+  const previous = { ...earned, id: 'older', title: 'Older badge' };
   const list = vi.spyOn(badgeService, 'list').mockResolvedValueOnce([locked, previous])
     .mockResolvedValue([earned, previous]);
   function ShowcaseState() {

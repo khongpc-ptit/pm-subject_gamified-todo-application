@@ -4,8 +4,8 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import authRoutes from './routes/auth.routes';
 import taskRoutes from './routes/task.routes';
-import badgeCatalogRoutes from './routes/badgeCatalogRoutes';
 import habitRoutes from './routes/habit.routes';
+import gamificationRoutes from './routes/gamification.routes';
 import { notFoundHandler, errorHandler } from './middlewares/error.middleware';
 
 const app: Application = express();
@@ -62,8 +62,8 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', taskRoutes);
-app.use('/api/v1/gamification', badgeCatalogRoutes);
 app.use('/api/v1/habits', habitRoutes);
+app.use('/api/v1/gamification', gamificationRoutes);
 
 // Error Handling
 app.use(notFoundHandler);

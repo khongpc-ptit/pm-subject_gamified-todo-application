@@ -21,11 +21,11 @@ export function useBadges(userId?: string) {
       if (request.signal.aborted) return;
       const unlocked = catalog.filter(badge => badge.is_unlocked);
       if (seen.current) {
-        const fresh = unlocked.filter(badge => !seen.current!.has(badge._id));
+        const fresh = unlocked.filter(badge => !seen.current!.has(badge.id));
         if (fresh.length) setPending(current => [...current, ...fresh]);
       }
       seen.current ??= new Set();
-      for (const badge of unlocked) seen.current.add(badge._id);
+      for (const badge of unlocked) seen.current.add(badge.id);
       setBadges(catalog);
     } catch {
       if (!request.signal.aborted) setError(true);

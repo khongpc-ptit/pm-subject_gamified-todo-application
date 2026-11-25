@@ -12,13 +12,15 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   xp: propXP,
-  streak = 6,
-  freeze = 1,
+  streak: propStreak,
+  freeze: propFreeze,
   level: propLevel
 }) => {
   const context = useGamification();
   const xp = propXP !== undefined ? propXP : context.totalXP;
   const level = propLevel !== undefined ? propLevel : context.currentLevel;
+  const streak = propStreak !== undefined ? propStreak : context.currentStreak;
+  const freeze = propFreeze !== undefined ? propFreeze : context.streakFreezeCount;
 
   return (
     <header id="header" className="topbar">
@@ -36,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Khối Freeze Protection */}
       <div className="freeze">
-        ◇ {freeze} freeze
+        ❄️ {freeze} freeze
         <small>Bảo vệ chuỗi của bạn</small>
       </div>
 

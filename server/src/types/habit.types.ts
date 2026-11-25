@@ -1,4 +1,5 @@
 import { Document, Types } from 'mongoose';
+import { IBadge } from './badge.types';
 
 export type HabitFrequency = 'DAILY' | 'WEEKLY';
 
@@ -45,4 +46,5 @@ export interface CheckInHabitResponseData {
   level_up: boolean;
   next_level_xp: number;
   is_cap_reached?: boolean;
+  unlocked_badges?: IBadge[];
 }

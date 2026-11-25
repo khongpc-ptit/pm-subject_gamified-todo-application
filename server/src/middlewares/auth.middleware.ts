@@ -45,3 +45,6 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
     });
   }
 };
+
+export const authMiddleware = verifyToken;
+export default verifyToken;

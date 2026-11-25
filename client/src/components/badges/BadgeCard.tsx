@@ -25,10 +25,10 @@ export function BadgeCard({ badge }: { badge: Badge }) {
         <>
           <progress
             aria-label={'Tiến độ ' + badge.title}
-            max={Math.max(1, badge.condition_value)}
-            value={Math.min(badge.condition_value, badge.current_progress)}
+            max={badge.target}
+            value={Math.min(badge.target, badge.current_progress)}
           />
-          <small>{badge.current_progress}/{badge.condition_value} {units[badge.condition_type]}</small>
+          <small>{badge.current_progress}/{badge.target} {units[badge.condition_type]}</small>
         </>
       )}
     </article>
