@@ -7,10 +7,12 @@ export function useBadges(userId?: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const seen = useRef<Set<string> | null>(null);
+  const confirmedAwards = useRef(new Set<string>());
   const active = useRef<AbortController | null>(null);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (awardedIds: string[] = []) => {
     if (!userId) return;
+    for (const id of awardedIds) confirmedAwards.current.add(id);
     active.current?.abort();
     const request = new AbortController();
     active.current = request;
@@ -20,12 +22,16 @@ export function useBadges(userId?: string) {
       const catalog = await badgeService.list(request.signal);
       if (request.signal.aborted) return;
       const unlocked = catalog.filter(badge => badge.is_unlocked);
-      if (seen.current) {
-        const fresh = unlocked.filter(badge => !seen.current!.has(badge.id));
-        if (fresh.length) setPending(current => [...current, ...fresh]);
-      }
+      const previous = seen.current;
+      const fresh = unlocked.filter(badge => previous
+        ? !previous.has(badge.id)
+        : confirmedAwards.current.has(badge.id));
+      if (fresh.length) setPending(current => [...current, ...fresh]);
       seen.current ??= new Set();
-      for (const badge of unlocked) seen.current.add(badge.id);
+      for (const badge of unlocked) {
+        seen.current.add(badge.id);
+        confirmedAwards.current.delete(badge.id);
+      }
       setBadges(catalog);
     } catch {
       if (!request.signal.aborted) setError(true);
@@ -36,6 +42,7 @@ export function useBadges(userId?: string) {
 
   useEffect(() => {
     seen.current = null;
+    confirmedAwards.current.clear();
     setBadges([]);
     setPending([]);
     void refresh();

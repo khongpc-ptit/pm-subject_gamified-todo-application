@@ -55,6 +55,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
   const handleSaveTask = async (id: string, data: UpdateTaskRequestDTO) => {
     await updateTask(id, data);
     showToast('Đã lưu thay đổi');
+    if (data.status === 'COMPLETED') void badgeShowcase.refresh();
   };
 
   return (
@@ -128,7 +129,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                 onNavigate={(screen) => setCurrentScreen(screen)}
                 onToast={showToast}
                 onCheckInSuccess={(result) => {
-                  void badgeShowcase.refresh();
+                  void badgeShowcase.refresh(result.unlocked_badges?.map(badge => badge._id));
                   triggerGamificationUpdate({
                     total_xp: result.total_xp,
                     current_level: result.current_level,
@@ -188,7 +189,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                       priorityFilter={priorityFilter}
                       onFilterChange={setPriorityFilter}
                       onToggleComplete={(updated) => {
-                        void badgeShowcase.refresh();
+                        void badgeShowcase.refresh(updated?.unlocked_badges?.map(badge => badge._id));
                         refetch();
                         if (updated && (updated as any).total_xp !== undefined) {
                           triggerGamificationUpdate({

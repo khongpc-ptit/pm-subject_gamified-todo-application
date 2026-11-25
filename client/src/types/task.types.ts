@@ -67,4 +67,5 @@ export interface CompleteTaskResponseData extends Task {
   next_level_xp?: number;
   progress_percent?: number;
   is_cap_reached?: boolean;
+  unlocked_badges?: { _id: string }[];
 }

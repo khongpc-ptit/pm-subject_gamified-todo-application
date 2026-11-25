@@ -10,3 +10,5 @@ Issue #77 · US-S3-04
 Chạy `npm run build` và `npm test` với `TEST_MONGODB_URI` trỏ tới MongoDB phát triển. Kiểm thử API dùng hai tài khoản với quyền mở khóa khác nhau.
 
 Đã chạy Edge với MongoDB thật ở chiều rộng 390 px. Danh mục khóa, tiến độ, modal sau khi thêm bản ghi mở khóa, nút Escape và trạng thái sau reload đều đạt.
+
+Đã xác minh trên Edge 390 px với seed chính thức và engine #76. Hoàn thành task đầu tiên mở modal Khởi đầu nan, danh mục chuyển từ 0/10 lên 1/10, toàn bộ 10 WebP trả HTTP 200 và modal không lặp sau reload.

@@ -47,3 +47,17 @@ it('celebrates new unlocks after baseline and does not repeat acknowledged badge
   expect(screen.queryByText(earned.title)).not.toBeInTheDocument();
   expect(list).toHaveBeenCalledTimes(3);
 });
+
+it('celebrates a server-confirmed award even before the first catalog request finishes', async () => {
+  vi.spyOn(badgeService, 'list').mockImplementationOnce(() => new Promise(() => {})).mockResolvedValue([earned]);
+  function Startup() {
+    const { refresh, unlocked } = useBadges('user-1');
+    return <div>
+      <button onClick={() => void refresh([earned.id])}>Task completed</button>
+      {unlocked && <p>{unlocked.title}</p>}
+    </div>;
+  }
+  render(<Startup />);
+  fireEvent.click(screen.getByRole('button', { name: 'Task completed' }));
+  expect(await screen.findByText(earned.title)).toBeInTheDocument();
+});
