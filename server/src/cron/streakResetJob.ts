@@ -6,6 +6,7 @@ import { Habit } from '../models/Habit';
 import { Notification } from '../models/Notification';
 import { IUser } from '../types/user.types';
 import { getVietnamDateString, getVietnamDayRangeUTC } from '../services/gamification.service';
+import { badgeService } from '../services/badgeService';
 
 export interface StreakProcessResult {
   userId: string;
@@ -156,6 +157,17 @@ export async function processUserStreak(
 
   if (action !== 'NO_OP' && typeof user.save === 'function') {
     await user.save();
+  }
+
+  // [US-S3-03 / TECH-S3-04] Kích hoạt quét huy hiệu STREAK_DAYS khi chuỗi ngày liên tục tăng lên
+  if (action === 'INCREMENT') {
+    try {
+      await badgeService.checkAndAwardBadges(userIdStr);
+    } catch (badgeError) {
+      if (process.env.NODE_ENV !== 'test') {
+        console.error('[BadgeTrigger] Lỗi khi quét huy hiệu sau khi tăng streak:', badgeError);
+      }
+    }
   }
 
   return {

@@ -1,6 +1,7 @@
 import mongoose, { Types } from 'mongoose';
 import { User } from '../models/User';
 import { LevelProgress, LevelUpResult } from '../types/level.types';
+import { badgeService } from './badgeService';
 import {
   calculateLevel,
   calculateRequiredXP,
@@ -82,6 +83,17 @@ export class LevelService {
 
         if (typeof user.save === 'function') {
           await user.save();
+        }
+
+        // [US-S3-03 / TECH-S3-04] Kích hoạt quét huy hiệu LEVEL_REACH khi người dùng thăng cấp
+        if (result.level_up) {
+          try {
+            await badgeService.checkAndAwardBadges(userId.toString());
+          } catch (badgeError) {
+            if (process.env.NODE_ENV !== 'test') {
+              console.error('[BadgeTrigger] Lỗi khi quét huy hiệu sau khi thăng cấp:', badgeError);
+            }
+          }
         }
 
         return result;

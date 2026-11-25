@@ -10,6 +10,8 @@ import {
   getVietnamDateString
 } from './gamification.service';
 import { levelService } from './level.service';
+import { badgeService } from './badgeService';
+import { IBadge } from '../types/badge.types';
 import {
   ITask,
   CreateTaskDTO,
@@ -70,6 +72,16 @@ export class TaskService {
         await task.save();
       }
 
+      // [US-S3-03 / TECH-S3-04] Kích hoạt quét và mở khóa huy hiệu tự động sau khi hoàn thành task
+      let unlockedBadges: IBadge[] = [];
+      try {
+        unlockedBadges = await badgeService.checkAndAwardBadges(userId);
+      } catch (badgeError) {
+        if (process.env.NODE_ENV !== 'test') {
+          console.error('[BadgeTrigger] Lỗi khi quét huy hiệu sau khi hoàn thành task:', badgeError);
+        }
+      }
+
       const taskObj = task.toObject ? task.toObject() : { ...task };
       const safeTask = { ...taskObj };
 
@@ -86,7 +98,8 @@ export class TaskService {
         required_xp: calculateRequiredXP(currentLevel),
         next_level_xp: calculateNextLevelXP(currentLevel),
         progress_percent: calculateProgressPercent(totalXP, currentLevel),
-        is_cap_reached: capResult.is_cap_reached
+        is_cap_reached: capResult.is_cap_reached,
+        unlocked_badges: unlockedBadges
       };
     }
     const existing = await Task.findOne({ _id: taskId, user_id: userId });
@@ -116,7 +129,8 @@ export class TaskService {
         current_level: currentLevel,
         level_up: false,
         next_level_xp: calculateNextLevelXP(currentLevel),
-        is_cap_reached: false
+        is_cap_reached: false,
+        unlocked_badges: []
       };
     }
     const exists = await Task.exists({ _id: taskId });
@@ -343,6 +357,8 @@ export class TaskService {
       }
     }
 
+    let justCompleted = false;
+
     // - Validate status
     if (data.status !== undefined) {
       const validStatuses: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'COMPLETED'];
@@ -363,6 +379,7 @@ export class TaskService {
         task.completed_at = null;
         task.xp_earned = 0;
       } else if (data.status === 'COMPLETED' && task.status !== 'COMPLETED') {
+        justCompleted = true;
         task.completed_at = new Date();
         const xpToAdd = gamificationService.calculateTaskXP(data.priority || task.priority);
         const capResult = await gamificationService.checkDailyXPCap(userId, xpToAdd);
@@ -387,7 +404,19 @@ export class TaskService {
     }
 
     // 5. Lưu vào MongoDB và trả về dữ liệu mới
-    return await task.save();
+    const savedTask = await task.save();
+
+    if (justCompleted) {
+      try {
+        await badgeService.checkAndAwardBadges(userId);
+      } catch (badgeError) {
+        if (process.env.NODE_ENV !== 'test') {
+          console.error('[BadgeTrigger] Lỗi khi quét huy hiệu sau khi cập nhật task:', badgeError);
+        }
+      }
+    }
+
+    return savedTask;
   }
 }
 
