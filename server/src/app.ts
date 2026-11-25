@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import authRoutes from './routes/auth.routes';
 import taskRoutes from './routes/task.routes';
 import habitRoutes from './routes/habit.routes';
+import notificationRoutes from './routes/notificationRoutes';
 import gamificationRoutes from './routes/gamification.routes';
 import { notFoundHandler, errorHandler } from './middlewares/error.middleware';
 
@@ -63,6 +64,7 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/habits', habitRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/gamification', gamificationRoutes);
 
 // Error Handling
