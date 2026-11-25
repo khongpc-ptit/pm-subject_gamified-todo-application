@@ -3,7 +3,7 @@ import { notificationService, type Notification, type NotificationInbox } from '
 import { NotificationDropdown } from './NotificationDropdown';
 import './notifications.css';
 
-export function NotificationBell() {
+export function NotificationBell({ refreshKey = 0 }: { refreshKey?: number }) {
   const [open, setOpen] = useState(false);
   const [inbox, setInbox] = useState<NotificationInbox | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,6 @@ export function NotificationBell() {
 
   useEffect(() => {
     mounted.current = true;
-    void refresh();
     const timer = window.setInterval(() => { if (!document.hidden) void refresh(); }, 30_000);
     const onFocus = () => { void refresh(); };
     window.addEventListener('focus', onFocus);
@@ -47,6 +46,8 @@ export function NotificationBell() {
       request.current?.abort();
     };
   }, [refresh]);
+
+  useEffect(() => { void refresh(); }, [refresh, refreshKey]);
 
   useEffect(() => {
     if (!open) return;
@@ -74,12 +75,13 @@ export function NotificationBell() {
     setLoading(false);
     setError('');
     try {
-      const result = item ? await notificationService.markRead(item._id) : await notificationService.markAllRead();
+      const result = item ? await notificationService.markRead(item.id) : await notificationService.markAllRead();
       if (!mounted.current) return;
       setInbox(previous => previous && ({
+        ...previous,
         unread_count: result.unread_count,
         notifications: previous.notifications.map(notice =>
-          !item || notice._id === item._id ? { ...notice, is_read: true } : notice
+          !item || notice.id === item.id ? { ...notice, is_read: true } : notice
         )
       }));
     } catch {

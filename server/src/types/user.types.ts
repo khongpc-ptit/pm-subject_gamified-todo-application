@@ -12,6 +12,7 @@ export interface IUser extends Document {
   current_streak: number;
   last_active_date: string | null;
   streak_freeze_count: number;
+  streak_frozen_date?: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -37,6 +38,7 @@ export interface UserProfileResponse {
   current_streak: number;
   last_active_date: string | null;
   streak_freeze_count: number;
+  streak_frozen_date?: string | null;
   created_at: string;
   updated_at?: string;
 }

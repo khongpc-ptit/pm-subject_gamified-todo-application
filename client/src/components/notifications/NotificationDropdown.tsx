@@ -39,7 +39,7 @@ export function NotificationDropdown({ id, inbox, loading, error, busy, onRetry,
       {!!inbox?.notifications.length && (
         <ul className="notification-list">
           {inbox.notifications.map(item => (
-            <li key={item._id}>
+            <li key={item.id}>
               <button
                 type="button"
                 className={'notification-item' + (item.is_read ? '' : ' notification-unread')}

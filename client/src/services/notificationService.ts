@@ -2,7 +2,7 @@ import { apiClient } from './api';
 import type { ApiResponse } from '../types/task.types';
 
 export interface Notification {
-  _id: string;
+  id: string;
   title: string;
   message: string;
   type: 'ACHIEVEMENT' | 'REMINDER' | 'SYSTEM';
@@ -13,6 +13,7 @@ export interface Notification {
 export interface NotificationInbox {
   notifications: Notification[];
   unread_count: number;
+  total: number;
 }
 
 export const notificationService = {
