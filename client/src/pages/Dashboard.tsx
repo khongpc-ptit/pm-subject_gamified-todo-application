@@ -51,6 +51,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
 
   const handleSaveTask = async (id: string, data: UpdateTaskRequestDTO) => {
     await updateTask(id, data);
+    if (data.status === 'COMPLETED') setNotificationRefreshKey(key => key + 1);
     showToast('Đã lưu thay đổi');
   };
 
