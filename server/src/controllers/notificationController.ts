@@ -15,7 +15,7 @@ function respond<T>(action: Action<T>, message: string) {
 }
 
 export const notificationController = {
-  list: respond(req => notificationService.list(req.user!.id), 'Lấy thông báo thành công'),
+  list: respond(req => notificationService.list(req.user!.id), 'Lấy danh sách thông báo thành công'),
   read: respond(req => notificationService.read(req.user!.id, String(req.params.id)), 'Đã đánh dấu thông báo là đã đọc'),
   readAll: respond(req => notificationService.readAll(req.user!.id), 'Đã đánh dấu tất cả thông báo là đã đọc')
 };

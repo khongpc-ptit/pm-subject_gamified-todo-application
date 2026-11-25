@@ -1297,3 +1297,99 @@ p {
   }
 }
 
+/* ==========================================================================
+   StreakCard & Streak Freeze Flow [US-S3-02 / TECH-S3-03]
+   ========================================================================== */
+
+.streak-card-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.streak-card-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 8px;
+}
+
+.streak-card-flame {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: #eaece6;
+  color: #8b948b;
+  border: 1px solid #d5dcd2;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.streak-card-flame svg {
+  width: 28px;
+  height: 28px;
+}
+
+.streak-card-flame.active {
+  background: radial-gradient(circle at 50% 65%, #fff5d6 0%, #ffe0a3 55%, #f6b95e 100%);
+  color: #d95d1e;
+  border-color: #ebb365;
+  box-shadow: 0 6px 18px rgba(217, 93, 30, 0.26), 0 0 12px rgba(245, 166, 35, 0.35);
+  animation: streak-flame-glow 2.2s infinite ease-in-out;
+}
+
+@keyframes streak-flame-glow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6px 18px rgba(217, 93, 30, 0.26), 0 0 12px rgba(245, 166, 35, 0.35);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(217, 93, 30, 0.38), 0 0 18px rgba(245, 166, 35, 0.5);
+  }
+}
+
+.streak-status-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: -2px;
+}
+
+.freeze-count-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.streak-protected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e6f2f8;
+  border: 1px solid #bcd9ea;
+  color: #235a78;
+  font-size: 11px;
+  font-weight: 650;
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.freeze-confirm-symbol {
+  width: 72px;
+  height: 76px;
+  margin: 0 auto 14px;
+  background: radial-gradient(circle, #eef7fc 0%, #d8ecf8 100%);
+  border: 1px solid #b5d6eb;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+}
+
+

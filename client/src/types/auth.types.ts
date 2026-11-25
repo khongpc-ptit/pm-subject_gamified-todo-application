@@ -7,6 +7,7 @@ export interface UserProfile {
   current_streak: number;
   last_active_date: string | null;
   streak_freeze_count: number;
+  streak_frozen_date?: string | null;
   created_at: string;
   updated_at?: string;
 }

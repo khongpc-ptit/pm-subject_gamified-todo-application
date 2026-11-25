@@ -1,50 +1,29 @@
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
+import { Notification } from '../models/Notification';
+import type { INotificationListResponse, NotificationType } from '../types/notification.types';
 
-export type NotificationType = 'ACHIEVEMENT' | 'REMINDER' | 'SYSTEM';
-
-interface NotificationRecord {
-  user_id: Types.ObjectId;
-  title: string;
-  message: string;
-  type: NotificationType;
-  is_read: boolean;
-  created_at: Date;
-}
-
-const notifications = () => mongoose.connection.collection('notifications');
-
-export async function ensureNotificationIndexes(): Promise<void> {
-  await notifications().createIndexes([
-    { key: { user_id: 1, is_read: 1 }, name: 'user_id_1_is_read_1' },
-    { key: { user_id: 1, created_at: -1 }, name: 'user_id_1_created_at_-1' }
-  ]);
-}
-
-export async function createNotification(
+export function createNotification(
   userId: string | Types.ObjectId,
   title: string,
   message: string,
   type: NotificationType
 ) {
-  const record: NotificationRecord = {
-    user_id: new Types.ObjectId(userId),
-    title,
-    message,
-    type,
-    is_read: false,
-    created_at: new Date()
-  };
-  const { insertedId } = await notifications().insertOne(record);
-  return { _id: insertedId, ...record };
+  return Notification.create({ user_id: new Types.ObjectId(userId), title, message, type, is_read: false });
 }
 
-async function list(userId: string) {
+async function list(userId: string): Promise<INotificationListResponse> {
   const owner = { user_id: new Types.ObjectId(userId) };
-  const [items, unread_count] = await Promise.all([
-    notifications().find(owner).sort({ created_at: -1 }).limit(20).toArray(),
-    notifications().countDocuments({ ...owner, is_read: false })
+  const [items, unread_count, total] = await Promise.all([
+    Notification.find(owner).sort({ created_at: -1 }).limit(20).lean(),
+    Notification.countDocuments({ ...owner, is_read: false }),
+    Notification.countDocuments(owner)
   ]);
-  return { notifications: items, unread_count };
+  return {
+    notifications: items.map(({ _id, title, message, type, is_read, created_at }) => ({
+      id: _id.toString(), title, message, type, is_read, created_at: created_at.toISOString()
+    })),
+    unread_count, total
+  };
 }
 
 async function read(userId: string, id: string) {
@@ -54,22 +33,22 @@ async function read(userId: string, id: string) {
     });
   }
   const owner = { user_id: new Types.ObjectId(userId) };
-  const result = await notifications().updateOne(
+  const result = await Notification.updateOne(
     { _id: new Types.ObjectId(id), ...owner },
     { $set: { is_read: true } }
   );
   if (result.matchedCount === 0) {
-    throw Object.assign(new Error('Không tìm thấy thông báo'), {
+    throw Object.assign(new Error('Thông báo không tồn tại hoặc bạn không có quyền truy cập'), {
       statusCode: 404, code: 'NOTIFICATION_NOT_FOUND'
     });
   }
-  return { id, is_read: true, unread_count: await notifications().countDocuments({ ...owner, is_read: false }) };
+  return { id, is_read: true, unread_count: await Notification.countDocuments({ ...owner, is_read: false }) };
 }
 
 async function readAll(userId: string) {
   const unread = { user_id: new Types.ObjectId(userId), is_read: false };
-  const result = await notifications().updateMany(unread, { $set: { is_read: true } });
-  return { updated_count: result.modifiedCount, unread_count: await notifications().countDocuments(unread) };
+  const result = await Notification.updateMany(unread, { $set: { is_read: true } });
+  return { modified_count: result.modifiedCount, unread_count: await Notification.countDocuments(unread) };
 }
 
 export const notificationService = { list, read, readAll, createNotification };

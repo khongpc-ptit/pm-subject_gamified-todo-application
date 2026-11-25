@@ -3,7 +3,7 @@ import { Task } from '../models/Task';
 import { Habit } from '../models/Habit';
 import { User } from '../models/User';
 import { TaskPriority } from '../types/task.types';
-import { DailyXPCapResult, RevertXPResult } from '../types/gamification.types';
+import { DailyXPCapResult, RevertXPResult, FreezeStreakResult } from '../types/gamification.types';
 
 export const DAILY_XP_CAP = 200;
 export const HABIT_CHECKIN_XP = 15;
@@ -226,6 +226,63 @@ export class GamificationService {
       total_xp: user?.total_xp ?? 0,
       current_level: user?.current_level ?? 1
     };
+  }
+
+  /**
+   * [US-S3-02 / TECH-S3-03] Chủ động kích hoạt đóng băng chuỗi ngày (Streak Freeze)
+   * - Kiểm tra user.streak_freeze_count > 0 (nếu <= 0 trả về 400 NO_FREEZE_REMAINING)
+   * - Trừ 1 lượt streak_freeze_count và ghi nhận streak_frozen_date = YYYY-MM-DD (UTC+7)
+   */
+  async freezeStreak(
+    userId: string | Types.ObjectId,
+    referenceDate: Date = new Date()
+  ): Promise<FreezeStreakResult> {
+    return this.withUserXP(userId.toString(), async () => {
+      const user = await User.findById(userId);
+      if (!user) {
+        throw Object.assign(new Error('Không tìm thấy người dùng'), {
+          statusCode: 404,
+          code: 'USER_NOT_FOUND'
+        });
+      }
+
+      const currentFreezeCount =
+        typeof user.streak_freeze_count === 'number' ? user.streak_freeze_count : 0;
+
+      if (currentFreezeCount <= 0) {
+        throw Object.assign(new Error('Bạn không còn lượt đóng băng chuỗi nào để sử dụng.'), {
+          statusCode: 400,
+          code: 'NO_FREEZE_REMAINING'
+        });
+      }
+
+      const todayVN = getVietnamDateString(referenceDate);
+
+      if (user.streak_frozen_date === todayVN) {
+        throw Object.assign(
+          new Error('Chuỗi ngày hôm nay của bạn đã được đóng băng bảo vệ rồi.'),
+          {
+            statusCode: 400,
+            code: 'STREAK_ALREADY_FROZEN'
+          }
+        );
+      }
+
+      user.streak_freeze_count = currentFreezeCount - 1;
+      user.streak_frozen_date = todayVN;
+
+      if (typeof user.save === 'function') {
+        await user.save();
+      }
+
+      return {
+        streak_freeze_count: user.streak_freeze_count,
+        current_streak: user.current_streak ?? 0,
+        is_protected: true,
+        frozen_date: todayVN,
+        message: 'Kích hoạt đóng băng chuỗi thành công! Chuỗi ngày của bạn hôm nay được bảo vệ.'
+      };
+    });
   }
 }
 
