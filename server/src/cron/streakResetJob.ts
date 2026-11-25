@@ -90,6 +90,7 @@ export async function processUserStreak(
   let notificationCreated = false;
 
   const lastActive = user.last_active_date;
+  const wasProactivelyFrozenYesterday = user.streak_frozen_date === yesterdayStr;
 
   // Trường hợp 1: Người dùng có hoạt động ngày hôm qua
   if (lastActive === yesterdayStr) {
@@ -105,7 +106,10 @@ export async function processUserStreak(
     } else {
       // Hôm qua không hoạt động nhưng hôm nay đã bắt đầu
       if (oldStreak > 0) {
-        if (oldFreeze > 0) {
+        if (wasProactivelyFrozenYesterday) {
+          // Đã chủ động tiêu 1 lượt đóng băng trong ngày hôm qua -> Giữ nguyên chuỗi, không trừ thêm
+          action = 'MAINTAIN_FREEZE';
+        } else if (oldFreeze > 0) {
           user.streak_freeze_count = oldFreeze - 1;
           action = 'MAINTAIN_FREEZE';
           await Notification.create({
@@ -130,7 +134,10 @@ export async function processUserStreak(
   } else {
     // Trường hợp 3: Người dùng KHÔNG có hoạt động ngày hôm qua (lastActive < yesterday hoặc chưa từng hoạt động)
     if (oldStreak > 0) {
-      if (oldFreeze > 0) {
+      if (wasProactivelyFrozenYesterday) {
+        // Đã chủ động tiêu 1 lượt đóng băng trong ngày hôm qua -> Giữ nguyên chuỗi, không trừ thêm
+        action = 'MAINTAIN_FREEZE';
+      } else if (oldFreeze > 0) {
         // Tiêu hao 1 lượt đóng băng chuỗi và giữ nguyên streak cũ
         user.streak_freeze_count = oldFreeze - 1;
         action = 'MAINTAIN_FREEZE';

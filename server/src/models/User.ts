@@ -43,6 +43,10 @@ const userSchema = new Schema<IUser>(
     streak_freeze_count: {
       type: Number,
       default: 1
+    },
+    streak_frozen_date: {
+      type: String,
+      default: null // Format: YYYY-MM-DD (UTC+7)
     }
   },
   {

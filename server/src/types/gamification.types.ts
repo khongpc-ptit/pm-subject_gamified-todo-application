@@ -28,3 +28,11 @@ export interface CompleteTaskGamificationData {
   status?: string;
   completed_at?: Date | string | null;
 }
+
+export interface FreezeStreakResult {
+  streak_freeze_count: number;
+  current_streak: number;
+  is_protected: boolean;
+  frozen_date: string;
+  message: string;
+}

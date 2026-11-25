@@ -4,18 +4,22 @@ import type { Habit, CreateHabitRequestDTO, CheckInHabitResponseData } from '../
 import { useHabits } from '../hooks/useHabits';
 import { HabitCard } from '../components/habits/HabitCard';
 import { HabitCreateModal } from '../components/habits/HabitCreateModal';
+import { StreakCard } from '../components/gamification/StreakCard';
+import type { FreezeStreakResponseData } from '../services/gamificationService';
 
 interface HabitsPageProps {
   currentUser?: UserProfile | null;
   onNavigate?: (screen: 'dashboard' | 'habits' | 'profile') => void;
   onCheckInSuccess?: (result: CheckInHabitResponseData) => void;
+  onFreezeSuccess?: (result: FreezeStreakResponseData) => void;
   onToast?: (message: string) => void;
 }
 
 export const HabitsPage: React.FC<HabitsPageProps> = ({
   currentUser,
   onToast,
-  onCheckInSuccess
+  onCheckInSuccess,
+  onFreezeSuccess
 }) => {
   const {
     habits,
@@ -144,34 +148,14 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
           )}
         </div>
 
-        {/* Cột phải: Thống kê Gamification */}
+        {/* Cột phải: Thống kê Chuỗi Streak & Đóng băng chuỗi [TECH-S3-03] */}
         <aside>
-          <section className="card flat">
-            <div className="eyebrow">DAILY STREAK</div>
-            <div className="metric">
-              {currentUser?.current_streak ?? 6}{' '}
-              <span style={{ fontSize: '14px' }}>ngày</span>
-            </div>
-            <p>Giữ lời hứa với bản thân, từng ngày một.</p>
-            <p className="helper">
-              Chuỗi tài khoản được hệ thống tổng hợp theo ngày Việt Nam (UTC+7).
-              Check-in giúp duy trì tính kỷ luật và nhận thêm XP mỗi ngày.
-            </p>
-          </section>
-
-          <section className="card">
-            <div className="eyebrow">STREAK PROTECTION</div>
-            <h3>◇ {currentUser?.streak_freeze_count ?? 1} lượt đóng băng</h3>
-            <p>Bảo vệ chuỗi khi bạn bỏ lỡ một ngày.</p>
-            <button
-              type="button"
-              className="primary"
-              style={{ width: '100%' }}
-              onClick={() => onToast?.('Tính năng bảo vệ streak đã sẵn sàng')}
-            >
-              Kích hoạt bảo vệ…
-            </button>
-          </section>
+          <StreakCard
+            currentStreak={currentUser?.current_streak}
+            streakFreezeCount={currentUser?.streak_freeze_count}
+            onToast={onToast}
+            onFreezeSuccess={onFreezeSuccess}
+          />
         </aside>
       </div>
 
