@@ -44,6 +44,7 @@ export class AuthService {
       current_streak: user.current_streak,
       last_active_date: user.last_active_date,
       streak_freeze_count: user.streak_freeze_count,
+      streak_frozen_date: user.streak_frozen_date ?? null,
       created_at: user.created_at ? user.created_at.toISOString() : new Date().toISOString(),
       updated_at: user.updated_at ? user.updated_at.toISOString() : undefined
     };
@@ -94,6 +95,7 @@ export class AuthService {
       current_streak: savedUser.current_streak,
       last_active_date: savedUser.last_active_date,
       streak_freeze_count: savedUser.streak_freeze_count,
+      streak_frozen_date: savedUser.streak_frozen_date ?? null,
       created_at: savedUser.created_at ? savedUser.created_at.toISOString() : new Date().toISOString(),
       updated_at: savedUser.updated_at ? savedUser.updated_at.toISOString() : undefined
     };
@@ -194,6 +196,7 @@ export class AuthService {
       current_streak: savedUser.current_streak,
       last_active_date: savedUser.last_active_date,
       streak_freeze_count: savedUser.streak_freeze_count,
+      streak_frozen_date: savedUser.streak_frozen_date ?? null,
       created_at: savedUser.created_at ? savedUser.created_at.toISOString() : new Date().toISOString()
     };
 

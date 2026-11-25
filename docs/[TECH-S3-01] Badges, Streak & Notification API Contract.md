@@ -140,6 +140,7 @@ Trong `server/src/models/User.ts`, các trường phục vụ Streak và Freeze 
 | `current_streak` | `Number` | `0` | Số ngày liên tục duy trì hoàn thành ít nhất 1 việc hoặc check-in 1 thói quen. |
 | `last_active_date` | `String` | `null` | Ngày ghi nhận hoạt động gần nhất theo định dạng `YYYY-MM-DD` (Giờ UTC+7). |
 | `streak_freeze_count` | `Number` | `1` | Số lượt bảo vệ chuỗi còn lại. Tài khoản mới tạo được tặng sẵn 01 lượt. |
+| `streak_frozen_date` | `String` | `null` | Ngày đã chủ động kích hoạt đóng băng chuỗi theo định dạng `YYYY-MM-DD` (Giờ UTC+7). |
 
 ---
 
