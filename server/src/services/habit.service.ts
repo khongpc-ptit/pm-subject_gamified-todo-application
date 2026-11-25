@@ -3,6 +3,8 @@ import { Habit } from '../models/Habit';
 import { User } from '../models/User';
 import { gamificationService, getVietnamDateString, HABIT_CHECKIN_XP } from './gamification.service';
 import { levelService } from './level.service';
+import { badgeService } from './badgeService';
+import { IBadge } from '../types/badge.types';
 import {
   IHabit,
   CheckInHabitResponseData,
@@ -65,9 +67,20 @@ export class HabitService {
         throw error;
       }
 
+      // [US-S3-03 / TECH-S3-04] Kích hoạt quét và mở khóa huy hiệu tự động sau khi check-in thói quen
+      let unlockedBadges: IBadge[] = [];
+      try {
+        unlockedBadges = await badgeService.checkAndAwardBadges(userId);
+      } catch (badgeError) {
+        if (process.env.NODE_ENV !== 'test') {
+          console.error('[BadgeTrigger] Lỗi khi quét huy hiệu sau khi check-in habit:', badgeError);
+        }
+      }
+
       return {
         habit: checkedIn, xp_earned, total_xp, current_level: progress.new_level,
-        level_up: progress.level_up, next_level_xp: progress.next_level_xp, is_cap_reached
+        level_up: progress.level_up, next_level_xp: progress.next_level_xp, is_cap_reached,
+        unlocked_badges: unlockedBadges
       };
     });
   }

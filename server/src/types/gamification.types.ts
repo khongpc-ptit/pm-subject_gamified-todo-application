@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { TaskPriority } from './task.types';
+import { IBadge } from './badge.types';
 export * from './level.types';
 
 export interface DailyXPCapResult {
@@ -24,6 +25,7 @@ export interface CompleteTaskGamificationData {
   level_up: boolean;
   next_level_xp: number;
   is_cap_reached: boolean;
+  unlocked_badges?: IBadge[];
   _id?: any;
   status?: string;
   completed_at?: Date | string | null;
