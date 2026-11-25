@@ -273,6 +273,7 @@ gantt
    - *Acceptance Criteria (AC):*
      - `AC-3.4.1`: Truy cập trang Huy hiệu -> Gọi `GET /api/v1/gamification/badges`. Trả về toàn bộ danh mục huy hiệu trong hệ thống kèm trạng thái `is_unlocked: true/false` và thời gian `unlocked_at`.
      - `AC-3.4.2`: Hình ảnh huy hiệu hiển thị tối ưu bằng định dạng WebP, tải mượt mà.
+   - [Báo cáo triển khai](reports/TECH-S3-05-badge-showcase-ui.md).
 5. **`US-S3-05` [Nhận thông báo nhắc nhở và thành tích]** *(Phụ trách: `@kiennarutonbmn1` | Hạn chót: 28/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn nhận thông báo khi có công việc sắp đến hạn chót hoặc khi có thành tựu mới mở khóa tại góc chuông thông báo.
    - *Acceptance Criteria (AC):*

@@ -1,0 +1,69 @@
+.badge-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 185px), 1fr));
+  gap: 1rem;
+}
+
+.showcase-badge {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: .5rem;
+  padding: 1.25rem;
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.showcase-badge h2, .showcase-badge p { margin: 0; }
+.showcase-badge time, .showcase-badge small { color: var(--muted); }
+.showcase-badge-icon {
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  background: var(--pale);
+  border-radius: 18px;
+  font-size: 2rem;
+  transition: box-shadow .2s ease;
+}
+.showcase-badge-icon img { object-fit: contain; }
+.showcase-badge-earned:hover .showcase-badge-icon { box-shadow: 0 0 18px #ba813566; }
+.showcase-badge-locked { border-style: dashed; }
+.showcase-badge-locked .showcase-badge-icon { filter: grayscale(1); opacity: .68; }
+.showcase-badge progress { width: 100%; accent-color: var(--green); }
+
+.badge-unlock-dialog {
+  width: min(420px, calc(100% - 2rem));
+  padding: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  color: var(--ink);
+  background: var(--card);
+  text-align: center;
+  overflow: hidden;
+}
+.badge-unlock-dialog::backdrop { background: #1b281f88; }
+.badge-confetti { position: absolute; inset: 0; pointer-events: none; }
+.badge-confetti span {
+  position: absolute;
+  top: -10px;
+  width: 7px;
+  height: 10px;
+  background: var(--gold);
+  animation: badge-confetti-drop .85s ease-out both;
+}
+.badge-confetti span:nth-child(2n) { background: var(--green); }
+@keyframes badge-confetti-drop {
+  to { transform: translateY(185px) rotate(280deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .badge-confetti { display: none; }
+  .showcase-badge-icon { transition: none; }
+}
+
+@media (max-width: 700px) {
+  .badge-showcase-shell { grid-template-columns: 72px minmax(0, 1fr); padding-left: 0; }
+  .badge-showcase-shell .topbar { flex-wrap: wrap; gap: .5rem; }
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Task } from '../types/task.types';
+import type { CompleteTaskResponseData, Task } from '../types/task.types';
 import { TaskRow } from './TaskRow';
 
 interface TaskListProps {
@@ -13,7 +13,7 @@ interface TaskListProps {
   onFilterChange: (priority: string) => void;
   onRetry: () => void;
   onFocusCreate?: () => void;
-  onToggleComplete?: (task: Task) => void;
+  onToggleComplete?: (task: CompleteTaskResponseData) => void;
   onEdit?: (task: Task) => void;
 }
 
