@@ -1,4 +1,8 @@
+import { randomUUID } from 'node:crypto';
 import mongoose from 'mongoose';
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import { app } from '../src/app';
 import { User } from '../src/models/User';
 import { Task } from '../src/models/Task';
 import { Habit } from '../src/models/Habit';
@@ -51,6 +55,17 @@ describe('Scheduled Cronjob Quét Chuỗi Streak (Daily Streak Maintenance) [TEC
 
       expect(todayStr).toBe('2027-01-01');
       expect(yesterdayStr).toBe('2026-12-31');
+    });
+
+    it('chuyển đổi múi giờ UTC+7 không lệch ngày so với mốc 00:00 nửa đêm Việt Nam (17:00 UTC)', () => {
+      // 23:59:59.999 UTC+7 ngày 24/11/2026 = 16:59:59.999 UTC ngày 24/11/2026
+      const beforeMidnightVN = new Date('2026-11-24T16:59:59.999Z');
+      // 00:00:00.000 UTC+7 ngày 25/11/2026 = 17:00:00.000 UTC ngày 24/11/2026
+      const atMidnightVN = new Date('2026-11-24T17:00:00.000Z');
+
+      expect(getVietnamDateString(beforeMidnightVN)).toBe('2026-11-24');
+      expect(getVietnamDateString(atMidnightVN)).toBe('2026-11-25');
+      expect(getYesterdayDateString(atMidnightVN)).toBe('2026-11-24');
     });
   });
 
@@ -183,6 +198,32 @@ describe('Scheduled Cronjob Quét Chuỗi Streak (Daily Streak Maintenance) [TEC
       expect(result.oldStreak).toBe(4);
       expect(result.newStreak).toBe(5);
       expect(mockUser.current_streak).toBe(5);
+      expect(mockUser.save).toHaveBeenCalled();
+    });
+
+    it('Kịch bản 5.1b: Tăng chuỗi (+1 Streak) khi hôm qua có check-in Habit (không có Task)', async () => {
+      const mockUser: any = {
+        _id: new mongoose.Types.ObjectId(),
+        email: 'habit_only@test.com',
+        current_streak: 2,
+        streak_freeze_count: 1,
+        last_active_date: today,
+        save: jest.fn().mockResolvedValue(true)
+      };
+
+      jest.spyOn(Task, 'findOne').mockReturnValue({
+        select: jest.fn().mockResolvedValue(null)
+      } as any);
+      jest.spyOn(Habit, 'findOne').mockReturnValue({
+        select: jest.fn().mockResolvedValue({ _id: new mongoose.Types.ObjectId() })
+      } as any);
+
+      const result = await processUserStreak(mockUser, yesterday, today);
+
+      expect(result.action).toBe('INCREMENT');
+      expect(result.oldStreak).toBe(2);
+      expect(result.newStreak).toBe(3);
+      expect(mockUser.current_streak).toBe(3);
       expect(mockUser.save).toHaveBeenCalled();
     });
 
@@ -366,5 +407,155 @@ describe('Scheduled Cronjob Quét Chuỗi Streak (Daily Streak Maintenance) [TEC
 
       stopStreakCronJob();
     });
+  });
+
+  // =========================================================================
+  // 6. Kiểm thử tích hợp API POST /api/v1/gamification/freeze-streak [TECH-S3-08]
+  // =========================================================================
+  describe('6. API POST /api/v1/gamification/freeze-streak [TECH-S3-08]', () => {
+    const JWT_SECRET = 'test-secret-sprint3-streak-suite';
+    const userId = new mongoose.Types.ObjectId().toString();
+    const token = jwt.sign({ id: userId, email: 'streak.qa@ptit.edu.vn' }, JWT_SECRET, {
+      algorithm: 'HS256',
+      expiresIn: '1h'
+    });
+
+    beforeAll(() => {
+      process.env.JWT_SECRET = JWT_SECRET;
+    });
+
+    it('từ chối 401 UNAUTHORIZED khi gọi API không đính kèm JWT', async () => {
+      const res = await request(app).post('/api/v1/gamification/freeze-streak');
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('kích hoạt đóng băng chuỗi thành công (200 OK) khi user còn lượt freeze', async () => {
+      const mockUser: any = {
+        _id: new mongoose.Types.ObjectId(userId),
+        email: 'streak.qa@ptit.edu.vn',
+        current_streak: 6,
+        streak_freeze_count: 1,
+        streak_frozen_date: null,
+        save: jest.fn().mockResolvedValue(true)
+      };
+      jest.spyOn(User, 'findById').mockResolvedValue(mockUser);
+
+      const res = await request(app)
+        .post('/api/v1/gamification/freeze-streak')
+        .set('Authorization', `Bearer ${token}`)
+        .send({});
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toMatchObject({
+        streak_freeze_count: 0,
+        current_streak: 6,
+        is_protected: true
+      });
+      expect(mockUser.streak_freeze_count).toBe(0);
+      expect(mockUser.save).toHaveBeenCalledTimes(1);
+    });
+
+    it('chặn với 400 Bad Request (NO_FREEZE_REMAINING) khi user đã hết lượt đóng băng', async () => {
+      const mockUser: any = {
+        _id: new mongoose.Types.ObjectId(userId),
+        email: 'streak.qa@ptit.edu.vn',
+        current_streak: 6,
+        streak_freeze_count: 0,
+        streak_frozen_date: null,
+        save: jest.fn().mockResolvedValue(true)
+      };
+      jest.spyOn(User, 'findById').mockResolvedValue(mockUser);
+
+      const res = await request(app)
+        .post('/api/v1/gamification/freeze-streak')
+        .set('Authorization', `Bearer ${token}`)
+        .send({});
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('NO_FREEZE_REMAINING');
+      expect(mockUser.save).not.toHaveBeenCalled();
+    });
+  });
+});
+
+// =========================================================================
+// 7. Integration Tests với MongoDB thật (CI / TEST_MONGODB_URI) [TECH-S3-08]
+// =========================================================================
+const mongoUri = process.env.TEST_MONGODB_URI;
+const describeWithMongo = mongoUri ? describe : describe.skip;
+
+describeWithMongo('[TECH-S3-08] Streak Cronjob & Freeze API Integration with MongoDB', () => {
+  const api = request(app);
+
+  beforeAll(async () => {
+    process.env.JWT_SECRET = randomUUID();
+    await mongoose.connect(mongoUri!, {
+      dbName: 'questline_s3_streak_' + randomUUID().replace(/-/g, ''),
+      serverSelectionTimeoutMS: 5000
+    });
+    await Promise.all([User.init(), Task.init(), Habit.init(), Notification.init()]);
+  }, 20000);
+
+  afterAll(async () => {
+    try {
+      if (mongoose.connection.readyState === 1) await mongoose.connection.dropDatabase();
+    } finally {
+      await mongoose.disconnect();
+    }
+  });
+
+  it('runs end-to-end streak cronjob scan and freeze-streak API against MongoDB', async () => {
+    const refDate = new Date('2026-11-24T17:05:00.000Z'); // 2026-11-25 00:05 UTC+7
+    const yesterday = '2026-11-24';
+
+    const registerUser = async (email: string) => {
+      const res = await api
+        .post('/api/v1/auth/register')
+        .send({ email, password: 'Password123', full_name: 'Streak QA' })
+        .expect(201);
+      return res.body.data as { token: string; user: { _id: string } };
+    };
+
+    const activeUser = await registerUser('active.s3@example.test');
+    const freezeUser = await registerUser('freeze.s3@example.test');
+    const resetUser = await registerUser('reset.s3@example.test');
+    const apiFreezeUser = await registerUser('apifreeze.s3@example.test');
+
+    await User.updateOne({ _id: activeUser.user._id }, { current_streak: 4, last_active_date: yesterday });
+    await User.updateOne({ _id: freezeUser.user._id }, { current_streak: 6, streak_freeze_count: 1, last_active_date: '2026-11-20' });
+    await User.updateOne({ _id: resetUser.user._id }, { current_streak: 9, streak_freeze_count: 0, last_active_date: '2026-11-20' });
+    await User.updateOne({ _id: apiFreezeUser.user._id }, { current_streak: 5, streak_freeze_count: 1 });
+
+    // API freeze-streak: thành công lần 1 (200), chặn lần 2 (400)
+    const okFreeze = await api
+      .post('/api/v1/gamification/freeze-streak')
+      .auth(apiFreezeUser.token, { type: 'bearer' })
+      .expect(200);
+    expect(okFreeze.body.data).toMatchObject({ streak_freeze_count: 0, current_streak: 5, is_protected: true });
+
+    const failFreeze = await api
+      .post('/api/v1/gamification/freeze-streak')
+      .auth(apiFreezeUser.token, { type: 'bearer' })
+      .expect(400);
+    expect(failFreeze.body.error.code).toBe('NO_FREEZE_REMAINING');
+
+    // Cronjob scan lúc 00:05 UTC+7
+    const summary = await runStreakScan(refDate);
+    expect(summary.errors).toBe(0);
+
+    const updatedActive = await User.findById(activeUser.user._id).lean();
+    const updatedFreeze = await User.findById(freezeUser.user._id).lean();
+    const updatedReset = await User.findById(resetUser.user._id).lean();
+
+    expect(updatedActive?.current_streak).toBe(5);
+    expect(updatedFreeze?.current_streak).toBe(6);
+    expect(updatedFreeze?.streak_freeze_count).toBe(0);
+    expect(updatedReset?.current_streak).toBe(0);
+
+    const freezeNotif = await Notification.findOne({ user_id: freezeUser.user._id, type: 'REMINDER' }).lean();
+    expect(freezeNotif).not.toBeNull();
   });
 });
