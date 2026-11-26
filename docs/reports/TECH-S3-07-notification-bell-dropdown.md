@@ -4,7 +4,7 @@ Issue #79 · US-S3-05
 
 Chuông trên Header hiển thị số thông báo chưa đọc, tự cập nhật mỗi 30 giây khi tab đang hiển thị, đồng thời cập nhật khi lấy lại tiêu điểm hoặc mở danh sách. Dropdown hiển thị thông báo theo ba loại, thông báo chưa đọc được đánh dấu riêng. Bấm vào thông báo hoặc bấm đánh dấu tất cả để cập nhật theo phản hồi API. Dropdown đóng khi bấm bên ngoài hoặc nhấn Escape, hỗ trợ danh sách cuộn và bố cục trên màn hình hẹp.
 
-Nhánh kiểm thử dùng API của #78. Đã tích hợp hợp đồng Sprint 3 dùng id. Chuông cập nhật thêm ngay khi hoàn thành task hoặc điểm danh, bên cạnh cơ chế thăm dò và cập nhật khi lấy lại tiêu điểm.
+API thông báo của #78 đã vào develop qua PR #89. Chuông dùng trực tiếp API này. Đã tích hợp hợp đồng Sprint 3 dùng id. Chuông cập nhật thêm ngay khi hoàn thành task hoặc điểm danh, bên cạnh cơ chế thăm dò và cập nhật khi lấy lại tiêu điểm.
 
 Chạy `npm run build` và `npm test`. Kiểm thử UI dùng dữ liệu mẫu với ba loại thông báo, thao tác đọc, lỗi mạng và cập nhật khi lấy lại tiêu điểm.
 
