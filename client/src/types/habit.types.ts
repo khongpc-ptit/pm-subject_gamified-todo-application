@@ -44,4 +44,5 @@ export interface CheckInHabitResponseData {
   level_up: boolean;
   next_level_xp: number;
   is_cap_reached?: boolean;
+  unlocked_badges?: { _id: string }[];
 }

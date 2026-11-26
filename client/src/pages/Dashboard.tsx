@@ -8,6 +8,9 @@ import { EditTaskModal } from '../components/EditTaskModal';
 import { LevelUpModal } from '../components/gamification/LevelUpModal';
 import { StreakCard } from '../components/gamification/StreakCard';
 import { useGamification } from '../context/GamificationContext';
+import { BadgesPage } from './BadgesPage';
+import { BadgeUnlockModal } from '../components/badges/BadgeUnlockModal';
+import { useBadges } from '../hooks/useBadges';
 import { ProfilePage } from './ProfilePage';
 import { HabitsPage } from './HabitsPage';
 import { useTasks, type DemoState } from '../hooks/useTasks';
@@ -20,9 +23,10 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onUpdateUser }) => {
-  const { totalXP, currentLevel, triggerGamificationUpdate } = useGamification();
+  const { totalXP, currentLevel, levelUpModal, triggerGamificationUpdate } = useGamification();
+  const badgeShowcase = useBadges(currentUser?._id);
   const quickInputRef = useRef<HTMLInputElement>(null);
-  const [currentScreen, setCurrentScreen] = useState<'dashboard' | 'habits' | 'profile'>('dashboard');
+  const [currentScreen, setCurrentScreen] = useState<'badges' | 'dashboard' | 'habits' | 'profile'>('dashboard');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [notificationRefreshKey, setNotificationRefreshKey] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -53,14 +57,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
     await updateTask(id, data);
     if (data.status === 'COMPLETED') setNotificationRefreshKey(key => key + 1);
     showToast('Đã lưu thay đổi');
+    if (data.status === 'COMPLETED') void badgeShowcase.refresh();
   };
 
   return (
-    <div className="shell">
+    <div className={currentScreen === 'badges' ? 'shell badge-showcase-shell' : 'shell'}>
       {/* 1. Thanh điều hướng Sidebar cố định bên trái */}
       <Sidebar
         currentScreen={currentScreen}
-        onNavigate={(screen) => setCurrentScreen(screen as 'dashboard' | 'habits' | 'profile')}
+        onNavigate={(screen) => {
+          if (screen === 'badges') void badgeShowcase.refresh();
+          setCurrentScreen(screen as 'badges' | 'dashboard' | 'habits' | 'profile');
+        }}
         onLogout={onLogout}
         userName={currentUser?.full_name || 'Minh Anh'}
         userEmail={currentUser?.email || 'minhanh@example.com'}
@@ -81,7 +89,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
 
           {/* Vùng nội dung trung tâm */}
           <div className="content">
-            {currentScreen === 'profile' ? (
+            {currentScreen === 'badges' ? (
+              <BadgesPage badges={badgeShowcase.badges} loading={badgeShowcase.loading}
+                error={badgeShowcase.error} onRetry={badgeShowcase.refresh} />
+            ) : currentScreen === 'profile' ? (
               <ProfilePage
                 currentUser={
                   currentUser
@@ -122,6 +133,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                 onNavigate={(screen) => setCurrentScreen(screen)}
                 onToast={showToast}
                 onCheckInSuccess={(result) => {
+                  void badgeShowcase.refresh(result.unlocked_badges?.map(badge => badge._id));
                   triggerGamificationUpdate({
                     total_xp: result.total_xp,
                     current_level: result.current_level,
@@ -182,6 +194,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                       priorityFilter={priorityFilter}
                       onFilterChange={setPriorityFilter}
                       onToggleComplete={(updated) => {
+                        void badgeShowcase.refresh(updated?.unlocked_badges?.map(badge => badge._id));
                         refetch();
                         setNotificationRefreshKey(key => key + 1);
                         if (updated && (updated as any).total_xp !== undefined) {
@@ -274,7 +287,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                       <button
                         type="button"
                         className="small"
-                        onClick={() => setCurrentScreen('profile')}
+                        onClick={() => {
+                          void badgeShowcase.refresh();
+                          setCurrentScreen('badges');
+                        }}
                       >
                         Xem bộ sưu tập ↗
                       </button>
@@ -325,6 +341,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
 
       {/* Modal Chúc mừng Thăng cấp độ [TECH-S2-07] */}
       <LevelUpModal />
+      {badgeShowcase.unlocked && !levelUpModal?.isOpen && (
+        <BadgeUnlockModal key={badgeShowcase.unlocked.id} badge={badgeShowcase.unlocked} onClose={badgeShowcase.acknowledge} />
+      )}
 
       {/* Thông báo Toast phản hồi thao tác */}
       {toastMessage && (
