@@ -28,6 +28,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
   const quickInputRef = useRef<HTMLInputElement>(null);
   const [currentScreen, setCurrentScreen] = useState<'badges' | 'dashboard' | 'habits' | 'profile'>('dashboard');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [notificationRefreshKey, setNotificationRefreshKey] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const {
@@ -54,6 +55,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
 
   const handleSaveTask = async (id: string, data: UpdateTaskRequestDTO) => {
     await updateTask(id, data);
+    if (data.status === 'COMPLETED') setNotificationRefreshKey(key => key + 1);
     showToast('Đã lưu thay đổi');
     if (data.status === 'COMPLETED') void badgeShowcase.refresh();
   };
@@ -77,6 +79,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
         <main className="main">
           {/* Header Topbar */}
           <Header
+            notifications={Boolean(currentUser)}
+            notificationRefreshKey={notificationRefreshKey}
             xp={currentUser?.total_xp ?? totalXP}
             streak={currentUser?.current_streak ?? 6}
             freeze={currentUser?.streak_freeze_count ?? 1}
@@ -136,6 +140,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                     level_up: result.level_up,
                     xp_earned: result.xp_earned
                   });
+                  setNotificationRefreshKey(key => key + 1);
                   if (currentUser) {
                     onUpdateUser?.({
                       ...currentUser,
@@ -191,6 +196,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
                       onToggleComplete={(updated) => {
                         void badgeShowcase.refresh(updated?.unlocked_badges?.map(badge => badge._id));
                         refetch();
+                        setNotificationRefreshKey(key => key + 1);
                         if (updated && (updated as any).total_xp !== undefined) {
                           triggerGamificationUpdate({
                             total_xp: (updated as any).total_xp,

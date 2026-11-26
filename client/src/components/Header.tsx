@@ -1,9 +1,12 @@
 import React from 'react';
+import { NotificationBell } from './notifications/NotificationBell';
 import { LevelBadge } from './gamification/LevelBadge';
 import { XPProgressBar } from './gamification/XPProgressBar';
 import { useGamification } from '../context/GamificationContext';
 
 interface HeaderProps {
+  notifications?: boolean;
+  notificationRefreshKey?: number;
   xp?: number;
   streak?: number;
   freeze?: number;
@@ -14,6 +17,8 @@ export const Header: React.FC<HeaderProps> = ({
   xp: propXP,
   streak: propStreak,
   freeze: propFreeze,
+  notifications = false,
+  notificationRefreshKey = 0,
   level: propLevel
 }) => {
   const context = useGamification();
@@ -26,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header id="header" className="topbar">
       {/* Khối Cấp độ: LevelBadge [TECH-S2-07] */}
       <LevelBadge level={level} />
+      {notifications && <NotificationBell refreshKey={notificationRefreshKey} />}
 
       {/* Khối Tiến trình XP: XPProgressBar [TECH-S2-07] */}
       <XPProgressBar xp={xp} level={level} />
