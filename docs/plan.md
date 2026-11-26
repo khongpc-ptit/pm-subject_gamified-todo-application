@@ -301,13 +301,21 @@ gantt
 * **Tài liệu tham chiếu:** [`docs/[DOC-11] System Design Document.md`]([DOC-11]%20System%20Design%20Document.md) (Mục 3.4, 4.2), [`docs/wireframe/Core MVP Screens.html`](wireframe/Core%20MVP%20Screens.html).
 
 #### 3.4.1. Danh sách User Stories & Tiêu chí Nghiệm thu (04 US)
-1. **`US-S4-01` [Biểu đồ thống kê năng suất theo tuần]:**
+
+| User Story ID | Tên User Story | Người được giao | Deadline |
+|---|---|---|:---:|
+| **US-S4-01** | Biểu đồ thống kê năng suất theo tuần | Cuong Khong Phu (`@khongpc-ptit`) | 29/11/2026 |
+| **US-S4-02** | Xem bảng tổng quan tiến trình Gamification (Stats Hub) | Cuong Khong Phu (`@khongpc-ptit`) | 29/11/2026 |
+| **US-S4-03** | Tìm kiếm và lọc nâng cao | Đinh Trung Kiên (`@kiennarutonbmn1`) | 29/11/2026 |
+| **US-S4-04** | Trải nghiệm giao diện thích ứng đa thiết bị (Responsive Design) | Mạnh Hùng (`@mhunglee20405`) | 29/11/2026 |
+
+1. **`US-S4-01` [Biểu đồ thống kê năng suất theo tuần]** *(Phụ trách: `@khongpc-ptit` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn xem biểu đồ trực quan thống kê số lượng công việc và thói quen hoàn thành trong 7 ngày qua để nắm bắt nhịp độ làm việc.
    - *Acceptance Criteria (AC):*
      - `AC-4.1.1`: Biểu đồ dạng cột hoặc đường (Chart.js / Recharts) hiển thị 7 ngày gần nhất (tính từ hôm nay trở về trước theo múi giờ UTC+7).
      - `AC-4.1.2`: Mỗi ngày thể hiện 2 cột/chỉ số rõ ràng: Số lượng One-off Tasks hoàn thành và Số lượng Habits đã check-in.
      - `AC-4.1.3`: Hover vào từng cột hiển thị tooltip chi tiết số lượng và số XP đã tích lũy trong ngày đó.
-2. **`US-S4-02` [Xem bảng tổng quan tiến trình Gamification (Stats Hub)]:**
+2. **`US-S4-02` [Xem bảng tổng quan tiến trình Gamification (Stats Hub)]** *(Phụ trách: `@khongpc-ptit` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn nhìn thấy một bảng tổng hợp đầy đủ gồm: Level hiện tại, tổng XP, số ngày Streak hiện tại, số huy hiệu đã đạt và tỷ lệ hoàn thành công việc.
    - *Acceptance Criteria (AC):*
      - `AC-4.2.1`: Dashboard hiển thị 4 Widget tóm tắt chỉ số chính:
@@ -316,27 +324,27 @@ gantt
        3. Tổng số huy hiệu đã mở khóa (ví dụ: 4/10 Badges).
        4. Tỷ lệ hoàn thành nhiệm vụ tổng thể (Completion Rate: $\frac{\text{Completed}}{\text{Total}} \times 100\%$).
      - `AC-4.2.2`: Thời gian tải và tổng hợp dữ liệu toàn bộ Dashboard phải phản hồi dưới **300ms** (tối ưu hóa qua Aggregation Pipeline).
-3. **`US-S4-03` [Tìm kiếm và lọc nâng cao]:**
+3. **`US-S4-03` [Tìm kiếm và lọc nâng cao]** *(Phụ trách: `@kiennarutonbmn1` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn tìm kiếm nhanh công việc theo từ khóa tiêu đề, lọc kết hợp nhiều điều kiện (Status + Priority + Date range) trên một màn hình duy nhất.
    - *Acceptance Criteria (AC):*
      - `AC-4.3.1`: Ô tìm kiếm có cơ chế Debounce 300ms, lọc danh sách task theo `title` (không phân biệt chữ hoa/thường).
      - `AC-4.3.2`: Cho phép chọn đồng thời nhiều tiêu chí lọc (ví dụ: Status = TODO AND Priority = HIGH).
      - `AC-4.3.3`: Có nút "Xóa tất cả bộ lọc" để đưa danh sách về mặc định.
-4. **`US-S4-04` [Trải nghiệm giao diện thích ứng đa thiết bị (Responsive Design)]:**
+4. **`US-S4-04` [Trải nghiệm giao diện thích ứng đa thiết bị (Responsive Design)]** *(Phụ trách: `@mhunglee20405` | Hạn chót: 29/11/2026)*:
    - *Mô tả:* Là người dùng, tôi muốn ứng dụng hiển thị vừa vặn, mượt mà trên cả trình duyệt máy tính, máy tính bảng lẫn màn hình điện thoại thông minh.
    - *Acceptance Criteria (AC):*
      - `AC-4.4.1`: Trên màn hình Desktop ($\ge$ 1024px): Bố cục chia 2 hoặc 3 cột (Task list bên trái, Habit tracker & Biểu đồ bên phải).
      - `AC-4.4.2`: Trên màn hình Mobile (< 768px): Bố cục chuyển sang 1 cột duy nhất, thanh điều hướng thu gọn thành Bottom Navigation Bar hoặc Hamburger Menu; kích thước các nút bấm đạt chuẩn tối thiểu $\ge 48 \times 48\text{px}$ cho thao tác chạm tay.
 
 #### 3.4.2. Danh sách Technical Tasks Chi Tiết (06 TECH Tasks)
-| Mã Task | Phân loại | Người phụ trách | Hạn chót | Mục tiêu, Đặc tả Kỹ thuật & Tiêu chí Hoàn thành | Phụ thuộc |
-|---|---|---|:---:|---|---|
-| **TECH-S4-01** | Backend | `@khongpc-ptit` | 19/12/2026 | **Thiết kế MongoDB Aggregation Pipelines Thống Kê Tổng Hợp:**<br>• Tệp: `server/src/services/dashboardService.ts`.<br>• Pipeline 1: Thống kê số lượng tasks hoàn thành trong 7 ngày gần nhất (nhóm theo `$dateToString` format `%Y-%m-%d` theo timezone `+07:00`).<br>• Pipeline 2: Thống kê số lượng thói quen check-in trong 7 ngày qua từ mảng nhúng `logs`.<br>• Pipeline 3: Tính toán tỷ lệ hoàn thành tasks (`completed_count / total_count`) và đếm số badge trong `user_badges`. Tối ưu index đảm bảo thời gian thực thi < 50ms trong CSDL. | Sprint 3 |
-| **TECH-S4-02** | Backend | `@khongpc-ptit` | 22/12/2026 | **Triển khai API Thống kê Báo cáo `GET /api/v1/dashboard/summary`:**<br>• Tệp: `server/src/controllers/dashboardController.ts`.<br>• Endpoint: `GET /api/v1/dashboard/summary` (Yêu cầu JWT token).<br>• Response Payload bọc trong Envelope Pattern:<br>`data: { stats: { total_tasks, completed_tasks, completion_rate, current_level, total_xp, current_streak, unlocked_badges_count }, weekly_activity: [{ date: "YYYY-MM-DD", tasks_completed, habits_completed, xp_earned }] }`. Thời gian phản hồi API toàn trình < 300ms. | TECH-S4-01 |
-| **TECH-S4-03** | Frontend | `@kiennarutonbmn1` | 24/12/2026 | **Xây dựng Biểu đồ Năng suất Tuần (Weekly Productivity Chart Component):**<br>• Tệp: `client/src/components/dashboard/WeeklyProductivityChart.tsx`.<br>• Tích hợp thư viện biểu đồ nhẹ (Recharts hoặc Chart.js). Hiển thị Bar Chart 2 cột màu sắc trực quan (Tasks vs Habits) theo 7 ngày trong tuần, tooltip hiển thị chi tiết khi rê chuột, animation chuyển động mượt mà. | TECH-S4-02 |
-| **TECH-S4-04** | Frontend | `@kiennarutonbmn1` | 26/12/2026 | **Tái cấu trúc Màn hình Tổng quan Dashboard (Master Dashboard Layout):**<br>• Tệp: `client/src/pages/DashboardPage.tsx`, `client/src/components/dashboard/GamificationWidget.tsx`.<br>• Tích hợp liền mạch: Form tạo nhanh One-off Task, Danh sách công việc cần làm, Bảng thói quen Habit Tracker hôm nay, Biểu đồ thống kê tuần và cụm Widgets Gamification. | TECH-S4-03 |
-| **TECH-S4-05** | Frontend/UX | `@mhunglee20405` | 28/12/2026 | **Tối ưu hóa Giao diện Thích ứng Di động (Mobile Responsive Overhaul):**<br>• Tệp: `client/src/index.css`, `client/src/components/layout/Navigation.tsx`.<br>• Thiết lập CSS Media Queries chuẩn cho Mobile (320px – 480px), Tablet (481px – 768px) và Desktop (> 768px). Xây dựng Bottom Navigation Bar cho di động, đảm bảo touch target $\ge$ 48px, nén ảnh huy hiệu sang WebP và kích hoạt Lazy Loading. | TECH-S4-04 |
-| **TECH-S4-06** | QA / Test | `@mhunglee20405` | 30/12/2026 | **Kiểm thử Hiệu năng Dashboard & Kiểm thử Hiển thị Đa Kích Thước:**<br>• Tệp: `server/tests/dashboard.test.ts`.<br>• Kịch bản kiểm thử: Benchmark API `GET /api/v1/dashboard/summary` dưới 300ms với tập dữ liệu 500 tasks; Kiểm tra tính chính xác của thuật toán tính tỷ lệ hoàn thành; Kiểm thử hiển thị trên Chrome DevTools giả lập iPhone 14, iPad Mini và Desktop 1920x1080 không bị vỡ giao diện hay lỗi scroll ngang. | TECH-S4-04, TECH-S4-05 |
+| Mã Task | GitHub Issue | User Story cha | Phân loại | Người phụ trách | Hạn chót | Mục tiêu, Đặc tả Kỹ thuật & Tiêu chí Hoàn thành | Phụ thuộc (Blocked by) |
+|---|:---:|:---:|---|---|:---:|---|---|
+| **TECH-S4-01** | [#93](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/93) | `US-S4-01`<br>`US-S4-02` | Backend | `@khongpc-ptit` | 29/11/2026 | **Thiết kế MongoDB Aggregation Pipelines Thống Kê Tổng Hợp:**<br>• Tệp: `server/src/services/dashboardService.ts`.<br>• Pipeline 1: Thống kê số lượng tasks hoàn thành trong 7 ngày gần nhất (nhóm theo `$dateToString` format `%Y-%m-%d` theo timezone `+07:00`).<br>• Pipeline 2: Thống kê số lượng thói quen check-in trong 7 ngày qua từ mảng nhúng `logs`.<br>• Pipeline 3: Tính toán tỷ lệ hoàn thành tasks (`completed_count / total_count`) và đếm số badge trong `user_badges`. Tối ưu index đảm bảo thời gian thực thi < 50ms trong CSDL. | Sprint 3 |
+| **TECH-S4-02** | [#94](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/94) | `US-S4-01`<br>`US-S4-02` | Backend | `@khongpc-ptit` | 29/11/2026 | **Triển khai API Thống kê Báo cáo `GET /api/v1/dashboard/summary`:**<br>• Tệp: `server/src/controllers/dashboardController.ts`.<br>• Endpoint: `GET /api/v1/dashboard/summary` (Yêu cầu JWT token).<br>• Response Payload bọc trong Envelope Pattern:<br>`data: { stats: { total_tasks, completed_tasks, completion_rate, current_level, total_xp, current_streak, unlocked_badges_count }, weekly_activity: [{ date: "YYYY-MM-DD", tasks_completed, habits_completed, xp_earned }] }`. Thời gian phản hồi API toàn trình < 300ms. | #93 |
+| **TECH-S4-03** | [#95](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/95) | `US-S4-01` | Frontend | `@khongpc-ptit` | 29/11/2026 | **Xây dựng Biểu đồ Năng suất Tuần (Weekly Productivity Chart Component):**<br>• Tệp: `client/src/components/dashboard/WeeklyProductivityChart.tsx`.<br>• Tích hợp thư viện biểu đồ nhẹ (Recharts hoặc Chart.js). Hiển thị Bar Chart 2 cột màu sắc trực quan (Tasks vs Habits) theo 7 ngày trong tuần, tooltip hiển thị chi tiết khi rê chuột, animation chuyển động mượt mà. | #94 |
+| **TECH-S4-04** | [#96](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/96) | `US-S4-02`<br>`US-S4-03` | Frontend | `@kiennarutonbmn1` | 29/11/2026 | **Tái cấu trúc Màn hình Tổng quan Dashboard, Stats Hub & Tìm kiếm/Lọc nâng cao:**<br>• Tệp: `client/src/pages/DashboardPage.tsx`, `client/src/components/dashboard/GamificationWidget.tsx`.<br>• Tích hợp liền mạch: Form tạo nhanh One-off Task, Danh sách công việc cần làm, Bảng thói quen Habit Tracker hôm nay, Biểu đồ thống kê tuần và cụm Widgets Gamification.<br>• Triển khai ô tìm kiếm Debounce 300ms (không phân biệt hoa/thường), lọc kết hợp nhiều điều kiện (Status + Priority + Date range) và nút "Xóa tất cả bộ lọc". | #95 |
+| **TECH-S4-05** | [#97](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/97) | `US-S4-04` | Frontend/UX | `@mhunglee20405` | 29/11/2026 | **Tối ưu hóa Giao diện Thích ứng Di động (Mobile Responsive Overhaul):**<br>• Tệp: `client/src/index.css`, `client/src/components/layout/Navigation.tsx`.<br>• Thiết lập CSS Media Queries chuẩn cho Mobile (320px – 480px), Tablet (481px – 768px) và Desktop (> 768px). Xây dựng Bottom Navigation Bar cho di động, đảm bảo touch target $\ge$ 48px, nén ảnh huy hiệu sang WebP và kích hoạt Lazy Loading. | #96 |
+| **TECH-S4-06** | [#98](https://github.com/khongpc-ptit/pm-subject_gamified-todo-application/issues/98) | `US-S4-01` → `04`<br>(Shared Test) | QA / Test | `@mhunglee20405` | 30/11/2026 | **Kiểm thử Hiệu năng Dashboard & Kiểm thử Hiển thị Đa Kích Thước:**<br>• Tệp: `server/tests/dashboard.test.ts`.<br>• Kịch bản kiểm thử: Benchmark API `GET /api/v1/dashboard/summary` dưới 300ms với tập dữ liệu 500 tasks; Kiểm tra tính chính xác của thuật toán tính tỷ lệ hoàn thành; Kiểm thử hiển thị trên Chrome DevTools giả lập iPhone 14, iPad Mini và Desktop 1920x1080 không bị vỡ giao diện hay lỗi scroll ngang. | #96, #97 |
 
 ---
 
