@@ -1,0 +1,23 @@
+.dashboard-overview { display: grid; gap: 1.25rem; }
+.dashboard-overview > h1 { margin: 0; }
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 205px), 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+.dashboard-stats > * { min-width: 0; margin: 0; }
+.dashboard-stat h2 { margin-bottom: .65rem; }
+.dashboard-work {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+.dashboard-work > * { min-width: 0; }
+.dashboard-work > :only-child { grid-column: 1 / -1; }
+.dashboard-task-filters { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; }
+.dashboard-task-filters label { margin: 0; }
+.dashboard-task-filters input, .dashboard-task-filters select { display: block; }
+@media (max-width: 1150px) {
+  .dashboard-work { grid-template-columns: minmax(0, 1fr); }
+}

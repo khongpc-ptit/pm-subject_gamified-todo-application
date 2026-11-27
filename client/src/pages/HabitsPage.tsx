@@ -8,6 +8,7 @@ import { StreakCard } from '../components/gamification/StreakCard';
 import type { FreezeStreakResponseData } from '../services/gamificationService';
 
 interface HabitsPageProps {
+  compact?: boolean;
   currentUser?: UserProfile | null;
   onNavigate?: (screen: 'dashboard' | 'habits' | 'profile') => void;
   onCheckInSuccess?: (result: CheckInHabitResponseData) => void;
@@ -16,6 +17,7 @@ interface HabitsPageProps {
 }
 
 export const HabitsPage: React.FC<HabitsPageProps> = ({
+  compact = false,
   currentUser,
   onToast,
   onCheckInSuccess,
@@ -86,9 +88,13 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
       {/* Tiêu đề trang */}
       <div className="page-title">
         <div>
-          <div className="eyebrow">02 / HABIT TRACKER</div>
-          <h1>Xây thói quen, giữ nhịp độ.</h1>
-          <p>Một lần check-in, thêm một bước tiến.</p>
+          {compact ? <h2>Thói quen hôm nay</h2> : (
+            <>
+              <div className="eyebrow">02 / HABIT TRACKER</div>
+              <h1>Xây thói quen, giữ nhịp độ.</h1>
+              <p>Một lần check-in, thêm một bước tiến.</p>
+            </>
+          )}
         </div>
         <button
           type="button"
@@ -101,7 +107,7 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
       </div>
 
       {/* Bố cục Grid 2 cột */}
-      <div className="grid">
+      <div className={compact ? undefined : "grid"}>
         {/* Cột trái: Danh sách thói quen */}
         <div>
           {loading ? (
@@ -149,14 +155,14 @@ export const HabitsPage: React.FC<HabitsPageProps> = ({
         </div>
 
         {/* Cột phải: Thống kê Chuỗi Streak & Đóng băng chuỗi [TECH-S3-03] */}
-        <aside>
+        {!compact && <aside>
           <StreakCard
             currentStreak={currentUser?.current_streak}
             streakFreezeCount={currentUser?.streak_freeze_count}
             onToast={onToast}
             onFreezeSuccess={onFreezeSuccess}
           />
-        </aside>
+        </aside>}
       </div>
 
       {/* Modal Tạo thói quen mới */}

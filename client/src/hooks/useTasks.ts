@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Task, UpdateTaskRequestDTO } from '../types/task.types';
+import { DEFAULT_TASK_FILTERS, type TaskFilterValues } from '../components/dashboard/TaskFilters';
 import { taskService } from '../services/task.service';
+
+const vietnamDate = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit'
+});
 
 export type DemoState = 'default' | 'empty' | 'loading' | 'error';
 
@@ -8,7 +13,16 @@ export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [priorityFilter, setPriorityFilter] = useState<string>('ALL');
+  const [filters, setFilters] = useState<TaskFilterValues>(DEFAULT_TASK_FILTERS);
+  const [keyword, setKeyword] = useState('');
+  useEffect(() => {
+    const timer = window.setTimeout(() => setKeyword(filters.search.trim().toLocaleLowerCase('vi')), 300);
+    return () => window.clearTimeout(timer);
+  }, [filters.search]);
+  const clearFilters = () => {
+    setFilters(DEFAULT_TASK_FILTERS);
+    setKeyword('');
+  };
   const [demoState, setDemoState] = useState<DemoState>('default');
 
   const fetchTasks = useCallback(async () => {
@@ -45,11 +59,15 @@ export function useTasks() {
 
   useEffect(() => { void fetchTasks(); }, [fetchTasks]);
 
-  // Lọc nhiệm vụ theo priorityFilter phía client
-  const filteredTasks = useMemo(() => {
-    if (priorityFilter === 'ALL') return tasks;
-    return tasks.filter((t) => t.priority === priorityFilter);
-  }, [tasks, priorityFilter]);
+  const filteredTasks = useMemo(() => tasks.filter(task => {
+    if (keyword && !task.title.toLocaleLowerCase('vi').includes(keyword)) return false;
+    if (filters.status !== 'ALL' && task.status !== filters.status) return false;
+    if (filters.priority !== 'ALL' && task.priority !== filters.priority) return false;
+    if (!filters.from && !filters.to) return true;
+    if (!task.due_date) return false;
+    const date = vietnamDate.format(new Date(task.due_date));
+    return (!filters.from || date >= filters.from) && (!filters.to || date <= filters.to);
+  }), [tasks, keyword, filters.status, filters.priority, filters.from, filters.to]);
 
   // Phân chia nhóm TODO và COMPLETED
   const todoTasks = useMemo(() => {
@@ -76,8 +94,9 @@ export function useTasks() {
     completedTasks,
     loading,
     error,
-    priorityFilter,
-    setPriorityFilter,
+    filters,
+    setFilters,
+    clearFilters,
     demoState,
     setDemoState,
     updateTask,

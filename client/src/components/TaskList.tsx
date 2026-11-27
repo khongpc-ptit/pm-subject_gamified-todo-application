@@ -9,8 +9,10 @@ interface TaskListProps {
   completedTasks: Task[];
   loading: boolean;
   error: string | null;
-  priorityFilter: string;
-  onFilterChange: (priority: string) => void;
+  filters?: React.ReactNode;
+  onClearFilters?: () => void;
+  priorityFilter?: string;
+  onFilterChange?: (priority: string) => void;
   onRetry: () => void;
   onFocusCreate?: () => void;
   onToggleComplete?: (task: CompleteTaskResponseData) => void;
@@ -24,6 +26,8 @@ export const TaskList: React.FC<TaskListProps> = ({
   completedTasks,
   loading,
   error,
+  filters,
+  onClearFilters,
   priorityFilter,
   onFilterChange,
   onRetry,
@@ -34,20 +38,20 @@ export const TaskList: React.FC<TaskListProps> = ({
   return (
     <div>
       {/* Thanh công cụ lọc */}
-      <div className="toolbar">
+      {filters ?? <div className="toolbar">
         <span className="screen-index">CÔNG VIỆC CỦA BẠN</span>
         <select
           id="priority-filter"
           aria-label="Lọc ưu tiên"
           value={priorityFilter}
-          onChange={(e) => onFilterChange(e.target.value)}
+          onChange={(e) => onFilterChange?.(e.target.value)}
         >
           <option value="ALL">Tất cả ưu tiên</option>
           <option value="HIGH">Ưu tiên cao</option>
           <option value="MEDIUM">Ưu tiên vừa</option>
           <option value="LOW">Ưu tiên thấp</option>
         </select>
-      </div>
+      </div>}
 
       {/* 1. Trạng thái Đang tải dữ liệu (Loading Skeleton) */}
       {loading && (
@@ -94,7 +98,7 @@ export const TaskList: React.FC<TaskListProps> = ({
           <p>Đổi bộ lọc để xem các công việc khác.</p>
           <button
             type="button"
-            onClick={() => onFilterChange('ALL')}
+            onClick={onClearFilters ?? (() => onFilterChange?.('ALL'))}
           >
             Xóa bộ lọc
           </button>
