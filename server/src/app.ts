@@ -7,6 +7,7 @@ import taskRoutes from './routes/task.routes';
 import habitRoutes from './routes/habit.routes';
 import notificationRoutes from './routes/notificationRoutes';
 import gamificationRoutes from './routes/gamification.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 import { notFoundHandler, errorHandler } from './middlewares/error.middleware';
 
 const app: Application = express();
@@ -66,6 +67,7 @@ app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/habits', habitRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/gamification', gamificationRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 // Error Handling
 app.use(notFoundHandler);
