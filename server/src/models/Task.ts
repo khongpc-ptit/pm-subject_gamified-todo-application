@@ -60,8 +60,9 @@ const taskSchema = new Schema<ITask>(
   }
 );
 
-// Compound index for optimal dashboard query by user and status
+// Compound indexes for optimal dashboard query and weekly aggregation (< 50ms)
 taskSchema.index({ user_id: 1, status: 1 });
+taskSchema.index({ user_id: 1, status: 1, completed_at: -1 });
 
 // Automatically compute xp_reward based on priority before saving
 taskSchema.pre('save', function (this: ITask, next) {
