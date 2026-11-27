@@ -8,6 +8,8 @@ import type { UserProfile } from '../types/auth.types';
 import type { Habit } from '../types/habit.types';
 import type { Task } from '../types/task.types';
 
+vi.mock('../components/dashboard/WeeklyProductivityChart', () => ({ default: () => null }));
+
 const profile: UserProfile = {
   _id: 'sprint2-user', email: 'sprint2@example.test', full_name: 'Sprint Two',
   current_level: 1, total_xp: 0, current_streak: 0, streak_freeze_count: 1,

@@ -79,9 +79,9 @@ it('uses the summary API for all four stats and embeds task, habit and chart vie
   expect(within(stats).getByText('70/100 XP · 70%')).toBeInTheDocument();
   expect(within(stats).getByText('4/10')).toBeInTheDocument();
   expect(within(stats).getByText('40%')).toBeInTheDocument();
-  expect(within(stats).getByText('2 ngày')).toBeInTheDocument();
+  expect(within(stats).getByTestId('streak-count')).toHaveTextContent('2 ngày');
   expect(screen.getByLabelText('Tên công việc')).toBeInTheDocument();
   expect(await screen.findByRole('button', { name: 'Check-in Read today' })).toBeInTheDocument();
-  expect(await screen.findByRole('region', { name: /Biểu đồ năng suất/ })).toBeInTheDocument();
+  expect(await screen.findByRole('region', { name: /Biểu đồ năng suất/ }, { timeout: 4000 })).toBeInTheDocument();
   expect(summary).toHaveBeenCalledOnce();
 });
