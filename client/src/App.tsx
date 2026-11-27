@@ -8,6 +8,7 @@ import { Login } from './pages/Login';
 import { apiClient } from './services/api';
 import { GamificationProvider } from './context/GamificationContext';
 import './styles/globals.css';
+import './index.css';
 export const App = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [registering, setRegistering] = useState(false);

@@ -1,0 +1,518 @@
+/* ==========================================================================
+   [US-S4-04 / TECH-S4-05] Mobile & Tablet Responsive Design System
+   Breakpoints:
+     - Mobile:  320px – 480px (and < 768px)
+     - Tablet:  481px – 768px (and 769px – 1023px)
+     - Desktop: >= 1024px
+   Touch Targets: >= 48x48px on touch / mobile viewports
+   ========================================================================== */
+
+/* 1. Global Horizontal Overflow Protection & Fluid Media */
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.shell,
+#frame,
+.main,
+.content,
+.dashboard-overview,
+.dashboard-work,
+.dashboard-stats,
+.weekly-chart-card,
+.weekly-chart-canvas {
+  max-width: 100%;
+  min-width: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.note-table-wrap,
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Badge Unlock Modal WebP Image */
+.badge-unlock-icon {
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: var(--pale);
+  padding: 6px;
+}
+
+/* 2. Mobile Bottom Navigation Bar & Hamburger Drawer (hidden on Desktop >= 768px) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+.mobile-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(24, 34, 29, 0.52);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mobile-drawer {
+  width: min(300px, 86vw);
+  height: 100%;
+  background: #f6f7f2;
+  border-left: 1px solid var(--line);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  box-shadow: -12px 0 32px rgba(18, 34, 24, 0.2);
+}
+
+.mobile-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.mobile-drawer-close {
+  min-width: 48px;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 18px;
+}
+
+.mobile-drawer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 12px 14px;
+  text-align: left;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.mobile-drawer-item.active {
+  background: #fff;
+  border-color: #d6dfd1;
+  color: var(--green);
+  font-weight: 650;
+}
+
+.mobile-drawer-icon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.mobile-drawer-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.mobile-drawer-footer .account-info {
+  display: block;
+}
+
+.mobile-drawer-logout {
+  width: 100%;
+  min-height: 48px;
+}
+
+/* ==========================================================================
+   3. Desktop Breakpoint (>= 1024px): Balanced 2 / 3-Column Layout
+   ========================================================================== */
+@media (min-width: 1024px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    padding-left: 0;
+    padding-bottom: 0;
+  }
+
+  .sidebar {
+    width: 260px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .dashboard-work {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .mobile-bottom-nav,
+  .mobile-drawer-overlay {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   4. Small Desktop / Landscape Tablet (769px – 1023px)
+   ========================================================================== */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    padding-left: 0;
+  }
+
+  .sidebar {
+    width: 210px;
+    padding: 24px 14px;
+  }
+
+  .content {
+    padding: 24px 20px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-work {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ==========================================================================
+   5. Mobile & Portrait Tablet (< 768px): Single Column + Bottom Nav + 48px Touch Targets
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Single-column shell, override narrow 72px rail from legacy/feature styles */
+  .shell,
+  .badge-showcase-shell,
+  .shell:has(.notification-bell) {
+    display: block;
+    grid-template-columns: minmax(0, 1fr);
+    padding-left: 0;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    overflow-x: clip;
+  }
+
+  /* Hide fixed desktop sidebar on mobile in favor of Bottom Nav + Hamburger Drawer */
+  .sidebar {
+    display: none;
+  }
+
+  #frame,
+  .main {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Show Fixed Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+    background: #fffffffa;
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -4px 18px rgba(24, 34, 29, 0.08);
+  }
+
+  .mobile-nav-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 4px 2px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  .mobile-nav-tab.active {
+    background: var(--pale);
+    border-color: #d6dfd1;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .mobile-nav-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .mobile-nav-label {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Touch Target Standard: >= 48 x 48px for all interactive controls */
+  button,
+  .check,
+  .edit,
+  .notification-toggle,
+  .modal-head button {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  /* Keep task checkbox visually balanced while maintaining >= 48x48px hit area */
+  .check {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    font-size: 18px;
+  }
+
+  /* Header / Topbar wraps cleanly with zero overflow */
+  .topbar,
+  .topbar:has(.notification-bell),
+  .badge-showcase-shell .topbar {
+    padding: 12px 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-height: auto;
+  }
+
+  .level {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .xp,
+  .xp-progress-container {
+    flex: 1 1 100%;
+    max-width: 100%;
+    order: 4;
+  }
+
+  .streak {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .freeze {
+    display: block;
+    font-size: 11px;
+  }
+
+  .header-flame {
+    display: none;
+  }
+
+  /* Content & Single-Column Grids */
+  .content {
+    padding: 18px 14px;
+  }
+
+  .page-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .page-title h1,
+  .dashboard-overview > h1 {
+    font-size: 24px;
+    line-height: 1.25;
+  }
+
+  .grid,
+  .dashboard-work,
+  .habit-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .quick {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .dashboard-task-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: end;
+  }
+
+  .dashboard-task-filters label,
+  .dashboard-task-filters input,
+  .dashboard-task-filters select,
+  .dashboard-task-filters button {
+    width: 100%;
+  }
+
+  .dashboard-task-filters > button {
+    grid-column: 1 / -1;
+  }
+
+  .weekly-chart-card {
+    padding: 14px 12px;
+    overflow: hidden;
+  }
+
+  .weekly-chart-canvas {
+    min-height: 230px;
+  }
+
+  /* Lift toast above fixed Bottom Navigation Bar */
+  .toast {
+    left: 14px;
+    right: 14px;
+    bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+    transform: none;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   6. Tablet Portrait Specific (481px – 768px)
+   ========================================================================== */
+@media (min-width: 481px) and (max-width: 768px) {
+  .dashboard-stats,
+  .badge-showcase-grid,
+  .badgegrid,
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick .task-title,
+  .quick button {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ==========================================================================
+   7. Narrow Mobile Breakpoint (320px – 480px: iPhone SE / iPhone 14)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .content {
+    padding: 14px 10px;
+  }
+
+  .card {
+    padding: 14px 12px;
+    margin-bottom: 14px;
+  }
+
+  .dashboard-stats,
+  .badge-showcase-grid,
+  .badgegrid,
+  .stats-grid,
+  .dashboard-task-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .task-row {
+    padding: 12px 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .reward {
+    font-size: 11px;
+  }
+
+  .habit-row {
+    padding: 14px 12px;
+  }
+
+  .habit-foot {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .weekly-chart-canvas {
+    min-height: 210px;
+  }
+
+  .modal {
+    padding: 20px 14px;
+    border-radius: 14px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+
+  .notification-dropdown {
+    left: 10px;
+    right: 10px;
+    width: auto;
+  }
+}
+
+/* Coarse pointer touch-target safeguard across all touch devices */
+@media (pointer: coarse) {
+  button,
+  .check,
+  .edit,
+  .notification-toggle,
+  .mobile-nav-tab {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
