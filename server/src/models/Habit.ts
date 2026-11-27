@@ -62,8 +62,9 @@ const habitSchema = new Schema<IHabit>(
   }
 );
 
-// Compound index for optimal querying active habits by user
+// Compound indexes for optimal querying active habits and weekly log aggregation
 habitSchema.index({ user_id: 1, is_active: 1 });
+habitSchema.index({ user_id: 1, 'logs.log_date': 1 });
 
 export const Habit: Model<IHabit> = mongoose.model<IHabit>('Habit', habitSchema);
 export default Habit;
