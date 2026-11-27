@@ -3,7 +3,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { DashboardPage } from './DashboardPage';
 import { TaskFilters } from '../components/dashboard/TaskFilters';
 import { Header } from '../components/Header';
-import { Sidebar } from '../components/Sidebar';
+import { Navigation } from '../components/layout/Navigation';
 import { QuickTaskForm } from '../components/QuickTaskForm';
 import { TaskList } from '../components/TaskList';
 import { EditTaskModal } from '../components/EditTaskModal';
@@ -165,8 +165,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentUser, onLogout, onU
 
   return (
     <div className={currentScreen === 'badges' ? 'shell badge-showcase-shell' : 'shell'}>
-      {/* 1. Thanh điều hướng Sidebar cố định bên trái */}
-      <Sidebar
+      {/* 1. Thanh điều hướng thích ứng (Desktop Sidebar + Mobile Bottom Nav & Drawer) [TECH-S4-05] */}
+      <Navigation
         currentScreen={currentScreen}
         onNavigate={(screen) => {
           if (screen === 'badges') void badgeShowcase.refresh();
