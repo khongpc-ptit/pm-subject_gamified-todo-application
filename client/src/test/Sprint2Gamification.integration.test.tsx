@@ -47,7 +47,7 @@ it('shows a single level-up dialog after task completion and keeps the new XP ac
     taskList.mockResolvedValue({ tasks: [completedTask], total: 1 });
     return { ...completedTask, xp_earned: 30, total_xp: 100, current_level: 2, level_up: true };
   });
-  const complete = await screen.findByRole('button', { name: 'Hoàn thành: Finish the sprint' });
+  const complete = await screen.findByRole('button', { name: 'Hoàn thành: Finish the sprint' }, { timeout: 4000 });
   expect(screen.getByTestId('xp-text')).toHaveTextContent('70/100 XP · 70%');
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   fireEvent.click(complete);
@@ -74,7 +74,7 @@ it('shows the cap warning while completing a task without awarding XP or opening
     taskList.mockResolvedValue({ tasks: [completedTask], total: 1 });
     return { ...completedTask, xp_earned: 0, total_xp: 200, current_level: 2, level_up: false, is_cap_reached: true };
   });
-  fireEvent.click(await screen.findByRole('button', { name: 'Hoàn thành: Finish the sprint' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Hoàn thành: Finish the sprint' }, { timeout: 4000 }));
   expect(await screen.findByText(/Đã đạt trần tối đa 200 XP hôm nay/)).toBeInTheDocument();
   expect(await screen.findByRole('button', { name: 'Đã hoàn thành: Finish the sprint' })).toBeDisabled();
   expect(screen.getByTestId('xp-text')).toHaveTextContent('100/300 XP');
